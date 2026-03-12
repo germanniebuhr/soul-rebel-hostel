@@ -637,6 +637,8 @@ function setSyncStatus(state){
   lbl.textContent=state==='syncing'?'Guardando...':state==='error'?'Sin conexión':'En línea';
 }
 
+function hideLoading(){document.getElementById('loading-screen').classList.add('hidden');}
+
 let loadedFlags = {movimientos:false, cierres:false, huespedes:false};
 function checkAllLoaded(){
   if(loadedFlags.movimientos && loadedFlags.cierres && loadedFlags.huespedes) hideLoading();
