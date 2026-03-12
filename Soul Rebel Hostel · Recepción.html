@@ -1,167 +1,240 @@
 <!DOCTYPE html>
-<!-- saved from url=(0058)file:///C:/Users/germa/Downloads/soul_rebel_recepcion.html -->
-<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="es">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Soul Rebel Hostel · Recepción</title>
-<link href="./Soul Rebel Hostel · Recepción_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0d0d0d;--surface:#161616;--surface2:#1e1e1e;--border:#2a2a2a;--accent:#c8f55a;--accent2:#ff6b35;--accent3:#38bdf8;--text:#f0ede8;--muted:#666;--green:#4ade80;--red:#f87171;--yellow:#fbbf24;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;}
+:root{--bg:#0d0d0d;--surface:#161616;--surface2:#1e1e1e;--border:#2a2a2a;--accent:#c8f55a;--accent2:#ff6b35;--accent3:#38bdf8;--text:#f0ede8;--muted:#666;--green:#4ade80;--red:#f87171;--yellow:#fbbf24;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;}
+#loading-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.loading-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;}
+.loading-logo span{color:var(--accent);}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+.loading-status{font-size:13px;color:var(--muted);}
+@keyframes spin{to{transform:rotate(360deg);}}
+#loading-screen.hidden{display:none;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;}
+.sync-dot.syncing{background:var(--yellow);animation:pulse .8s infinite;}
+.sync-dot.error{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.sync-status{font-size:12px;color:var(--muted);display:flex;align-items:center;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;gap:12px;}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;white-space:nowrap;}
+.logo span{color:var(--accent);}
+.header-right{display:flex;align-items:center;gap:12px;}
+.date-badge{background:var(--surface2);border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:13px;color:var(--muted);white-space:nowrap;}
+.date-badge strong{color:var(--text);}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:2px;overflow-x:auto;}
+.nav-btn{padding:14px 14px;background:none;border:none;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;position:relative;bottom:-1px;white-space:nowrap;}
+.nav-btn:hover{color:var(--text);}
+.nav-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+main{padding:24px;max-width:1600px;margin:0 auto;}
+.tab{display:none;}.tab.active{display:block;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px;margin-bottom:28px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.card-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;}
+.card-value{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;line-height:1;}
+.card-sub{font-size:12px;color:var(--muted);margin-top:6px;}
+.card-accent{border-color:var(--accent);}.card-accent .card-value{color:var(--accent);}
+.card-warn{border-color:var(--red);}.card-warn .card-value{color:var(--red);}
+.section-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--surface2);}
+th{padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;}
+.badge-green{background:rgba(74,222,128,.15);color:var(--green);}
+.badge-red{background:rgba(248,113,113,.15);color:var(--red);}
+.badge-yellow{background:rgba(251,191,36,.15);color:var(--yellow);}
+.badge-blue{background:rgba(56,189,248,.15);color:var(--accent3);}
+.badge-gray{background:rgba(255,255,255,.08);color:var(--muted);}
+.badge-orange{background:rgba(255,107,53,.15);color:var(--accent2);}
+.search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 16px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;margin-bottom:16px;}
+.search-input:focus{border-color:var(--accent);}
+.rooms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px;margin-bottom:24px;}
+.room-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;transition:transform .2s;}
+.room-card:hover{transform:translateY(-2px);}
+.room-card.occupied{border-color:rgba(248,113,113,.4);}
+.room-card.free{border-color:rgba(74,222,128,.25);}
+.room-name{font-weight:600;font-size:14px;margin-bottom:8px;}
+.room-guest{font-size:11px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.date-nav{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.date-nav-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:8px;font-size:16px;cursor:pointer;}
+.date-nav-btn:hover{border-color:var(--accent);}
+.date-nav-label{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;flex:1;text-align:center;}
+.date-input{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;}
+.date-input:focus{border-color:var(--accent);}
+.turno-selector{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.turno-btn{padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
+.turno-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+.cierre-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:22px;}
+.cierre-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:600px){.cierre-grid{grid-template-columns:1fr;}}
+.cierre-block-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:12px;}
+.cierre-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.cierre-label{font-size:12px;color:var(--muted);width:65px;}
+.cierre-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;outline:none;width:110px;}
+.cierre-input:focus{border-color:var(--accent);}
+.alert-box{border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+.alert-ok{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);color:var(--green);}
+.alert-warn{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);color:var(--red);}
+.alert-info{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);color:var(--accent3);}
+.form-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:22px;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:14px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.form-input,.form-select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;}
+.form-input:focus,.form-select:focus{border-color:var(--accent);}
+.form-select option{background:var(--surface2);}
+.btn-primary{background:var(--accent);color:#000;border:none;padding:11px 22px;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-primary:hover{opacity:.85;}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border);padding:11px 22px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(248,113,113,.3);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;}
+.btn-danger:hover{background:rgba(248,113,113,.1);}
+.totales-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;gap:22px;flex-wrap:wrap;margin-bottom:18px;}
+.total-item{display:flex;flex-direction:column;gap:2px;}
+.total-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.total-value{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;}
+.amount-usd{color:var(--accent);}
+.amount-crc{color:var(--accent3);}
+.amount-neg{color:var(--red);}
+.range-selector{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.range-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .2s;}
+.range-btn.active{background:var(--surface2);color:var(--text);border-color:var(--text);}
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:22px;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bar-label{font-size:12px;width:90px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{flex:1;background:var(--surface2);border-radius:4px;height:10px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .4s ease;}
+.bar-fill.crc{background:var(--accent3);}
+.bar-fill.rooms{background:var(--accent2);}
+.bar-val{font-size:12px;font-weight:600;min-width:65px;text-align:right;}
+.vol-badge{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;display:inline-flex;align-items:center;gap:8px;font-size:13px;}
+.vol-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.empty{text-align:center;padding:36px 24px;color:var(--muted);font-size:14px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:90%;max-width:500px;max-height:85vh;overflow-y:auto;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;}
+.modal-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;gap:16px;}
+.modal-row:last-child{border-bottom:none;}
+.modal-key{color:var(--muted);}
+.modal-val{font-weight:500;}
+.notif{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;transform:translateY(10px);transition:all .3s;z-index:300;pointer-events:none;}
+.notif.show{opacity:1;transform:translateY(0);}
+.diff-bad{color:var(--red);font-weight:700;}
+.diff-ok-cell{color:var(--green);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:700px){.two-col{grid-template-columns:1fr;}}
 
-  /* LOADING SCREEN */
-  #loading-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
-  .loading-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;}
-  .loading-logo span{color:var(--accent);}
-  .loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
-  .loading-status{font-size:13px;color:var(--muted);}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  #loading-screen.hidden{display:none;}
+/* GANTT */
+.gantt-wrap{overflow-x:auto;margin-bottom:24px;}
+.gantt-table{border-collapse:collapse;min-width:100%;}
+.gantt-table th,.gantt-table td{border:1px solid var(--border);padding:0;white-space:nowrap;}
+.gantt-room-col{background:var(--surface2);padding:8px 14px;font-size:12px;font-weight:600;text-align:left;min-width:110px;position:sticky;left:0;z-index:2;}
+.gantt-day-header{background:var(--surface2);padding:6px 3px;font-size:10px;text-align:center;min-width:52px;color:var(--muted);}
+.gantt-day-header.today{color:var(--accent);font-weight:700;background:rgba(200,245,90,.05);}
+.gantt-cell{height:52px;min-width:52px;position:relative;cursor:default;}
+.gantt-cell.free{background:var(--surface);}
+.gantt-cell.today-col{background:rgba(200,245,90,.04);}
+.gantt-block{position:absolute;top:5px;left:2px;right:2px;bottom:5px;border-radius:4px;display:flex;align-items:center;padding:0 7px;overflow:hidden;cursor:pointer;transition:filter .15s;}
+.gantt-block:hover{filter:brightness(1.15);}
+.gantt-block-text{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gantt-block.start{left:2px;border-radius:6px 0 0 6px;}
+.gantt-block.end{right:2px;border-radius:0 6px 6px 0;}
+.gantt-block.middle{left:0;right:0;border-radius:0;}
+.gantt-block.solo{border-radius:6px;}
+/* Estado colors */
+.gantt-block.estado-reserva{background:#dc2626;}
+.gantt-block.estado-cobrar{background:#d97706;}
+.gantt-block.estado-pagado{background:#16a34a;}
 
-  /* SYNC INDICATOR */
-  .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;}
-  .sync-dot.syncing{background:var(--yellow);animation:pulse .8s infinite;}
-  .sync-dot.error{background:var(--red);}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-  .sync-status{font-size:12px;color:var(--muted);display:flex;align-items:center;}
+.gantt-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.gantt-nav-label{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.gantt-legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap;}
+.gantt-legend-item{display:flex;align-items:center;gap:5px;}
+.gantt-legend-dot{width:10px;height:10px;border-radius:3px;}
+/* GANTT vista calendario (tipo imagen) */
+.gcal-wrap{overflow-x:auto;margin-bottom:24px;}
+.gcal-table{border-collapse:collapse;min-width:100%;}
+.gcal-table th,.gcal-table td{border:1px solid var(--border);white-space:nowrap;}
+.gcal-header-date{background:var(--surface2);padding:8px 10px;text-align:center;min-width:100px;}
+.gcal-header-top{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.gcal-header-day{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+.gcal-header-day.today{color:var(--accent);}
+.gcal-room-col{background:var(--surface2);padding:8px 14px;font-size:12px;font-weight:700;min-width:80px;position:sticky;left:0;z-index:2;border-right:2px solid var(--border);}
+.gcal-cell{padding:3px 2px;height:48px;min-width:100px;position:relative;vertical-align:top;}
+.gcal-block{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:5px;cursor:pointer;height:40px;overflow:hidden;}
+.gcal-block:hover{filter:brightness(1.1);}
+.gcal-block-name{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gcal-block-nights{font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap;}
+.estado-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;border:none;}
+.estado-pill.reserva{background:rgba(220,38,38,.15);color:#ef4444;}
+.estado-pill.cobrar{background:rgba(217,119,6,.15);color:#f59e0b;}
+.estado-pill.pagado{background:rgba(22,163,74,.15);color:#22c55e;}
+/* AUDIT */
+.audit-action-new{color:var(--green);}
+.audit-action-edit{color:var(--yellow);}
+.audit-action-delete{color:var(--red);}
+.audit-action-estado{color:var(--accent3);}
 
-  header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;gap:12px;}
-  .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;white-space:nowrap;}
-  .logo span{color:var(--accent);}
-  .header-right{display:flex;align-items:center;gap:12px;}
-  .date-badge{background:var(--surface2);border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:13px;color:var(--muted);white-space:nowrap;}
-  .date-badge strong{color:var(--text);}
-  nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto;}
-  .nav-btn{padding:14px 16px;background:none;border:none;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;position:relative;bottom:-1px;white-space:nowrap;}
-  .nav-btn:hover{color:var(--text);}
-  .nav-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
-  main{padding:24px;max-width:1400px;margin:0 auto;}
-  .tab{display:none;}.tab.active{display:block;}
-  .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
-  .card-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;}
-  .card-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;line-height:1;}
-  .card-sub{font-size:12px;color:var(--muted);margin-top:6px;}
-  .card-accent{border-color:var(--accent);}.card-accent .card-value{color:var(--accent);}
-  .card-warn{border-color:var(--red);}.card-warn .card-value{color:var(--red);}
-  .section-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;}
-  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px;}
-  table{width:100%;border-collapse:collapse;}
-  thead{background:var(--surface2);}
-  th{padding:11px 16px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);}
-  td{padding:12px 16px;font-size:14px;border-bottom:1px solid var(--border);}
-  tr:last-child td{border-bottom:none;}
-  tr:hover td{background:var(--surface2);}
-  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;}
-  .badge-green{background:rgba(74,222,128,.15);color:var(--green);}
-  .badge-red{background:rgba(248,113,113,.15);color:var(--red);}
-  .badge-yellow{background:rgba(251,191,36,.15);color:var(--yellow);}
-  .badge-blue{background:rgba(56,189,248,.15);color:var(--accent3);}
-  .badge-gray{background:rgba(255,255,255,.08);color:var(--muted);}
-  .search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 16px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;margin-bottom:16px;}
-  .search-input:focus{border-color:var(--accent);}
-  .rooms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
-  .room-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;transition:transform .2s;}
-  .room-card:hover{transform:translateY(-2px);}
-  .room-card.occupied{border-color:rgba(248,113,113,.4);}
-  .room-card.free{border-color:rgba(74,222,128,.25);}
-  .room-name{font-weight:600;font-size:14px;margin-bottom:8px;}
-  .room-guest{font-size:11px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .date-nav{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
-  .date-nav-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:8px;font-size:16px;cursor:pointer;}
-  .date-nav-btn:hover{border-color:var(--accent);}
-  .date-nav-label{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;flex:1;text-align:center;}
-  .date-input{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;}
-  .date-input:focus{border-color:var(--accent);}
-  .turno-selector{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
-  .turno-btn{padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
-  .turno-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
-  .cierre-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:22px;}
-  .cierre-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-  @media(max-width:600px){.cierre-grid{grid-template-columns:1fr;}}
-  .cierre-block-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:12px;}
-  .cierre-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-  .cierre-label{font-size:12px;color:var(--muted);width:65px;}
-  .cierre-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;outline:none;width:110px;}
-  .cierre-input:focus{border-color:var(--accent);}
-  .alert-box{border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
-  .alert-ok{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);color:var(--green);}
-  .alert-warn{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);color:var(--red);}
-  .alert-info{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);color:var(--accent3);}
-  .form-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:22px;}
-  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:14px;}
-  .form-group{display:flex;flex-direction:column;gap:6px;}
-  .form-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
-  .form-input,.form-select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;}
-  .form-input:focus,.form-select:focus{border-color:var(--accent);}
-  .form-select option{background:var(--surface2);}
-  .btn-primary{background:var(--accent);color:#000;border:none;padding:11px 22px;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
-  .btn-primary:hover{opacity:.85;}
-  .btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border);padding:11px 22px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;}
-  .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
-  .totales-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;gap:22px;flex-wrap:wrap;margin-bottom:18px;}
-  .total-item{display:flex;flex-direction:column;gap:2px;}
-  .total-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
-  .total-value{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;}
-  .amount-usd{color:var(--accent);}
-  .amount-crc{color:var(--accent3);}
-  .amount-neg{color:var(--red);}
-  .range-selector{display:flex;gap:8px;margin-bottom:20px;}
-  .range-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .2s;}
-  .range-btn.active{background:var(--surface2);color:var(--text);border-color:var(--text);}
-  .chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:22px;}
-  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .bar-label{font-size:12px;width:90px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .bar-track{flex:1;background:var(--surface2);border-radius:4px;height:10px;overflow:hidden;}
-  .bar-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .4s ease;}
-  .bar-fill.crc{background:var(--accent3);}
-  .bar-fill.rooms{background:var(--accent2);}
-  .bar-val{font-size:12px;font-weight:600;min-width:65px;text-align:right;}
-  .vol-badge{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;display:inline-flex;align-items:center;gap:8px;font-size:13px;}
-  .vol-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
-  .empty{text-align:center;padding:36px 24px;color:var(--muted);font-size:14px;}
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:90%;max-width:480px;max-height:85vh;overflow-y:auto;}
-  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-  .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
-  .modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;}
-  .modal-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;gap:16px;}
-  .modal-row:last-child{border-bottom:none;}
-  .modal-key{color:var(--muted);}
-  .modal-val{font-weight:500;}
-  .notif{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#000;padding:12px 20px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;transform:translateY(10px);transition:all .3s;z-index:300;pointer-events:none;}
-  .notif.show{opacity:1;transform:translateY(0);}
-  .diff-bad{color:var(--red);font-weight:700;}
-  .diff-ok-cell{color:var(--green);}
-  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-  @media(max-width:700px){.two-col{grid-template-columns:1fr;}}
-  @media(max-width:600px){header{padding:0 14px;}nav{padding:0 10px;}main{padding:14px;}.cards-grid{grid-template-columns:repeat(2,1fr);}.card-value{font-size:22px;}}
+/* RECEPCIONISTAS */
+.recep-list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.recep-chip{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;transition:all .2s;}
+.recep-chip:hover{border-color:var(--accent);}
+.recep-chip.selected{border-color:var(--accent);background:rgba(200,245,90,.1);}
+.recep-chip .chip-name{font-weight:600;}
+.recep-chip .chip-del{color:var(--muted);font-size:16px;line-height:1;margin-left:4px;}
+.recep-chip .chip-del:hover{color:var(--red);}
+
+/* CONTABILIDAD */
+.cat-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.cat-alojamiento{background:rgba(200,245,90,.15);color:var(--accent);}
+.cat-llave{background:rgba(56,189,248,.15);color:var(--accent3);}
+.cat-compras{background:rgba(255,107,53,.15);color:var(--accent2);}
+.cat-servicios{background:rgba(251,191,36,.15);color:var(--yellow);}
+.cat-salarios{background:rgba(248,113,113,.15);color:var(--red);}
+.cat-transferencia{background:rgba(255,255,255,.1);color:var(--muted);}
+.cat-otros{background:rgba(74,222,128,.15);color:var(--green);}
+
+@media(max-width:600px){header{padding:0 14px;}nav{padding:0 8px;}main{padding:14px;}.cards-grid{grid-template-columns:repeat(2,1fr);}.card-value{font-size:22px;}}
 </style>
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
-<div id="loading-screen" class="hidden">
+<div id="loading-screen">
   <div class="loading-logo">Soul <span>Rebel</span></div>
   <div class="loading-spinner"></div>
-  <div class="loading-status" id="loading-status">Cargando movimientos de caja...</div>
+  <div class="loading-status" id="loading-status">Conectando con Firebase...</div>
 </div>
 
 <header>
   <div class="logo">Soul <span>Rebel</span></div>
   <div class="header-right">
     <div class="sync-status"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">En línea</span></div>
-    <div class="date-badge">Hoy · <strong id="today-date">miércoles, 11 de marzo</strong></div>
+    <div class="date-badge">Hoy · <strong id="today-date"></strong></div>
   </div>
 </header>
 <nav>
-  <button class="nav-btn active" onclick="showTab(&#39;inicio&#39;,this)">🏠 Inicio</button>
-  <button class="nav-btn" onclick="showTab(&#39;huespedes&#39;,this)">👤 Huéspedes</button>
-  <button class="nav-btn" onclick="showTab(&#39;habitaciones&#39;,this)">🛏️ Habitaciones</button>
-  <button class="nav-btn" onclick="showTab(&#39;caja&#39;,this)">💰 Caja</button>
-  <button class="nav-btn" onclick="showTab(&#39;resumen&#39;,this)">📊 Resumen</button>
+  <button class="nav-btn active" onclick="showTab('inicio',this)">🏠 Inicio</button>
+  <button class="nav-btn" onclick="showTab('gantt',this)">📅 GANTT A</button>
+  <button class="nav-btn" onclick="showTab('gantt2',this)">🗓️ GANTT B</button>
+  <button class="nav-btn" onclick="showTab('huespedes',this)">👤 Huéspedes</button>
+  <button class="nav-btn" onclick="showTab('habitaciones',this)">🛏️ Habitaciones</button>
+  <button class="nav-btn" onclick="showTab('caja',this)">💰 Caja</button>
+  <button class="nav-btn" onclick="showTab('contabilidad',this)">📒 Contabilidad</button>
+  <button class="nav-btn" onclick="showTab('resumen',this)">📊 Resumen</button>
+  <button class="nav-btn" onclick="showTab('auditoria',this)">🔒 Auditoría</button>
+  <button class="nav-btn" onclick="showTab('config',this)">⚙️ Config</button>
 </nav>
 <main>
 
@@ -170,328 +243,89 @@
   <div class="cards-grid">
     <div class="card card-accent">
       <div class="card-label">Huéspedes hoy</div>
-      <div class="card-value" id="stat-huespedes">3</div>
-      <div class="card-sub">según GANTT</div>
+      <div class="card-value" id="stat-huespedes">—</div>
+      <div class="card-sub" id="stat-ocup-sub">de 15 habitaciones</div>
     </div>
     <div class="card">
       <div class="card-label">Ingresos hoy USD</div>
-      <div class="card-value" id="stat-usd">$0.00</div>
+      <div class="card-value" id="stat-usd">$0</div>
       <div class="card-sub" id="stat-crc">₡0 CRC</div>
     </div>
     <div class="card">
       <div class="card-label">Ocupación</div>
-      <div class="card-value" id="stat-ocup">20%</div>
-      <div class="card-sub" id="stat-ocup-sub">3 de 15 habitaciones</div>
+      <div class="card-value" id="stat-ocup">—</div>
+      <div class="card-sub">% habitaciones</div>
     </div>
     <div class="card">
       <div class="card-label">Voluntario en turno</div>
-      <div class="card-value" id="stat-vol" style="font-size:18px">—</div>
-      <div class="card-sub" id="stat-turno-label">Turno mañana</div>
+      <div class="card-value" id="stat-vol" style="font-size:16px">—</div>
+      <div class="card-sub" id="stat-turno-label"></div>
     </div>
   </div>
   <p class="section-title">Voluntario en turno</p>
-  <div id="voluntario-display" style="margin-bottom:22px"><div style="display:flex;align-items:center;gap:12px">
-      <span style="color:var(--muted);font-size:13px">☀️ Turno Mañana (10–14hs) · Sin asignar</span>
-      <button class="btn-primary" style="padding:7px 14px;font-size:12px" onclick="cambiarVoluntario()">+ Asignar</button></div></div>
+  <div id="voluntario-display" style="margin-bottom:22px"></div>
   <p class="section-title">Huéspedes activos hoy</p>
   <div class="table-wrap" style="margin-bottom:22px">
     <table>
       <thead><tr><th>Hab.</th><th>ID</th><th>Nombre</th><th>Check-in</th><th>$/Noche</th><th>Noches</th><th>Total</th></tr></thead>
-      <tbody id="active-today-table"><tr>
-        <td><span class="badge badge-blue">Pb 5</span></td>
-        <td><span class="badge badge-gray">#119</span></td>
-        <td><strong>Henry Raymond (Calipso)</strong></td>
-        <td>—</td>
-        <td>$15.00</td>
-        <td>—</td>
-        <td>—</td>
-      </tr><tr>
-        <td><span class="badge badge-blue">Pb 1</span></td>
-        <td><span class="badge badge-gray">#544</span></td>
-        <td><strong>Jessica Jacobs</strong></td>
-        <td>09/03/2026</td>
-        <td>$14.66</td>
-        <td>3</td>
-        <td><strong style="color:var(--accent)">$43.98</strong></td>
-      </tr><tr>
-        <td><span class="badge badge-blue">Pb 2</span></td>
-        <td><span class="badge badge-gray">#545</span></td>
-        <td><strong>Javier Martinez</strong></td>
-        <td>10/03/2026</td>
-        <td>$15.00</td>
-        <td>3</td>
-        <td><strong style="color:var(--accent)">$45.00</strong></td>
-      </tr></tbody>
+      <tbody id="active-today-table"></tbody>
     </table>
   </div>
   <p class="section-title">Últimos movimientos de caja</p>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Fecha</th><th>Turno</th><th>Detalle</th><th>USD</th><th>CRC</th></tr></thead>
-      <tbody id="movimientos-recientes"><tr><td colspan="5" class="empty">Sin movimientos aún</td></tr></tbody>
+      <thead><tr><th>Fecha</th><th>Turno</th><th>Recepcionista</th><th>Detalle</th><th>USD</th><th>CRC</th></tr></thead>
+      <tbody id="movimientos-recientes"></tbody>
     </table>
   </div>
 </div>
 
-<!-- HUESPEDES -->
+<!-- GANTT A — barra horizontal compacta -->
+<div class="tab" id="tab-gantt">
+  <div class="gantt-nav">
+    <button class="date-nav-btn" onclick="ganttPrev()">‹</button>
+    <div class="gantt-nav-label" id="gantt-label"></div>
+    <button class="date-nav-btn" onclick="ganttNext()">›</button>
+    <button class="btn-primary" style="padding:8px 16px;font-size:12px" onclick="ganttGoToday()">Hoy</button>
+  </div>
+  <div class="gantt-wrap">
+    <table class="gantt-table" id="gantt-table"></table>
+  </div>
+  <div class="gantt-legend">
+    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#dc2626"></div> Reserva</div>
+    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#d97706"></div> Cobrar (activo)</div>
+    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#16a34a"></div> Pagado</div>
+  </div>
+</div>
+
+<!-- GANTT B — vista calendario (estilo imagen) -->
+<div class="tab" id="tab-gantt2">
+  <div class="gantt-nav">
+    <button class="date-nav-btn" onclick="gantt2Prev()">‹</button>
+    <div class="gantt-nav-label" id="gantt2-label"></div>
+    <button class="date-nav-btn" onclick="gantt2Next()">›</button>
+    <button class="btn-primary" style="padding:8px 16px;font-size:12px" onclick="gantt2GoToday()">Hoy</button>
+  </div>
+  <div class="gcal-wrap">
+    <table class="gcal-table" id="gcal-table"></table>
+  </div>
+  <div class="gantt-legend">
+    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#dc2626"></div> Reserva</div>
+    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#d97706"></div> Cobrar (activo)</div>
+    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#16a34a"></div> Pagado</div>
+  </div>
+</div>
+
+<!-- HUÉSPEDES -->
 <div class="tab" id="tab-huespedes">
-  <input class="search-input" id="search-input" type="text" placeholder="Buscar por nombre, ID o habitación..." oninput="filterGuests()">
+  <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;">
+    <input class="search-input" style="margin-bottom:0" id="search-input" type="text" placeholder="Buscar por nombre, ID o habitación..." oninput="filterGuests()">
+    <button class="btn-primary" style="white-space:nowrap" onclick="openNewGuestModal()">+ Check-in</button>
+  </div>
   <div class="table-wrap">
     <table>
       <thead><tr><th>ID</th><th>Nombre</th><th>Habitación</th><th>Check-in</th><th>$/Noche</th><th>Días</th><th>Total</th><th>Estado</th></tr></thead>
-      <tbody id="guests-table"><tr style="cursor:pointer" onclick="openGuestModal(119)">
-    <td><span class="badge badge-gray">#119</span></td>
-    <td><strong>Henry Raymond (calipso)</strong></td>
-    <td>Pb 5</td>
-    <td>—</td>
-    <td>$15.00</td>
-    <td>—</td>
-    <td>—</td>
-    <td><span class="badge badge-green">Activo</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(443)">
-    <td><span class="badge badge-gray">#443</span></td>
-    <td><strong>Gallo Gordillo Catalina</strong></td>
-    <td>Arriba 2</td>
-    <td>11/02/2026</td>
-    <td>$16.16</td>
-    <td>3</td>
-    <td><strong>$48.48</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(444)">
-    <td><span class="badge badge-gray">#444</span></td>
-    <td><strong>Paula Vargas Jimenez</strong></td>
-    <td>Doble</td>
-    <td>13/02/2026</td>
-    <td>$41.00</td>
-    <td>2</td>
-    <td><strong>$82.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(446)">
-    <td><span class="badge badge-gray">#446</span></td>
-    <td><strong>Edrei Alvarado Zúñiga</strong></td>
-    <td>Depto</td>
-    <td>13/02/2026</td>
-    <td>$40.00</td>
-    <td>3</td>
-    <td><strong>$120.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(448)">
-    <td><span class="badge badge-gray">#448</span></td>
-    <td><strong>Greta Höftmann</strong></td>
-    <td>Triple</td>
-    <td>13/02/2026</td>
-    <td>$43.00</td>
-    <td>3</td>
-    <td><strong>$129.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(450)">
-    <td><span class="badge badge-gray">#450</span></td>
-    <td><strong>Horatiu Moarcas</strong></td>
-    <td>Doble</td>
-    <td>15/02/2026</td>
-    <td>$29.50</td>
-    <td>3</td>
-    <td><strong>$88.50</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(467)">
-    <td><span class="badge badge-gray">#467</span></td>
-    <td><strong>Olivier Bergeron</strong></td>
-    <td>Triple</td>
-    <td>16/02/2026</td>
-    <td>$40.00</td>
-    <td>1</td>
-    <td><strong>$40.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(469)">
-    <td><span class="badge badge-gray">#469</span></td>
-    <td><strong>Quesada Rebeca</strong></td>
-    <td>Depto</td>
-    <td>18/02/2026</td>
-    <td>$41.50</td>
-    <td>1</td>
-    <td><strong>$41.50</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(472)">
-    <td><span class="badge badge-gray">#472</span></td>
-    <td><strong>Marcelo Leguizamón</strong></td>
-    <td>Triple</td>
-    <td>19/02/2026</td>
-    <td>$43.00</td>
-    <td>3</td>
-    <td><strong>$129.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(476)">
-    <td><span class="badge badge-gray">#476</span></td>
-    <td><strong>Lola Ramos</strong></td>
-    <td>Casita</td>
-    <td>20/02/2026</td>
-    <td>$44.00</td>
-    <td>3</td>
-    <td><strong>$132.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(490)">
-    <td><span class="badge badge-gray">#490</span></td>
-    <td><strong>Carmela Dueñas</strong></td>
-    <td>Doble</td>
-    <td>23/02/2026</td>
-    <td>$33.30</td>
-    <td>3</td>
-    <td><strong>$99.90</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(492)">
-    <td><span class="badge badge-gray">#492</span></td>
-    <td><strong>Valborg Fältskog</strong></td>
-    <td>Triple</td>
-    <td>23/02/2026</td>
-    <td>$39.00</td>
-    <td>4</td>
-    <td><strong>$156.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(493)">
-    <td><span class="badge badge-gray">#493</span></td>
-    <td><strong>Duncan Sharpe</strong></td>
-    <td>Casita</td>
-    <td>24/02/2026</td>
-    <td>$44.00</td>
-    <td>1</td>
-    <td><strong>$44.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(495)">
-    <td><span class="badge badge-gray">#495</span></td>
-    <td><strong>Raul Martínez Azlor</strong></td>
-    <td>Casita</td>
-    <td>25/02/2026</td>
-    <td>$44.00</td>
-    <td>2</td>
-    <td><strong>$88.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(496)">
-    <td><span class="badge badge-gray">#496</span></td>
-    <td><strong>Landon Nordhus</strong></td>
-    <td>Doble</td>
-    <td>26/02/2026</td>
-    <td>$36.66</td>
-    <td>6</td>
-    <td><strong>$219.96</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(508)">
-    <td><span class="badge badge-gray">#508</span></td>
-    <td><strong>Nelly Agber</strong></td>
-    <td>Casita</td>
-    <td>01/03/2026</td>
-    <td>$44.00</td>
-    <td>4</td>
-    <td><strong>$176.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(510)">
-    <td><span class="badge badge-gray">#510</span></td>
-    <td><strong>Lucie Bardet</strong></td>
-    <td>Doble</td>
-    <td>01/03/2026</td>
-    <td>$35.00</td>
-    <td>5</td>
-    <td><strong>$175.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(516)">
-    <td><span class="badge badge-gray">#516</span></td>
-    <td><strong>Lars Hoffmann</strong></td>
-    <td>Arriba 4</td>
-    <td>03/03/2026</td>
-    <td>$14.00</td>
-    <td>3</td>
-    <td><strong>$42.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(519)">
-    <td><span class="badge badge-gray">#519</span></td>
-    <td><strong>Ana Flores</strong></td>
-    <td>Pb 1</td>
-    <td>03/03/2026</td>
-    <td>$13.00</td>
-    <td>7</td>
-    <td><strong>$91.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(520)">
-    <td><span class="badge badge-gray">#520</span></td>
-    <td><strong>Carlos Torres</strong></td>
-    <td>Pb 2</td>
-    <td>03/03/2026</td>
-    <td>$13.00</td>
-    <td>4</td>
-    <td><strong>$52.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(533)">
-    <td><span class="badge badge-gray">#533</span></td>
-    <td><strong>Ken Skatalite</strong></td>
-    <td>Pb 2</td>
-    <td>08/03/2026</td>
-    <td>$40.00</td>
-    <td>3</td>
-    <td><strong>$120.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(538)">
-    <td><span class="badge badge-gray">#538</span></td>
-    <td><strong>Henrik Larsson</strong></td>
-    <td>Arriba 1</td>
-    <td>09/03/2026</td>
-    <td>$14.00</td>
-    <td>2</td>
-    <td><strong>$28.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(539)">
-    <td><span class="badge badge-gray">#539</span></td>
-    <td><strong>Camille Bernard</strong></td>
-    <td>Arriba 5</td>
-    <td>09/03/2026</td>
-    <td>$14.00</td>
-    <td>2</td>
-    <td><strong>$28.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(542)">
-    <td><span class="badge badge-gray">#542</span></td>
-    <td><strong>Catalina Tufare</strong></td>
-    <td>Pb 1</td>
-    <td>09/03/2026</td>
-    <td>$15.00</td>
-    <td>1</td>
-    <td><strong>$15.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(543)">
-    <td><span class="badge badge-gray">#543</span></td>
-    <td><strong>Juana Formica</strong></td>
-    <td>Pb 3</td>
-    <td>09/03/2026</td>
-    <td>$15.00</td>
-    <td>1</td>
-    <td><strong>$15.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(544)">
-    <td><span class="badge badge-gray">#544</span></td>
-    <td><strong>Jessica Jacobs</strong></td>
-    <td>Pb 1</td>
-    <td>09/03/2026</td>
-    <td>$14.66</td>
-    <td>3</td>
-    <td><strong>$43.98</strong></td>
-    <td><span class="badge badge-green">Activo</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(545)">
-    <td><span class="badge badge-gray">#545</span></td>
-    <td><strong>Javier Martinez</strong></td>
-    <td>Pb 2</td>
-    <td>10/03/2026</td>
-    <td>$15.00</td>
-    <td>3</td>
-    <td><strong>$45.00</strong></td>
-    <td><span class="badge badge-green">Activo</span></td>
-    </tr><tr style="cursor:pointer" onclick="openGuestModal(546)">
-    <td><span class="badge badge-gray">#546</span></td>
-    <td><strong>Carlos Ivan Aguirre</strong></td>
-    <td>Pb 6</td>
-    <td>10/03/2026</td>
-    <td>$15.00</td>
-    <td>1</td>
-    <td><strong>$15.00</strong></td>
-    <td><span class="badge badge-gray">Check-out</span></td>
-    </tr></tbody>
+      <tbody id="guests-table"></tbody>
     </table>
   </div>
 </div>
@@ -499,74 +333,14 @@
 <!-- HABITACIONES -->
 <div class="tab" id="tab-habitaciones">
   <p class="section-title">Estado de habitaciones · hoy</p>
-  <div class="rooms-grid" id="rooms-grid"><div class="room-card free">
-      <div class="room-name">Doble</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">Triple</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">Casita</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">Arriba 1</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">Arriba 2</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">Arriba 3</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">Arriba 4</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">Arriba 5</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">Arriba 6</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">PB 1</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">PB 2</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">PB 3</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">PB 4</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">PB 5</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div><div class="room-card free">
-      <div class="room-name">PB 6</div>
-      <span class="badge badge-green">Libre</span>
-      
-    </div></div>
+  <div class="rooms-grid" id="rooms-grid"></div>
 </div>
 
 <!-- CAJA -->
 <div class="tab" id="tab-caja">
   <div class="date-nav">
     <button class="date-nav-btn" onclick="cajaPrevDay()">‹</button>
-    <div class="date-nav-label" id="caja-date-label">📅 Hoy — mié, 11 mar</div>
+    <div class="date-nav-label" id="caja-date-label"></div>
     <button class="date-nav-btn" onclick="cajaNextDay()">›</button>
     <input type="date" class="date-input" id="caja-date-picker" onchange="cajaGoDate(this.value)">
   </div>
@@ -601,12 +375,23 @@
   <p class="section-title">Registrar movimiento</p>
   <div class="form-section">
     <div class="turno-selector" id="form-turno-sel">
-      <button class="turno-btn active" onclick="setTurno(&#39;MAÑANA&#39;,this)">☀️ Mañana</button>
-      <button class="turno-btn" onclick="setTurno(&#39;TARDE&#39;,this)">🌙 Tarde</button>
+      <button class="turno-btn active" onclick="setTurno('MAÑANA',this)">☀️ Mañana</button>
+      <button class="turno-btn" onclick="setTurno('TARDE',this)">🌙 Tarde</button>
     </div>
     <div class="form-grid">
       <div class="form-group"><label class="form-label">Tipo</label>
         <select class="form-select" id="mov-tipo"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Categoría</label>
+        <select class="form-select" id="mov-cat">
+          <option value="Alojamiento">Alojamiento</option>
+          <option value="Depósito llave">Depósito llave</option>
+          <option value="Compras/Insumos">Compras/Insumos</option>
+          <option value="Servicios">Servicios</option>
+          <option value="Salarios">Salarios</option>
+          <option value="Transferencia">Transferencia</option>
+          <option value="Otros">Otros</option>
+        </select>
       </div>
       <div class="form-group"><label class="form-label">Detalle</label>
         <input class="form-input" id="mov-detalle" placeholder="Ej: Juan García (547)">
@@ -624,22 +409,49 @@
     </div>
   </div>
   <div class="totales-bar">
-    <div class="total-item"><div class="total-label">Ing. USD</div><div class="total-value amount-usd" id="total-usd-ing">$0.00</div></div>
-    <div class="total-item"><div class="total-label">Eg. USD</div><div class="total-value amount-neg" id="total-usd-eg">$0.00</div></div>
-    <div class="total-item"><div class="total-label">Neto USD</div><div class="total-value" id="total-usd-net" style="color: var(--green);">+0.00 USD</div></div>
+    <div class="total-item"><div class="total-label">Ing. USD</div><div class="total-value amount-usd" id="total-usd-ing">$0</div></div>
+    <div class="total-item"><div class="total-label">Eg. USD</div><div class="total-value amount-neg" id="total-usd-eg">$0</div></div>
+    <div class="total-item"><div class="total-label">Neto USD</div><div class="total-value" id="total-usd-net">$0</div></div>
     <div class="total-item"><div class="total-label">Ing. CRC</div><div class="total-value amount-crc" id="total-crc-ing">₡0</div></div>
     <div class="total-item"><div class="total-label">Eg. CRC</div><div class="total-value amount-neg" id="total-crc-eg">₡0</div></div>
-    <div class="total-item"><div class="total-label">Neto CRC</div><div class="total-value" id="total-crc-net" style="color: var(--green);">+0 CRC</div></div>
+    <div class="total-item"><div class="total-label">Neto CRC</div><div class="total-value" id="total-crc-net">₡0</div></div>
   </div>
   <div class="turno-selector" id="caja-filter-sel">
-    <button class="turno-btn active" onclick="filterCaja(&#39;TODOS&#39;,this)">Todos</button>
-    <button class="turno-btn" onclick="filterCaja(&#39;MAÑANA&#39;,this)">☀️ Mañana</button>
-    <button class="turno-btn" onclick="filterCaja(&#39;TARDE&#39;,this)">🌙 Tarde</button>
+    <button class="turno-btn active" onclick="filterCaja('TODOS',this)">Todos</button>
+    <button class="turno-btn" onclick="filterCaja('MAÑANA',this)">☀️ Mañana</button>
+    <button class="turno-btn" onclick="filterCaja('TARDE',this)">🌙 Tarde</button>
   </div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Turno</th><th>Detalle</th><th>Tipo</th><th>USD</th><th>CRC</th><th></th></tr></thead>
-      <tbody id="caja-table"><tr><td colspan="6" class="empty">Sin movimientos para este día</td></tr></tbody>
+      <thead><tr><th>Turno</th><th>Recep.</th><th>Cat.</th><th>Detalle</th><th>Tipo</th><th>USD</th><th>CRC</th><th></th></tr></thead>
+      <tbody id="caja-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CONTABILIDAD -->
+<div class="tab" id="tab-contabilidad">
+  <div class="range-selector" id="cont-range-sel">
+    <button class="range-btn active" onclick="setContRange('semana',this)">Esta semana</button>
+    <button class="range-btn" onclick="setContRange('mes',this)">Este mes</button>
+    <button class="range-btn" onclick="setContRange('todo',this)">Todo</button>
+  </div>
+  <div class="cards-grid" id="cont-cards"></div>
+  <div class="two-col">
+    <div>
+      <p class="section-title">Ingresos por categoría</p>
+      <div class="chart-wrap" id="cont-chart-ing"></div>
+    </div>
+    <div>
+      <p class="section-title">Egresos por categoría</p>
+      <div class="chart-wrap" id="cont-chart-eg"></div>
+    </div>
+  </div>
+  <p class="section-title">Detalle por categoría</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fecha</th><th>Turno</th><th>Recep.</th><th>Categoría</th><th>Detalle</th><th>Tipo</th><th>USD</th><th>CRC</th></tr></thead>
+      <tbody id="cont-table"></tbody>
     </table>
   </div>
 </div>
@@ -647,9 +459,9 @@
 <!-- RESUMEN -->
 <div class="tab" id="tab-resumen">
   <div class="range-selector">
-    <button class="range-btn active" onclick="setRange(&#39;semana&#39;,this)">Esta semana</button>
-    <button class="range-btn" onclick="setRange(&#39;mes&#39;,this)">Este mes</button>
-    <button class="range-btn" onclick="setRange(&#39;todo&#39;,this)">Todo</button>
+    <button class="range-btn active" onclick="setRange('semana',this)">Esta semana</button>
+    <button class="range-btn" onclick="setRange('mes',this)">Este mes</button>
+    <button class="range-btn" onclick="setRange('todo',this)">Todo</button>
   </div>
   <div class="cards-grid" id="resumen-cards"></div>
   <div id="resumen-alertas" style="margin-bottom:16px"></div>
@@ -662,20 +474,61 @@
     <div>
       <p class="section-title">Diferencias de caja</p>
       <div class="table-wrap" style="margin-bottom:0">
-        <table><thead><tr><th>Fecha</th><th>Turno/Tipo</th><th>Dif. USD</th><th>Dif. CRC</th></tr></thead>
+        <table><thead><tr><th>Fecha</th><th>Turno</th><th>Dif. USD</th><th>Dif. CRC</th></tr></thead>
         <tbody id="diffs-table"></tbody></table>
       </div>
     </div>
   </div>
-  <p class="section-title" style="margin-top:4px">Todos los movimientos</p>
+</div>
+
+<!-- AUDITORÍA -->
+<div class="tab" id="tab-auditoria">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <p class="section-title" style="margin-bottom:4px">Registro de cambios</p>
+      <p style="font-size:12px;color:var(--muted)">Todo borrado, edición o cambio de estado queda registrado aquí permanentemente.</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <select class="form-select" id="audit-filter" onchange="renderAudit()" style="font-size:12px;padding:6px 10px;">
+        <option value="TODOS">Todos</option>
+        <option value="NUEVO">Nuevos</option>
+        <option value="EDICION">Ediciones</option>
+        <option value="BORRADO">Borrados</option>
+        <option value="ESTADO">Cambios estado</option>
+        <option value="CHECKOUT">Check-outs</option>
+      </select>
+    </div>
+  </div>
   <div class="table-wrap">
-    <table><thead><tr><th>Fecha</th><th>Turno</th><th>Detalle</th><th>Tipo</th><th>USD</th><th>CRC</th></tr></thead>
-    <tbody id="resumen-mov-table"></tbody></table>
+    <table>
+      <thead><tr><th>Fecha/Hora</th><th>Acción</th><th>Recep.</th><th>Detalle</th><th>Dato anterior</th><th>Dato nuevo</th></tr></thead>
+      <tbody id="audit-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div class="tab" id="tab-config">
+  <p class="section-title">Recepcionistas</p>
+  <div class="form-section">
+    <div class="recep-list" id="recep-list"></div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <input class="form-input" id="new-recep-input" placeholder="Nombre del recepcionista" style="max-width:280px">
+      <button class="btn-primary" onclick="addRecepcionista()">+ Agregar</button>
+    </div>
+  </div>
+  <p class="section-title">Información del hostel</p>
+  <div class="form-section" style="color:var(--muted);font-size:13px;line-height:1.8;">
+    <strong style="color:var(--text)">Soul Rebel Hostel</strong><br>
+    Puerto Viejo, Limón, Costa Rica<br>
+    Firebase: soul-rebel-hostel<br>
+    GitHub: germanniebuhr/soul-rebel-hostel
   </div>
 </div>
 
 </main>
 
+<!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal">
     <div class="modal-header"><div class="modal-title" id="modal-title"></div><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -685,13 +538,10 @@
 <div class="notif" id="notif"></div>
 
 <script type="module">
-// ════════════════════════════════════════════════════════════
-// FIREBASE SETUP
-// ════════════════════════════════════════════════════════════
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, doc, addDoc, setDoc, deleteDoc,
-  onSnapshot, query, orderBy
+  onSnapshot, query, orderBy, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -702,62 +552,32 @@ const firebaseConfig = {
   messagingSenderId: "741841941202",
   appId: "1:741841941202:web:efb60bfeac4e02d9d8330b"
 };
-
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-// ════════════════════════════════════════════════════════════
-// STATIC DATA (guests / rooms — will move to Firestore later)
-// ════════════════════════════════════════════════════════════
+// ── CONSTANTS ─────────────────────────────────────────────
 const ROOMS = ['Doble','Triple','Casita','Arriba 1','Arriba 2','Arriba 3','Arriba 4','Arriba 5','Arriba 6','PB 1','PB 2','PB 3','PB 4','PB 5','PB 6'];
+const CAT_COLORS = {'Alojamiento':'cat-alojamiento','Depósito llave':'cat-llave','Compras/Insumos':'cat-compras','Servicios':'cat-servicios','Salarios':'cat-salarios','Transferencia':'cat-transferencia','Otros':'cat-otros'};
 
-let allGuests = [
-  {id:119,name:"Henry Raymond (Calipso)",hab:"PB 5",fecha:"—",precio_dia:15.0,dias:null,total:null,activo:true},
-  {id:443,name:"Gallo Gordillo Catalina",hab:"Arriba 2",fecha:"11/02/2026",precio_dia:16.16,dias:3,total:48.48,activo:false},
-  {id:444,name:"Paula Vargas Jimenez",hab:"Doble",fecha:"13/02/2026",precio_dia:41.0,dias:2,total:82.0,activo:false},
-  {id:446,name:"Edrei Alvarado Zúñiga",hab:"Depto",fecha:"13/02/2026",precio_dia:40.0,dias:3,total:120.0,activo:false},
-  {id:448,name:"Greta Höftmann",hab:"Triple",fecha:"13/02/2026",precio_dia:43.0,dias:3,total:129.0,activo:false},
-  {id:450,name:"Horatiu Moarcas",hab:"Doble",fecha:"15/02/2026",precio_dia:29.5,dias:3,total:88.5,activo:false},
-  {id:467,name:"Olivier Bergeron",hab:"Triple",fecha:"16/02/2026",precio_dia:40.0,dias:1,total:40.0,activo:false},
-  {id:469,name:"Quesada Rebeca",hab:"Depto",fecha:"18/02/2026",precio_dia:41.5,dias:1,total:41.5,activo:false},
-  {id:472,name:"Marcelo Leguizamón",hab:"Triple",fecha:"19/02/2026",precio_dia:43.0,dias:3,total:129.0,activo:false},
-  {id:476,name:"Lola Ramos",hab:"Casita",fecha:"20/02/2026",precio_dia:44.0,dias:3,total:132.0,activo:false},
-  {id:490,name:"Carmela Dueñas",hab:"Doble",fecha:"23/02/2026",precio_dia:33.3,dias:3,total:99.9,activo:false},
-  {id:492,name:"Valborg Fältskog",hab:"Triple",fecha:"23/02/2026",precio_dia:39.0,dias:4,total:156.0,activo:false},
-  {id:493,name:"Duncan Sharpe",hab:"Casita",fecha:"24/02/2026",precio_dia:44.0,dias:1,total:44.0,activo:false},
-  {id:495,name:"Raul Martínez Azlor",hab:"Casita",fecha:"25/02/2026",precio_dia:44.0,dias:2,total:88.0,activo:false},
-  {id:496,name:"Landon Nordhus",hab:"Doble",fecha:"26/02/2026",precio_dia:36.66,dias:6,total:219.96,activo:false},
-  {id:508,name:"Nelly Agber",hab:"Casita",fecha:"01/03/2026",precio_dia:44.0,dias:4,total:176.0,activo:false},
-  {id:510,name:"Lucie Bardet",hab:"Doble",fecha:"01/03/2026",precio_dia:35.0,dias:5,total:175.0,activo:false},
-  {id:516,name:"Lars Hoffmann",hab:"Arriba 4",fecha:"03/03/2026",precio_dia:14.0,dias:3,total:42.0,activo:false},
-  {id:519,name:"Ana Flores",hab:"PB 1",fecha:"03/03/2026",precio_dia:13.0,dias:7,total:91.0,activo:false},
-  {id:520,name:"Carlos Torres",hab:"PB 2",fecha:"03/03/2026",precio_dia:13.0,dias:4,total:52.0,activo:false},
-  {id:533,name:"Ken Skatalite",hab:"PB 2",fecha:"08/03/2026",precio_dia:40.0,dias:3,total:120.0,activo:false},
-  {id:538,name:"Henrik Larsson",hab:"Arriba 1",fecha:"09/03/2026",precio_dia:14.0,dias:2,total:28.0,activo:false},
-  {id:539,name:"Camille Bernard",hab:"Arriba 5",fecha:"09/03/2026",precio_dia:14.0,dias:2,total:28.0,activo:false},
-  {id:542,name:"Catalina Tufare",hab:"PB 1",fecha:"09/03/2026",precio_dia:15.0,dias:1,total:15.0,activo:false},
-  {id:543,name:"Juana Formica",hab:"PB 3",fecha:"09/03/2026",precio_dia:15.0,dias:1,total:15.0,activo:false},
-  {id:544,name:"Jessica Jacobs",hab:"PB 1",fecha:"09/03/2026",precio_dia:14.66,dias:3,total:43.98,activo:true},
-  {id:545,name:"Javier Martinez",hab:"PB 2",fecha:"10/03/2026",precio_dia:15.0,dias:3,total:45.0,activo:true},
-  {id:546,name:"Carlos Ivan Aguirre",hab:"PB 6",fecha:"10/03/2026",precio_dia:15.0,dias:1,total:15.0,activo:false},
-];
-
-// ════════════════════════════════════════════════════════════
-// REACTIVE STATE — populated by Firestore listeners
-// ════════════════════════════════════════════════════════════
-let cajaData   = [];   // [{id, fecha, turno, tipo, detalle, usd_ing, usd_eg, crc_ing, crc_eg}]
-let cierreData = {};   // {"DD/MM/YYYY": {ap_man_usd, ...}}
-
+// ── STATE ─────────────────────────────────────────────────
+let cajaData   = [];
+let cierreData = {};
+let guestData  = [];
+let auditData  = [];
+let recepcionistas = ['Pupi','Alan','Adri','Nico'];
 let voluntarioActivo = null;
-let currentTurno     = new Date().getHours() < 14 ? 'MAÑANA' : 'TARDE';
-let cajaFilter       = 'TODOS';
-let cajaViewDate     = getTodayStr();
-let resumenRange     = 'semana';
-let saveCierreTimer  = null;
+let currentTurno = new Date().getHours() < 14 ? 'MAÑANA' : 'TARDE';
+let cajaFilter = 'TODOS';
+let cajaViewDate = getTodayStr();
+let resumenRange = 'semana';
+let contRange = 'semana';
+let saveCierreTimer = null;
+let ganttStartDate = null;
+let gantt2StartDate = null;
+let GANTT_DAYS = 30;
+let GANTT2_DAYS = 7;
 
-// ════════════════════════════════════════════════════════════
-// UTILS
-// ════════════════════════════════════════════════════════════
+// ── UTILS ─────────────────────────────────────────────────
 function getTodayStr(){const d=new Date();return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();}
 function p(n){return String(n).padStart(2,'0');}
 function cap(s){if(!s)return'';return s.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');}
@@ -765,279 +585,614 @@ function dateStrToISO(str){const[d,m,y]=str.split('/');return y+'-'+m+'-'+d;}
 function isoToDateStr(iso){const[y,m,d]=iso.split('-');return d+'/'+m+'/'+y;}
 function addDays(str,n){const[d,m,y]=str.split('/').map(Number);const dt=new Date(y,m-1,d);dt.setDate(dt.getDate()+n);return p(dt.getDate())+'/'+p(dt.getMonth()+1)+'/'+dt.getFullYear();}
 function dateLabel(str){const[d,m,y]=str.split('/').map(Number);return new Date(y,m-1,d).toLocaleDateString('es-CR',{weekday:'short',day:'numeric',month:'short'});}
+function dateLabelShort(str){const[d,m,y]=str.split('/').map(Number);const dt=new Date(y,m-1,d);const days=['D','L','M','X','J','V','S'];return days[dt.getDay()]+'<br>'+p(d)+'/'+(p(m));}
 function isToday(str){return str===getTodayStr();}
-
-function showNotif(msg,color){
-  const n=document.getElementById('notif');
-  n.textContent=msg;
-  n.style.background=color||'var(--accent)';
-  n.style.color=color?'#fff':'#000';
-  n.classList.add('show');
-  setTimeout(()=>n.classList.remove('show'),2500);
+// FIX: Use local midnight to avoid timezone offset bugs
+function dateToMs(str){const[d,m,y]=str.split('/').map(Number);return new Date(y,m-1,d,0,0,0,0).getTime();}
+function msToDDMMYYYY(ms){const d=new Date(ms);return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();}
+function msToDatetimeStr(ms){const d=new Date(ms);return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes());}
+function estadoClass(estado){
+  // Migrate legacy values
+  if(estado==='activo'||estado==='pendiente') return 'estado-cobrar';
+  return{'reserva':'estado-reserva','cobrar':'estado-cobrar','pagado':'estado-pagado'}[estado]||'estado-cobrar';
+}
+function estadoLabel(estado){
+  if(estado==='activo'||estado==='pendiente') return 'Cobrar';
+  return{'reserva':'Reserva','cobrar':'Cobrar','pagado':'Pagado'}[estado]||'Cobrar';
+}
+function estadoPillClass(estado){
+  if(estado==='activo'||estado==='pendiente') return 'cobrar';
+  return{'reserva':'reserva','cobrar':'cobrar','pagado':'pagado'}[estado]||'cobrar';
+}
+// A guest is "currently in hostel" if estado is cobrar/activo/pendiente
+function isGuestActive(g){
+  const hoy=Date.now();
+  const cin=g.checkin_ms||0;
+  const cout=g.checkout_ms||(cin+365*86400000);
+  // Active = today falls within stay AND not checked out
+  return hoy>=cin && hoy<cout && g.activo!==false;
 }
 
+async function logAudit(accion, detalle, datoAnterior='', datoNuevo=''){
+  try{
+    await addDoc(collection(db,'auditoria'),{
+      timestamp: Date.now(),
+      accion,
+      recepcionista: voluntarioActivo||'Desconocido',
+      detalle,
+      dato_anterior: datoAnterior,
+      dato_nuevo: datoNuevo
+    });
+  }catch(e){console.log('Audit log error:',e);}
+}
+
+function showNotif(msg,isError){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.style.background=isError?'var(--red)':'var(--accent)';n.style.color=isError?'#fff':'#000';
+  n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2500);
+}
 function setSyncStatus(state){
-  const dot=document.getElementById('sync-dot');
-  const lbl=document.getElementById('sync-label');
+  const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label');
   dot.className='sync-dot'+(state==='syncing'?' syncing':state==='error'?' error':'');
   lbl.textContent=state==='syncing'?'Guardando...':state==='error'?'Sin conexión':'En línea';
 }
 
-// ════════════════════════════════════════════════════════════
-// FIRESTORE LISTENERS — real-time sync
-// ════════════════════════════════════════════════════════════
+let loadedFlags = {movimientos:false, cierres:false, huespedes:false};
+function checkAllLoaded(){
+  if(loadedFlags.movimientos && loadedFlags.cierres && loadedFlags.huespedes) hideLoading();
+}
+
+// ── FIREBASE LISTENERS ────────────────────────────────────
 function startListeners(){
-  setLoadingStatus('Cargando movimientos de caja...');
+  document.getElementById('loading-status').textContent='Cargando datos...';
 
-  // Listen to movimientos
-  const movRef = query(collection(db,'movimientos'), orderBy('fecha'));
-  onSnapshot(movRef, snap => {
-    cajaData = snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderCaja();
-    renderMovimientosRecientes();
-    renderStats();
-    if(document.getElementById('tab-resumen').classList.contains('active')) renderResumen();
+  // Movimientos
+  onSnapshot(query(collection(db,'movimientos'),orderBy('fecha')), snap=>{
+    cajaData=snap.docs.map(d=>({id:d.id,...d.data()}));
+    loadedFlags.movimientos=true; checkAllLoaded();
+    renderCaja();renderMovimientosRecientes();renderStats();
+    if(document.getElementById('tab-resumen').classList.contains('active'))renderResumen();
+    if(document.getElementById('tab-contabilidad').classList.contains('active'))renderContabilidad();
+  }, err=>{ loadedFlags.movimientos=true; checkAllLoaded(); console.log('movimientos err',err); });
+
+  // Cierres
+  onSnapshot(collection(db,'cierres'), snap=>{
+    cierreData={};
+    snap.docs.forEach(d=>{cierreData[d.id]=d.data();});
+    loadedFlags.cierres=true; checkAllLoaded();
+    loadCierreInputs(cajaViewDate);checkDiffs();
+  }, err=>{ loadedFlags.cierres=true; checkAllLoaded(); console.log('cierres err',err); });
+
+  // Huéspedes
+  onSnapshot(collection(db,'huespedes'), snap=>{
+    if(!snap.empty){
+      guestData=snap.docs.map(d=>({fbId:d.id,...d.data()}));
+      migrateGuestEstados(guestData);
+    } else {
+      seedGuests();
+    }
+    loadedFlags.huespedes=true; checkAllLoaded();
+    renderActiveToday();renderGuests(guestData);renderRooms();renderStats();
+    if(document.getElementById('tab-gantt').classList.contains('active'))renderGantt();
+    if(document.getElementById('tab-gantt2').classList.contains('active'))renderGantt2();
+  }, err=>{ loadedFlags.huespedes=true; checkAllLoaded(); console.log('huespedes err',err); });
+
+  // Recepcionistas
+  onSnapshot(doc(db,'config','recepcionistas'), snap=>{
+    if(snap.exists()&&snap.data().lista){
+      recepcionistas=snap.data().lista;
+      renderRecepConfig();
+    }
   });
 
-  // Listen to cierres
-  onSnapshot(collection(db,'cierres'), snap => {
-    cierreData = {};
-    snap.docs.forEach(d=>{ cierreData[d.id]=d.data(); });
-    loadCierreInputs(cajaViewDate);
-    checkDiffs();
-    if(document.getElementById('tab-resumen').classList.contains('active')) renderResumen();
-    hideLoading();
+  // Auditoría
+  onSnapshot(query(collection(db,'auditoria'),orderBy('timestamp','desc')), snap=>{
+    auditData=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(document.getElementById('tab-auditoria').classList.contains('active'))renderAudit();
   });
 }
 
-function hideLoading(){
-  document.getElementById('loading-screen').classList.add('hidden');
-}
-function setLoadingStatus(msg){
-  document.getElementById('loading-status').textContent=msg;
+async function seedGuests(){
+  const historical=[
+    {id:119,name:"Henry Raymond (Calipso)",hab:"PB 5",fecha:"01/01/2026",checkin_ms:dateToMs("01/01/2026"),checkout_ms:null,precio_dia:15.0,dias:null,total:null,activo:true,estado:'pagado'},
+    {id:443,name:"Gallo Gordillo Catalina",hab:"Arriba 2",fecha:"11/02/2026",checkin_ms:dateToMs("11/02/2026"),checkout_ms:dateToMs("14/02/2026"),precio_dia:16.16,dias:3,total:48.48,activo:false,estado:'pagado'},
+    {id:444,name:"Paula Vargas Jimenez",hab:"Doble",fecha:"13/02/2026",checkin_ms:dateToMs("13/02/2026"),checkout_ms:dateToMs("15/02/2026"),precio_dia:41.0,dias:2,total:82.0,activo:false,estado:'pagado'},
+    {id:446,name:"Edrei Alvarado Zúñiga",hab:"Depto",fecha:"13/02/2026",checkin_ms:dateToMs("13/02/2026"),checkout_ms:dateToMs("16/02/2026"),precio_dia:40.0,dias:3,total:120.0,activo:false,estado:'pagado'},
+    {id:448,name:"Greta Höftmann",hab:"Triple",fecha:"13/02/2026",checkin_ms:dateToMs("13/02/2026"),checkout_ms:dateToMs("16/02/2026"),precio_dia:43.0,dias:3,total:129.0,activo:false,estado:'pagado'},
+    {id:450,name:"Horatiu Moarcas",hab:"Doble",fecha:"15/02/2026",checkin_ms:dateToMs("15/02/2026"),checkout_ms:dateToMs("18/02/2026"),precio_dia:29.5,dias:3,total:88.5,activo:false,estado:'pagado'},
+    {id:467,name:"Olivier Bergeron",hab:"Triple",fecha:"16/02/2026",checkin_ms:dateToMs("16/02/2026"),checkout_ms:dateToMs("17/02/2026"),precio_dia:40.0,dias:1,total:40.0,activo:false,estado:'pagado'},
+    {id:469,name:"Quesada Rebeca",hab:"Depto",fecha:"18/02/2026",checkin_ms:dateToMs("18/02/2026"),checkout_ms:dateToMs("19/02/2026"),precio_dia:41.5,dias:1,total:41.5,activo:false,estado:'pagado'},
+    {id:472,name:"Marcelo Leguizamón",hab:"Triple",fecha:"19/02/2026",checkin_ms:dateToMs("19/02/2026"),checkout_ms:dateToMs("22/02/2026"),precio_dia:43.0,dias:3,total:129.0,activo:false,estado:'pagado'},
+    {id:476,name:"Lola Ramos",hab:"Casita",fecha:"20/02/2026",checkin_ms:dateToMs("20/02/2026"),checkout_ms:dateToMs("23/02/2026"),precio_dia:44.0,dias:3,total:132.0,activo:false,estado:'pagado'},
+    {id:490,name:"Carmela Dueñas",hab:"Doble",fecha:"23/02/2026",checkin_ms:dateToMs("23/02/2026"),checkout_ms:dateToMs("26/02/2026"),precio_dia:33.3,dias:3,total:99.9,activo:false,estado:'pagado'},
+    {id:492,name:"Valborg Fältskog",hab:"Triple",fecha:"23/02/2026",checkin_ms:dateToMs("23/02/2026"),checkout_ms:dateToMs("27/02/2026"),precio_dia:39.0,dias:4,total:156.0,activo:false,estado:'pagado'},
+    {id:493,name:"Duncan Sharpe",hab:"Casita",fecha:"24/02/2026",checkin_ms:dateToMs("24/02/2026"),checkout_ms:dateToMs("25/02/2026"),precio_dia:44.0,dias:1,total:44.0,activo:false,estado:'pagado'},
+    {id:495,name:"Raul Martínez Azlor",hab:"Casita",fecha:"25/02/2026",checkin_ms:dateToMs("25/02/2026"),checkout_ms:dateToMs("27/02/2026"),precio_dia:44.0,dias:2,total:88.0,activo:false,estado:'pagado'},
+    {id:496,name:"Landon Nordhus",hab:"Doble",fecha:"26/02/2026",checkin_ms:dateToMs("26/02/2026"),checkout_ms:dateToMs("04/03/2026"),precio_dia:36.66,dias:6,total:219.96,activo:false,estado:'pagado'},
+    {id:508,name:"Nelly Agber",hab:"Casita",fecha:"01/03/2026",checkin_ms:dateToMs("01/03/2026"),checkout_ms:dateToMs("05/03/2026"),precio_dia:44.0,dias:4,total:176.0,activo:false,estado:'pagado'},
+    {id:510,name:"Lucie Bardet",hab:"Doble",fecha:"01/03/2026",checkin_ms:dateToMs("01/03/2026"),checkout_ms:dateToMs("06/03/2026"),precio_dia:35.0,dias:5,total:175.0,activo:false,estado:'pagado'},
+    {id:516,name:"Lars Hoffmann",hab:"Arriba 4",fecha:"03/03/2026",checkin_ms:dateToMs("03/03/2026"),checkout_ms:dateToMs("06/03/2026"),precio_dia:14.0,dias:3,total:42.0,activo:false,estado:'pagado'},
+    {id:519,name:"Ana Flores",hab:"PB 1",fecha:"03/03/2026",checkin_ms:dateToMs("03/03/2026"),checkout_ms:dateToMs("10/03/2026"),precio_dia:13.0,dias:7,total:91.0,activo:false,estado:'pagado'},
+    {id:520,name:"Carlos Torres",hab:"PB 2",fecha:"03/03/2026",checkin_ms:dateToMs("03/03/2026"),checkout_ms:dateToMs("07/03/2026"),precio_dia:13.0,dias:4,total:52.0,activo:false,estado:'pagado'},
+    {id:533,name:"Ken Skatalite",hab:"PB 2",fecha:"08/03/2026",checkin_ms:dateToMs("08/03/2026"),checkout_ms:dateToMs("11/03/2026"),precio_dia:40.0,dias:3,total:120.0,activo:false,estado:'pagado'},
+    {id:538,name:"Henrik Larsson",hab:"Arriba 1",fecha:"09/03/2026",checkin_ms:dateToMs("09/03/2026"),checkout_ms:dateToMs("11/03/2026"),precio_dia:14.0,dias:2,total:28.0,activo:false,estado:'pagado'},
+    {id:539,name:"Camille Bernard",hab:"Arriba 5",fecha:"09/03/2026",checkin_ms:dateToMs("09/03/2026"),checkout_ms:dateToMs("11/03/2026"),precio_dia:14.0,dias:2,total:28.0,activo:false,estado:'pagado'},
+    {id:542,name:"Catalina Tufare",hab:"PB 1",fecha:"09/03/2026",checkin_ms:dateToMs("09/03/2026"),checkout_ms:dateToMs("10/03/2026"),precio_dia:15.0,dias:1,total:15.0,activo:false,estado:'pagado'},
+    {id:543,name:"Juana Formica",hab:"PB 3",fecha:"09/03/2026",checkin_ms:dateToMs("09/03/2026"),checkout_ms:dateToMs("10/03/2026"),precio_dia:15.0,dias:1,total:15.0,activo:false,estado:'pagado'},
+    {id:544,name:"Jessica Jacobs",hab:"PB 1",fecha:"09/03/2026",checkin_ms:dateToMs("09/03/2026"),checkout_ms:dateToMs("12/03/2026"),precio_dia:14.66,dias:3,total:43.98,activo:true,estado:'pagado'},
+    {id:545,name:"Javier Martinez",hab:"PB 2",fecha:"10/03/2026",checkin_ms:dateToMs("10/03/2026"),checkout_ms:dateToMs("13/03/2026"),precio_dia:15.0,dias:3,total:45.0,activo:true,estado:'pagado'},
+    {id:546,name:"Carlos Ivan Aguirre",hab:"PB 6",fecha:"10/03/2026",checkin_ms:dateToMs("10/03/2026"),checkout_ms:dateToMs("11/03/2026"),precio_dia:15.0,dias:1,total:15.0,activo:false,estado:'pagado'},
+  ];
+  // Seed historical caja too
+  const historicalCaja=[
+    {fecha:"10/03/2026",turno:"TARDE",tipo:"Ingreso",categoria:"Alojamiento",detalle:"Javier Martinez (545) Abajo cama 1, 3 noches",recepcionista:"Nico",usd_ing:null,usd_eg:null,crc_ing:21600,crc_eg:null,timestamp:dateToMs("10/03/2026")},
+    {fecha:"10/03/2026",turno:"TARDE",tipo:"Ingreso",categoria:"Alojamiento",detalle:"Ken Skatalite (533)",recepcionista:"Nico",usd_ing:40,usd_eg:null,crc_ing:null,crc_eg:null,timestamp:dateToMs("10/03/2026")+1},
+    {fecha:"10/03/2026",turno:"TARDE",tipo:"Ingreso",categoria:"Alojamiento",detalle:"Carlos Ivan Aguilar (546)",recepcionista:"Nico",usd_ing:null,usd_eg:null,crc_ing:7200,crc_eg:null,timestamp:dateToMs("10/03/2026")+2},
+  ];
+  const historicalCierre={
+    ap_man_usd:4,ap_man_crc:36400,ci_man_usd:4,ci_man_crc:36400,
+    ap_tar_usd:4,ap_tar_crc:36400,ci_tar_usd:44,ci_tar_crc:64720
+  };
+
+  try{
+    for(const g of historical) await addDoc(collection(db,'huespedes'),g);
+    for(const m of historicalCaja){
+      const clean={...m};Object.keys(clean).forEach(k=>{if(clean[k]===null)delete clean[k];});
+      await addDoc(collection(db,'movimientos'),clean);
+    }
+    await setDoc(doc(db,'cierres','10-03-2026'),historicalCierre,{merge:true});
+  } catch(e){console.log('Seed error (may already exist):',e);}
 }
 
-// ════════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('today-date').textContent = new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});
-  document.getElementById('caja-date-picker').value = dateStrToISO(getTodayStr());
-  renderCajaDateLabel();
-  renderActiveToday();
-  renderGuests(allGuests);
-  renderRooms();
-  renderVoluntario();
+// One-time migration: fix legacy estados
+let migrationDone = false;
+async function migrateGuestEstados(guests){
+  if(migrationDone) return;
+  const needsFix = guests.filter(g =>
+    g.estado === 'activo' || g.estado === 'pendiente' || !g.estado
+  );
+  if(!needsFix.length){ migrationDone=true; return; }
+  migrationDone = true; // set before writes to prevent re-entry
+  for(const g of needsFix){
+    // activo guests who haven't checked out → pagado; checked-out → pagado
+    const newEstado = 'pagado';
+    try{
+      await setDoc(doc(db,'huespedes',g.fbId),{estado:newEstado},{merge:true});
+    }catch(e){console.log('migrate error',e);}
+  }
+  console.log(`Migrated ${needsFix.length} guest(s) → pagado`);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('today-date').textContent=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('caja-date-picker').value=dateStrToISO(getTodayStr());
+  // GANTT: start 5 days before today
+  const[d,m,y]=getTodayStr().split('/').map(Number);
+  const start=new Date(y,m-1,d-5);
+  ganttStartDate=p(start.getDate())+'/'+p(start.getMonth()+1)+'/'+start.getFullYear();
+  gantt2StartDate=ganttStartDate;
+  renderCajaDateLabel();renderVoluntario();renderRecepConfig();
   startListeners();
-  // Fallback: hide loading after 6s if Firestore is slow
-  setTimeout(hideLoading, 6000);
+  setTimeout(hideLoading, 5000); // fallback por si algún listener falla
 });
 
-// ════════════════════════════════════════════════════════════
-// TABS
-// ════════════════════════════════════════════════════════════
-function showTab(id,btn){
+// ── TABS ──────────────────────────────────────────────────
+window.showTab=function(id,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='resumen') renderResumen();
-  if(id==='caja') renderCajaView();
-}
-window.showTab = showTab;
+  if(id==='resumen')renderResumen();
+  if(id==='caja')renderCajaView();
+  if(id==='gantt')renderGantt();
+  if(id==='gantt2')renderGantt2();
+  if(id==='contabilidad')renderContabilidad();
+  if(id==='config')renderRecepConfig();
+  if(id==='auditoria')renderAudit();
+};
 
-// ════════════════════════════════════════════════════════════
-// STATS
-// ════════════════════════════════════════════════════════════
+// ── STATS ─────────────────────────────────────────────────
 function renderStats(){
-  const active = allGuests.filter(g=>g.activo);
-  const td = cajaData.filter(m=>m.fecha===getTodayStr());
-  const usd = td.reduce((s,m)=>s+(m.usd_ing||0),0);
-  const crc = td.reduce((s,m)=>s+(m.crc_ing||0),0);
-  document.getElementById('stat-huespedes').textContent = active.length;
-  document.getElementById('stat-usd').textContent = '$'+usd.toFixed(2);
-  document.getElementById('stat-crc').textContent = '₡'+Math.round(crc).toLocaleString('es-CR')+' CRC';
-  document.getElementById('stat-ocup').textContent = Math.round(active.length/15*100)+'%';
-  document.getElementById('stat-ocup-sub').textContent = active.length+' de 15 habitaciones';
+  const active=guestData.filter(g=>isGuestActive(g));
+  const td=cajaData.filter(m=>m.fecha===getTodayStr());
+  const usd=td.reduce((s,m)=>s+(m.usd_ing||0),0);
+  const crc=td.reduce((s,m)=>s+(m.crc_ing||0),0);
+  document.getElementById('stat-huespedes').textContent=active.length;
+  document.getElementById('stat-usd').textContent='$'+usd.toFixed(2);
+  document.getElementById('stat-crc').textContent='₡'+Math.round(crc).toLocaleString('es-CR')+' CRC';
+  document.getElementById('stat-ocup').textContent=Math.round(active.length/15*100)+'%';
+  document.getElementById('stat-ocup-sub').textContent=active.length+' de 15 habitaciones';
 }
 
-// ════════════════════════════════════════════════════════════
-// ACTIVE TODAY
-// ════════════════════════════════════════════════════════════
+// ── ACTIVE TODAY ──────────────────────────────────────────
 function renderActiveToday(){
-  const active = allGuests.filter(g=>g.activo);
-  document.getElementById('active-today-table').innerHTML = active.length
-    ? active.map(g=>`<tr>
-        <td><span class="badge badge-blue">${cap(g.hab)}</span></td>
-        <td><span class="badge badge-gray">#${g.id}</span></td>
-        <td><strong>${g.name}</strong></td>
-        <td>${g.fecha}</td>
-        <td>${g.precio_dia?'$'+g.precio_dia.toFixed(2):'—'}</td>
-        <td>${g.dias||'—'}</td>
-        <td>${g.total?'<strong style="color:var(--accent)">$'+g.total.toFixed(2)+'</strong>':'—'}</td>
+  const active=guestData.filter(g=>isGuestActive(g));
+  document.getElementById('active-today-table').innerHTML=active.length
+    ?active.map(g=>`<tr>
+      <td><span class="badge badge-blue">${cap(g.hab)}</span></td>
+      <td><span class="badge badge-gray">#${g.id}</span></td>
+      <td><strong>${g.name}</strong></td>
+      <td>${g.fecha}</td>
+      <td>${g.precio_dia?'$'+g.precio_dia.toFixed(2):'—'}</td>
+      <td>${g.dias||'—'}</td>
+      <td>${g.total?'<strong style="color:var(--accent)">$'+g.total.toFixed(2)+'</strong>':'—'}</td>
       </tr>`).join('')
-    : '<tr><td colspan="7" class="empty">Sin huéspedes activos hoy</td></tr>';
+    :'<tr><td colspan="7" class="empty">Sin huéspedes activos</td></tr>';
 }
 
-// ════════════════════════════════════════════════════════════
-// VOLUNTARIO
-// ════════════════════════════════════════════════════════════
+// ── VOLUNTARIO ────────────────────────────────────────────
 function renderVoluntario(){
-  const lbl=currentTurno==='MAÑANA'?'☀️ Turno Mañana (10–14hs)':'🌙 Turno Tarde (14–20hs)';
-  document.getElementById('stat-turno-label').textContent=currentTurno==='MAÑANA'?'Turno mañana':'Turno tarde';
+  const lbl=currentTurno==='MAÑANA'?'☀️ Turno Mañana':'🌙 Turno Tarde';
+  document.getElementById('stat-turno-label').textContent=lbl;
+  const el=document.getElementById('voluntario-display');
   if(voluntarioActivo){
     document.getElementById('stat-vol').textContent=voluntarioActivo;
-    document.getElementById('voluntario-display').innerHTML=`<div class="vol-badge" style="background:rgba(200,245,90,.1);border-color:var(--accent)">
+    el.innerHTML=`<div class="vol-badge" style="background:rgba(200,245,90,.1);border-color:var(--accent)">
       <div class="vol-dot"></div><strong style="color:var(--accent)">${voluntarioActivo}</strong>
       <span style="color:var(--muted);font-size:12px">· ${lbl}</span>
-      <button onclick="cambiarVoluntario()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;margin-left:8px">cambiar</button></div>`;
+      <button onclick="abrirSeleccionVoluntario()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;margin-left:8px">cambiar</button></div>`;
   } else {
     document.getElementById('stat-vol').textContent='—';
-    document.getElementById('voluntario-display').innerHTML=`<div style="display:flex;align-items:center;gap:12px">
+    el.innerHTML=`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <span style="color:var(--muted);font-size:13px">${lbl} · Sin asignar</span>
-      <button class="btn-primary" style="padding:7px 14px;font-size:12px" onclick="cambiarVoluntario()">+ Asignar</button></div>`;
+      <button class="btn-primary" style="padding:7px 14px;font-size:12px" onclick="abrirSeleccionVoluntario()">+ Asignar turno</button></div>`;
   }
 }
-window.cambiarVoluntario = function(){
-  const n=prompt('Nombre del voluntario en turno:');
-  if(n&&n.trim()){voluntarioActivo=n.trim();renderVoluntario();showNotif('✓ '+voluntarioActivo);}
+
+window.abrirSeleccionVoluntario=function(){
+  const chips=recepcionistas.map(r=>`
+    <div onclick="seleccionarVoluntario('${r}')" style="padding:10px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">${r}</div>
+  `).join('');
+  document.getElementById('modal-title').textContent='¿Quién está en turno?';
+  document.getElementById('modal-body').innerHTML=`
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">${currentTurno==='MAÑANA'?'☀️ Turno Mañana (10–14hs)':'🌙 Turno Tarde (14–20hs)'}</p>
+    <div style="display:flex;flex-direction:column;gap:8px;">${chips}</div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px">¿No está en la lista? Agregalo en ⚙️ Config</p>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
 };
 
-// ════════════════════════════════════════════════════════════
-// MOVIMIENTOS RECIENTES
-// ════════════════════════════════════════════════════════════
+window.seleccionarVoluntario=function(nombre){
+  voluntarioActivo=nombre;
+  renderVoluntario();
+  closeModal();
+  showNotif('✓ '+nombre+' en turno');
+};
+
+// ── MOVIMIENTOS RECIENTES ─────────────────────────────────
 function renderMovimientosRecientes(){
-  const tbody=document.getElementById('movimientos-recientes');
   const r=[...cajaData].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,6);
-  tbody.innerHTML=r.length?r.map(m=>`<tr>
-    <td>${m.fecha}</td>
-    <td><span class="badge ${m.turno==='MAÑANA'?'badge-yellow':'badge-blue'}">${m.turno}</span></td>
-    <td>${m.detalle}</td>
-    <td class="${m.usd_ing?'amount-usd':m.usd_eg?'amount-neg':''}">${m.usd_ing?'+$'+m.usd_ing.toFixed(2):m.usd_eg?'-$'+m.usd_eg.toFixed(2):'—'}</td>
-    <td class="${m.crc_ing?'amount-crc':m.crc_eg?'amount-neg':''}">${m.crc_ing?'+₡'+m.crc_ing.toLocaleString('es-CR'):m.crc_eg?'-₡'+m.crc_eg.toLocaleString('es-CR'):'—'}</td>
-    </tr>`).join('')
-    :'<tr><td colspan="5" class="empty">Sin movimientos aún</td></tr>';
+  document.getElementById('movimientos-recientes').innerHTML=r.length
+    ?r.map(m=>`<tr>
+      <td>${m.fecha}</td>
+      <td><span class="badge ${m.turno==='MAÑANA'?'badge-yellow':'badge-blue'}">${m.turno}</span></td>
+      <td>${m.recepcionista||'—'}</td>
+      <td>${m.detalle}</td>
+      <td class="${m.usd_ing?'amount-usd':m.usd_eg?'amount-neg':''}">${m.usd_ing?'+$'+m.usd_ing.toFixed(2):m.usd_eg?'-$'+m.usd_eg.toFixed(2):'—'}</td>
+      <td class="${m.crc_ing?'amount-crc':m.crc_eg?'amount-neg':''}">${m.crc_ing?'+₡'+m.crc_ing.toLocaleString('es-CR'):m.crc_eg?'-₡'+m.crc_eg.toLocaleString('es-CR'):'—'}</td>
+      </tr>`).join('')
+    :'<tr><td colspan="6" class="empty">Sin movimientos aún</td></tr>';
 }
 
-// ════════════════════════════════════════════════════════════
-// GUESTS
-// ════════════════════════════════════════════════════════════
+// ── GUESTS ────────────────────────────────────────────────
 function renderGuests(data){
-  const tbody=document.getElementById('guests-table');
-  tbody.innerHTML=data.length?data.map(g=>`<tr style="cursor:pointer" onclick="openGuestModal(${g.id})">
-    <td><span class="badge badge-gray">#${g.id}</span></td>
-    <td><strong>${cap(g.name)}</strong></td>
-    <td>${cap(g.hab)}</td>
-    <td>${g.fecha}</td>
-    <td>${g.precio_dia?'$'+g.precio_dia.toFixed(2):'—'}</td>
-    <td>${g.dias||'—'}</td>
-    <td>${g.total?'<strong>$'+g.total.toFixed(2)+'</strong>':'—'}</td>
-    <td><span class="badge ${g.activo?'badge-green':'badge-gray'}">${g.activo?'Activo':'Check-out'}</span></td>
-    </tr>`).join('')
-    :'<tr><td colspan="8" class="empty">Sin resultados</td></tr>';
+  document.getElementById('guests-table').innerHTML=data.length
+    ?[...data].sort((a,b)=>b.activo-a.activo||(b.checkin_ms||0)-(a.checkin_ms||0)).map(g=>`<tr style="cursor:pointer" onclick="openGuestModal('${g.fbId}')">
+      <td><span class="badge badge-gray">#${g.id}</span></td>
+      <td><strong>${cap(g.name)}</strong></td>
+      <td>${cap(g.hab)}</td>
+      <td>${g.fecha}</td>
+      <td>${g.precio_dia?'$'+g.precio_dia.toFixed(2):'—'}</td>
+      <td>${g.dias||'—'}</td>
+      <td>${g.total?'<strong>$'+g.total.toFixed(2)+'</strong>':'—'}</td>
+      <td><button class="estado-pill ${estadoPillClass(g.estado||'cobrar')}" onclick="event.stopPropagation();openGuestModal('${g.fbId}')">${estadoLabel(g.estado||'cobrar')}</button></td>
+      </tr>`).join('')
+    :'<tr><td colspan="8" class="empty">Sin huéspedes</td></tr>';
 }
-window.filterGuests = function(){
+window.filterGuests=function(){
   const q=document.getElementById('search-input').value.toLowerCase();
-  renderGuests(allGuests.filter(g=>g.name.toLowerCase().includes(q)||String(g.id).includes(q)||g.hab.toLowerCase().includes(q)));
+  renderGuests(guestData.filter(g=>g.name.toLowerCase().includes(q)||String(g.id).includes(q)||g.hab.toLowerCase().includes(q)));
 };
-window.openGuestModal = function(id){
-  const g=allGuests.find(x=>x.id===id);if(!g)return;
+
+window.openGuestModal=function(fbId){
+  const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
+  const checkoutDate=g.checkout_ms?msToDDMMYYYY(g.checkout_ms):'—';
+  const estado=g.estado||'cobrar';
   document.getElementById('modal-title').textContent=cap(g.name);
   document.getElementById('modal-body').innerHTML=`
     <div class="modal-row"><span class="modal-key">ID</span><span class="modal-val">#${g.id}</span></div>
     <div class="modal-row"><span class="modal-key">Habitación</span><span class="modal-val">${cap(g.hab)}</span></div>
     <div class="modal-row"><span class="modal-key">Check-in</span><span class="modal-val">${g.fecha}</span></div>
+    <div class="modal-row"><span class="modal-key">Check-out</span><span class="modal-val">${checkoutDate}</span></div>
     <div class="modal-row"><span class="modal-key">$/Noche</span><span class="modal-val">${g.precio_dia?'$'+g.precio_dia.toFixed(2):'—'}</span></div>
     <div class="modal-row"><span class="modal-key">Noches</span><span class="modal-val">${g.dias||'—'}</span></div>
     <div class="modal-row"><span class="modal-key">Total</span><span class="modal-val" style="color:var(--accent)">${g.total?'$'+g.total.toFixed(2):'—'}</span></div>
-    <div class="modal-row"><span class="modal-key">Estado</span><span class="modal-val"><span class="badge ${g.activo?'badge-green':'badge-gray'}">${g.activo?'Activo':'Check-out'}</span></span></div>`;
+    <div class="modal-row">
+      <span class="modal-key">Estado</span>
+      <span class="modal-val">
+        <select onchange="cambiarEstado('${g.fbId}','${estado}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px;width:auto">
+          <option value="reserva" ${estado==='reserva'?'selected':''}>🔴 Reserva</option>
+          <option value="cobrar" ${(estado==='cobrar'||estado==='pendiente'||estado==='activo')?'selected':''}>🟡 Cobrar (activo en hostel)</option>
+          <option value="pagado" ${estado==='pagado'?'selected':''}>🟢 Pagado</option>
+        </select>
+      </span>
+    </div>
+    ${g.activo?`<div style="margin-top:16px"><button class="btn-danger" onclick="doCheckout('${g.fbId}')">Hacer Check-out</button></div>`:''}`;
   document.getElementById('modal-overlay').classList.add('open');
 };
-window.closeModal = function(e){
+
+window.cambiarEstado=async function(fbId,estadoAnterior,estadoNuevo){
+  if(estadoAnterior===estadoNuevo)return;
+  const g=guestData.find(x=>x.fbId===fbId);
+  try{
+    setSyncStatus('syncing');
+    await setDoc(doc(db,'huespedes',fbId),{estado:estadoNuevo},{merge:true});
+    await logAudit('ESTADO',`#${g?.id} ${g?.name}`,estadoLabel(estadoAnterior),estadoLabel(estadoNuevo));
+    setSyncStatus('online');showNotif('✓ Estado actualizado');
+  }catch(e){setSyncStatus('error');showNotif('Error',true);}
+};
+
+window.doCheckout=async function(fbId){
+  const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
+  if(!confirm('¿Confirmar check-out de '+g.name+'?'))return;
+  try{
+    setSyncStatus('syncing');
+    await setDoc(doc(db,'huespedes',fbId),{activo:false,checkout_ms:Date.now(),estado:'pagado'},{merge:true});
+    await logAudit('CHECKOUT',`#${g.id} ${g.name}`,g.fecha,'checkout '+getTodayStr());
+    setSyncStatus('online');showNotif('✓ Check-out realizado');closeModal();
+  }catch(e){setSyncStatus('error');showNotif('Error',true);}
+};
+
+window.openNewGuestModal=function(){
+  const nextId=guestData.length?Math.max(...guestData.map(g=>g.id||0))+1:547;
+  document.getElementById('modal-title').textContent='Nuevo Check-in';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="form-group" style="margin-bottom:12px"><label class="form-label">Nombre completo</label>
+      <input class="form-input" id="ni-name" placeholder="Nombre del huésped"></div>
+    <div class="form-group" style="margin-bottom:12px"><label class="form-label">Habitación</label>
+      <select class="form-select" id="ni-hab">${ROOMS.map(r=>`<option>${r}</option>`).join('')}</select></div>
+    <div class="form-group" style="margin-bottom:12px"><label class="form-label">Estado inicial</label>
+      <select class="form-select" id="ni-estado">
+        <option value="cobrar">🟡 Cobrar (activo en hostel)</option>
+        <option value="reserva">🔴 Reserva (no llegó aún)</option>
+        <option value="pagado">🟢 Pagado</option>
+      </select></div>
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="form-group"><label class="form-label">$/Noche</label><input class="form-input" id="ni-precio" type="number" placeholder="0.00"></div>
+      <div class="form-group"><label class="form-label">Noches</label><input class="form-input" id="ni-dias" type="number" placeholder="1"></div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">ID asignado: <strong style="color:var(--text)">#${nextId}</strong></p>
+    <button class="btn-primary" onclick="saveNewGuest(${nextId})">✓ Registrar</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.saveNewGuest=async function(nextId){
+  const name=document.getElementById('ni-name').value.trim();
+  const hab=document.getElementById('ni-hab').value;
+  const estado=document.getElementById('ni-estado').value;
+  const precio=parseFloat(document.getElementById('ni-precio').value)||null;
+  const dias=parseInt(document.getElementById('ni-dias').value)||null;
+  if(!name){showNotif('Ingresá el nombre',true);return;}
+  const today=getTodayStr();
+  const total=precio&&dias?parseFloat((precio*dias).toFixed(2)):null;
+  const checkin_ms=dateToMs(today);
+  const checkout_ms=dias?checkin_ms+dias*86400000:null;
+  const activo = estado !== 'pagado'; // reserva and cobrar are both active stays
+  const guest={id:nextId,name,hab,fecha:today,checkin_ms,checkout_ms,precio_dia:precio,dias,total,activo,estado};
+  try{
+    setSyncStatus('syncing');
+    await addDoc(collection(db,'huespedes'),guest);
+    await logAudit('NUEVO',`#${nextId} ${name} · ${cap(hab)}`,'','check-in '+today);
+    setSyncStatus('online');showNotif('✓ Check-in registrado');closeModal();
+  }catch(e){setSyncStatus('error');showNotif('Error',true);}
+};
+
+window.closeModal=function(e){
   if(!e||e.target===document.getElementById('modal-overlay'))
     document.getElementById('modal-overlay').classList.remove('open');
 };
 
-// ════════════════════════════════════════════════════════════
-// ROOMS
-// ════════════════════════════════════════════════════════════
+// ── ROOMS ─────────────────────────────────────────────────
 function renderRooms(){
   const activeRooms={};
-  allGuests.filter(g=>g.activo).forEach(g=>{activeRooms[cap(g.hab)]={id:g.id,name:g.name};});
+  guestData.filter(g=>isGuestActive(g)).forEach(g=>{activeRooms[cap(g.hab)]={id:g.id,name:g.name,estado:g.estado};});
   document.getElementById('rooms-grid').innerHTML=ROOMS.map(r=>{
     const o=activeRooms[r];
+    const dotColors={reserva:'#dc2626',cobrar:'#d97706',pendiente:'#d97706',activo:'#d97706',pagado:'#16a34a'};
     return`<div class="room-card ${o?'occupied':'free'}">
       <div class="room-name">${r}</div>
       <span class="badge ${o?'badge-red':'badge-green'}">${o?'Ocupada':'Libre'}</span>
-      ${o?`<div class="room-guest">${cap(o.name)}</div>`:''}
+      ${o?`<div class="room-guest" style="margin-top:6px">#${o.id} · ${cap(o.name)}</div>
+           <div style="margin-top:5px;display:flex;align-items:center;gap:4px">
+             <span style="width:7px;height:7px;border-radius:50%;background:${dotColors[o.estado||'cobrar']};display:inline-block"></span>
+             <span style="font-size:10px;color:var(--muted)">${estadoLabel(o.estado||'cobrar')}</span>
+           </div>`:''}
     </div>`;}).join('');
 }
 
-// ════════════════════════════════════════════════════════════
-// CAJA — DATE NAV
-// ════════════════════════════════════════════════════════════
+// ── GANTT ─────────────────────────────────────────────────
+window.ganttPrev=function(){ganttStartDate=addDays(ganttStartDate,-14);renderGantt();};
+window.ganttNext=function(){ganttStartDate=addDays(ganttStartDate,14);renderGantt();};
+window.ganttGoToday=function(){
+  const[d,m,y]=getTodayStr().split('/').map(Number);
+  const start=new Date(y,m-1,d-5);
+  ganttStartDate=p(start.getDate())+'/'+p(start.getMonth()+1)+'/'+start.getFullYear();
+  renderGantt();
+};
+
+function buildOccupancy(){
+  const occ={};
+  ROOMS.forEach(r=>{occ[r]=[];});
+  guestData.forEach(g=>{
+    if(!g.checkin_ms) return;
+    const room=cap(g.hab);
+    if(occ[room]!==undefined) occ[room].push(g);
+  });
+  return occ;
+}
+
+// Returns true if guest occupies a given day (dateMs = local midnight)
+function guestOnDate(g, dateMs){
+  const cin=g.checkin_ms||0;
+  const cout=g.checkout_ms||(cin+365*86400000);
+  return dateMs>=cin && dateMs<cout;
+}
+
+function renderGantt(){
+  const dates=[];
+  for(let i=0;i<GANTT_DAYS;i++) dates.push(addDays(ganttStartDate,i));
+  document.getElementById('gantt-label').textContent=dateLabel(ganttStartDate)+' → '+dateLabel(dates[dates.length-1]);
+  const occ=buildOccupancy();
+
+  let html='<thead><tr>';
+  html+=`<th class="gantt-room-col">Habitación</th>`;
+  dates.forEach(d=>{
+    html+=`<th class="gantt-day-header ${isToday(d)?'today':''}">${dateLabelShort(d)}</th>`;
+  });
+  html+='</tr></thead><tbody>';
+
+  ROOMS.forEach(room=>{
+    html+=`<tr><td class="gantt-room-col">${room}</td>`;
+    dates.forEach(date=>{
+      const dateMs=dateToMs(date);
+      const guest=occ[room].find(g=>guestOnDate(g,dateMs));
+      if(guest){
+        const cin=guest.checkin_ms||0;
+        const cout=guest.checkout_ms||(cin+365*86400000);
+        const isFirst=dateMs>=cin && dateMs<cin+86400000;
+        const isLast=dateMs>=cout-86400000 && dateMs<cout;
+        let pos='middle';
+        if(isFirst&&isLast) pos='solo';
+        else if(isFirst) pos='start';
+        else if(isLast) pos='end';
+        const ec=estadoClass(guest.estado||'cobrar');
+        const shortName=guest.name.split(' ')[0];
+        html+=`<td class="gantt-cell ${isToday(date)?'today-col':''}">
+          <div class="gantt-block ${pos} ${ec}" onclick="openGuestModal('${guest.fbId}')"
+            title="#${guest.id} ${guest.name} · ${estadoLabel(guest.estado)} · $${guest.precio_dia||'?'}/noche · ${guest.dias||'?'} noches">
+            <span class="gantt-block-text">${isFirst?'#'+guest.id+' '+shortName:''}</span>
+          </div></td>`;
+      } else {
+        html+=`<td class="gantt-cell free ${isToday(date)?'today-col':''}"></td>`;
+      }
+    });
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  document.getElementById('gantt-table').innerHTML=html;
+}
+
+// ── GANTT B — vista calendario (ancho, nombre completo) ───
+window.gantt2Prev=function(){gantt2StartDate=addDays(gantt2StartDate,-7);renderGantt2();};
+window.gantt2Next=function(){gantt2StartDate=addDays(gantt2StartDate,7);renderGantt2();};
+window.gantt2GoToday=function(){
+  const[d,m,y]=getTodayStr().split('/').map(Number);
+  const start=new Date(y,m-1,d-2);
+  gantt2StartDate=p(start.getDate())+'/'+p(start.getMonth()+1)+'/'+start.getFullYear();
+  renderGantt2();
+};
+
+function renderGantt2(){
+  const dates=[];
+  for(let i=0;i<GANTT2_DAYS;i++) dates.push(addDays(gantt2StartDate,i));
+  document.getElementById('gantt2-label').textContent=dateLabel(gantt2StartDate)+' → '+dateLabel(dates[dates.length-1]);
+  const occ=buildOccupancy();
+
+  // Header
+  let html='<thead><tr><th class="gcal-room-col">Hab.</th>';
+  dates.forEach(d=>{
+    const[dd,mm,yy]=d.split('/').map(Number);
+    const dt=new Date(yy,mm-1,dd);
+    const months=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+    const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    html+=`<th class="gcal-header-date">
+      <div class="gcal-header-top">${months[mm-1]}</div>
+      <div class="gcal-header-day ${isToday(d)?'today':''}">${days[dt.getDay()]} ${dd}</div>
+    </th>`;
+  });
+  html+='</tr></thead><tbody>';
+
+  ROOMS.forEach(room=>{
+    html+=`<tr><td class="gcal-room-col">${room}</td>`;
+    dates.forEach(date=>{
+      const dateMs=dateToMs(date);
+      const guest=occ[room].find(g=>guestOnDate(g,dateMs));
+      if(guest){
+        const cin=guest.checkin_ms||0;
+        const isFirst=dateMs>=cin && dateMs<cin+86400000;
+        const ec=guest.estado||'cobrar';
+        const bgColors={reserva:'#dc2626',cobrar:'#d97706',pendiente:'#d97706',activo:'#d97706',pagado:'#16a34a'};
+        const bg=bgColors[ec]||'#d97706';
+        // Only show content on first day, stretch block across days
+        html+=`<td class="gcal-cell ${isToday(date)?'today-col':''}">
+          <div class="gcal-block" onclick="openGuestModal('${guest.fbId}')"
+            style="background:${bg}"
+            title="#${guest.id} ${guest.name} · ${estadoLabel(guest.estado)} · $${guest.precio_dia||'?'}/n · ${guest.dias||'?'} noches">
+            ${isFirst?`
+              <div style="overflow:hidden;flex:1">
+                <div class="gcal-block-name">#${guest.id} ${guest.name}</div>
+                <div class="gcal-block-nights">🌙 ${guest.dias||'?'}n · $${guest.precio_dia||'?'}</div>
+              </div>`:
+              `<div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4)"></div>`}
+          </div>
+        </td>`;
+      } else {
+        html+=`<td class="gcal-cell ${isToday(date)?'today-col':''}"></td>`;
+      }
+    });
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  document.getElementById('gcal-table').innerHTML=html;
+}
+
+// ── CAJA DATE NAV ─────────────────────────────────────────
 window.cajaPrevDay=function(){cajaViewDate=addDays(cajaViewDate,-1);document.getElementById('caja-date-picker').value=dateStrToISO(cajaViewDate);renderCajaView();};
 window.cajaNextDay=function(){cajaViewDate=addDays(cajaViewDate,1);document.getElementById('caja-date-picker').value=dateStrToISO(cajaViewDate);renderCajaView();};
 window.cajaGoDate=function(iso){cajaViewDate=isoToDateStr(iso);renderCajaView();};
 
 function renderCajaDateLabel(){
-  const it=isToday(cajaViewDate);
-  document.getElementById('caja-date-label').textContent=(it?'📅 Hoy — ':'')+dateLabel(cajaViewDate);
+  document.getElementById('caja-date-label').textContent=(isToday(cajaViewDate)?'📅 Hoy — ':'')+dateLabel(cajaViewDate);
 }
-
 function renderCajaView(){
-  renderCajaDateLabel();
-  loadCierreInputs(cajaViewDate);
-  renderCaja();
-  renderCajaAlertas();
+  renderCajaDateLabel();loadCierreInputs(cajaViewDate);renderCaja();renderCajaAlertas();
   const dis=!isToday(cajaViewDate);
-  ['mov-detalle','mov-usd','mov-crc','mov-tipo'].forEach(id=>{document.getElementById(id).disabled=dis;});
-  const btn=document.getElementById('btn-agregar');
-  btn.disabled=dis;btn.style.opacity=dis?'0.4':'1';
+  ['mov-detalle','mov-usd','mov-crc','mov-tipo','mov-cat'].forEach(id=>{document.getElementById(id).disabled=dis;});
+  const btn=document.getElementById('btn-agregar');btn.disabled=dis;btn.style.opacity=dis?'0.4':'1';
 }
 
-// ════════════════════════════════════════════════════════════
-// CIERRE — saved to Firestore, doc ID = date string
-// ════════════════════════════════════════════════════════════
-window.saveCierre = function(){
-  // Debounce: wait 800ms after last keystroke before saving
+// ── CIERRE ────────────────────────────────────────────────
+window.saveCierre=function(){
   clearTimeout(saveCierreTimer);
-  saveCierreTimer = setTimeout(async ()=>{
-    const data={
-      ap_man_usd:parseFloat(document.getElementById('ap-man-usd').value)||null,
-      ap_man_crc:parseFloat(document.getElementById('ap-man-crc').value)||null,
-      ci_man_usd:parseFloat(document.getElementById('ci-man-usd').value)||null,
-      ci_man_crc:parseFloat(document.getElementById('ci-man-crc').value)||null,
-      ap_tar_usd:parseFloat(document.getElementById('ap-tar-usd').value)||null,
-      ap_tar_crc:parseFloat(document.getElementById('ap-tar-crc').value)||null,
-      ci_tar_usd:parseFloat(document.getElementById('ci-tar-usd').value)||null,
-      ci_tar_crc:parseFloat(document.getElementById('ci-tar-crc').value)||null,
+  saveCierreTimer=setTimeout(async()=>{
+    const data={};
+    const fields={
+      'ap-man-usd':'ap_man_usd','ap-man-crc':'ap_man_crc','ci-man-usd':'ci_man_usd','ci-man-crc':'ci_man_crc',
+      'ap-tar-usd':'ap_tar_usd','ap-tar-crc':'ap_tar_crc','ci-tar-usd':'ci_tar_usd','ci-tar-crc':'ci_tar_crc'
     };
-    // Remove nulls so we don't overwrite with nulls
-    Object.keys(data).forEach(k=>{ if(data[k]===null) delete data[k]; });
+    Object.entries(fields).forEach(([id,key])=>{
+      const v=parseFloat(document.getElementById(id).value);
+      if(!isNaN(v))data[key]=v;
+    });
+    if(!Object.keys(data).length)return;
     try{
       setSyncStatus('syncing');
-      // Use date as doc ID, merge so partial updates work
-      await setDoc(doc(db,'cierres', cajaViewDate.replace(/\//g,'-')), data, {merge:true});
+      await setDoc(doc(db,'cierres',cajaViewDate.replace(/\//g,'-')),data,{merge:true});
       setSyncStatus('online');
-    } catch(e){
-      setSyncStatus('error');
-      showNotif('Error guardando cierre','#f87171');
-    }
-  }, 800);
+    }catch(e){setSyncStatus('error');showNotif('Error guardando',true);}
+  },800);
 };
 
 function loadCierreInputs(date){
-  // Use dash-keyed version since that's the doc ID
   const key=date.replace(/\//g,'-');
-  const c=cierreData[key]||cierreData[date]||{};
+  const c=cierreData[key]||{};
   const map={'ap-man-usd':'ap_man_usd','ap-man-crc':'ap_man_crc','ci-man-usd':'ci_man_usd','ci-man-crc':'ci_man_crc','ap-tar-usd':'ap_tar_usd','ap-tar-crc':'ap_tar_crc','ci-tar-usd':'ci_tar_usd','ci-tar-crc':'ci_tar_crc'};
-  Object.entries(map).forEach(([id,key])=>{ document.getElementById(id).value=c[key]!=null?c[key]:''; });
+  Object.entries(map).forEach(([id,k])=>{document.getElementById(id).value=c[k]!=null?c[k]:'';});
 }
 
-function getCierreForDate(date){
-  return cierreData[date.replace(/\//g,'-')]||cierreData[date]||{};
-}
+function getCierreForDate(date){return cierreData[date.replace(/\//g,'-')]||{};}
 
 function getExpectedCierre(date,turno){
   const c=getCierreForDate(date);
@@ -1049,25 +1204,11 @@ function getExpectedCierre(date,turno){
 
 function getDiffs(date){
   const c=getCierreForDate(date);const diffs=[];
-  if(c.ci_man_usd!=null||c.ci_man_crc!=null){
-    const exp=getExpectedCierre(date,'MAÑANA');
-    const dU=(c.ci_man_usd||0)-exp.usd,dC=(c.ci_man_crc||0)-exp.crc;
-    if(Math.abs(dU)>0.01||Math.abs(dC)>1)diffs.push({turno:'MAÑANA',tipo:'cierre vs movimientos',diff_usd:dU,diff_crc:dC});
-  }
-  if(c.ci_tar_usd!=null||c.ci_tar_crc!=null){
-    const exp=getExpectedCierre(date,'TARDE');
-    const dU=(c.ci_tar_usd||0)-exp.usd,dC=(c.ci_tar_crc||0)-exp.crc;
-    if(Math.abs(dU)>0.01||Math.abs(dC)>1)diffs.push({turno:'TARDE',tipo:'cierre vs movimientos',diff_usd:dU,diff_crc:dC});
-  }
-  if(c.ci_man_usd!=null&&c.ap_tar_usd!=null){
-    const dU=(c.ci_man_usd||0)-(c.ap_tar_usd||0),dC=(c.ci_man_crc||0)-(c.ap_tar_crc||0);
-    if(Math.abs(dU)>0.01||Math.abs(dC)>1)diffs.push({turno:'MAÑANA→TARDE',tipo:'cierre mañana ≠ apertura tarde',diff_usd:dU,diff_crc:dC});
-  }
-  const tom=addDays(date,1);const ct=getCierreForDate(tom);
-  if(c.ci_tar_usd!=null&&ct.ap_man_usd!=null){
-    const dU=(c.ci_tar_usd||0)-(ct.ap_man_usd||0),dC=(c.ci_tar_crc||0)-(ct.ap_man_crc||0);
-    if(Math.abs(dU)>0.01||Math.abs(dC)>1)diffs.push({turno:'TARDE→MAÑANA',tipo:'cierre tarde ≠ apertura siguiente',diff_usd:dU,diff_crc:dC});
-  }
+  if(c.ci_man_usd!=null){const exp=getExpectedCierre(date,'MAÑANA');const dU=(c.ci_man_usd||0)-exp.usd,dC=(c.ci_man_crc||0)-exp.crc;if(Math.abs(dU)>0.01||Math.abs(dC)>1)diffs.push({turno:'MAÑANA',tipo:'cierre vs movimientos',diff_usd:dU,diff_crc:dC});}
+  if(c.ci_tar_usd!=null){const exp=getExpectedCierre(date,'TARDE');const dU=(c.ci_tar_usd||0)-exp.usd,dC=(c.ci_tar_crc||0)-exp.crc;if(Math.abs(dU)>0.01||Math.abs(dC)>1)diffs.push({turno:'TARDE',tipo:'cierre vs movimientos',diff_usd:dU,diff_crc:dC});}
+  if(c.ci_man_usd!=null&&c.ap_tar_usd!=null){const dU=(c.ci_man_usd||0)-(c.ap_tar_usd||0),dC=(c.ci_man_crc||0)-(c.ap_tar_crc||0);if(Math.abs(dU)>0.01||Math.abs(dC)>1)diffs.push({turno:'MAÑANA→TARDE',tipo:'cierre ≠ apertura tarde',diff_usd:dU,diff_crc:dC});}
+  const ct=getCierreForDate(addDays(date,1));
+  if(c.ci_tar_usd!=null&&ct.ap_man_usd!=null){const dU=(c.ci_tar_usd||0)-(ct.ap_man_usd||0),dC=(c.ci_tar_crc||0)-(ct.ap_man_crc||0);if(Math.abs(dU)>0.01||Math.abs(dC)>1)diffs.push({turno:'TARDE→MAÑANA',tipo:'cierre ≠ apertura siguiente',diff_usd:dU,diff_crc:dC});}
   return diffs;
 }
 
@@ -1076,8 +1217,7 @@ window.checkDiffs=function(){renderCajaAlertas();};
 function renderCajaAlertas(){
   const diffs=getDiffs(cajaViewDate);
   const dayData=cajaData.filter(m=>m.fecha===cajaViewDate);
-  const c=getCierreForDate(cajaViewDate);
-  const hasCierre=Object.values(c).some(v=>v!=null);
+  const hasCierre=Object.values(getCierreForDate(cajaViewDate)).some(v=>v!=null);
   document.getElementById('caja-alertas').innerHTML=diffs.length
     ?diffs.map(d=>`<div class="alert-box alert-warn">⚠️ <div><strong>${d.turno}</strong> · ${d.tipo}<br>
       ${Math.abs(d.diff_usd)>0.01?'<strong>$'+d.diff_usd.toFixed(2)+'</strong> USD ':''} 
@@ -1085,9 +1225,7 @@ function renderCajaAlertas(){
     :(dayData.length||hasCierre)?'<div class="alert-box alert-ok">✓ Caja cuadra correctamente</div>':'';
 }
 
-// ════════════════════════════════════════════════════════════
-// CAJA — MOVIMIENTOS (Firestore write)
-// ════════════════════════════════════════════════════════════
+// ── CAJA MOVIMIENTOS ──────────────────────────────────────
 window.setTurno=function(t,btn){currentTurno=t;document.querySelectorAll('#form-turno-sel .turno-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');};
 window.filterCaja=function(f,btn){cajaFilter=f;document.querySelectorAll('#caja-filter-sel .turno-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCaja();};
 
@@ -1097,13 +1235,15 @@ function renderCaja(){
   document.getElementById('caja-table').innerHTML=data.length
     ?data.map(m=>`<tr>
       <td><span class="badge ${m.turno==='MAÑANA'?'badge-yellow':'badge-blue'}">${m.turno}</span></td>
+      <td>${m.recepcionista||'—'}</td>
+      <td><span class="cat-badge ${CAT_COLORS[m.categoria]||'badge-gray'}">${m.categoria||'—'}</span></td>
       <td>${m.detalle}</td>
       <td><span class="badge ${m.tipo==='Ingreso'?'badge-green':'badge-red'}">${m.tipo}</span></td>
       <td class="${m.usd_ing?'amount-usd':m.usd_eg?'amount-neg':''}">${m.usd_ing?'+$'+m.usd_ing.toFixed(2):m.usd_eg?'-$'+m.usd_eg.toFixed(2):'—'}</td>
       <td class="${m.crc_ing?'amount-crc':m.crc_eg?'amount-neg':''}">${m.crc_ing?'+₡'+m.crc_ing.toLocaleString('es-CR'):m.crc_eg?'-₡'+m.crc_eg.toLocaleString('es-CR'):'—'}</td>
-      <td><button onclick="delMov('${m.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1" title="Eliminar">×</button></td>
+      <td><button onclick="delMov('${m.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px" title="Eliminar">×</button></td>
       </tr>`).join('')
-    :'<tr><td colspan="6" class="empty">Sin movimientos para este día</td></tr>';
+    :'<tr><td colspan="8" class="empty">Sin movimientos para este día</td></tr>';
 
   const uI=day.reduce((s,m)=>s+(m.usd_ing||0),0),uE=day.reduce((s,m)=>s+(m.usd_eg||0),0);
   const cI=day.reduce((s,m)=>s+(m.crc_ing||0),0),cE=day.reduce((s,m)=>s+(m.crc_eg||0),0);
@@ -1118,63 +1258,170 @@ function renderCaja(){
   document.getElementById('total-crc-net').style.color=nC>=0?'var(--green)':'var(--red)';
 }
 
-window.addMovimiento = async function(){
-  if(!isToday(cajaViewDate)){showNotif('Solo podés agregar movimientos al día de hoy','#f87171');return;}
+window.addMovimiento=async function(){
+  if(!isToday(cajaViewDate)){showNotif('Solo podés agregar movimientos al día de hoy',true);return;}
   const det=document.getElementById('mov-detalle').value.trim();
-  if(!det){showNotif('Completá el detalle','#f87171');return;}
+  if(!det){showNotif('Completá el detalle',true);return;}
   const tipo=document.getElementById('mov-tipo').value;
+  const cat=document.getElementById('mov-cat').value;
   const usd=parseFloat(document.getElementById('mov-usd').value)||null;
   const crc=parseFloat(document.getElementById('mov-crc').value)||null;
-  if(!usd&&!crc){showNotif('Ingresá un monto','#f87171');return;}
-
-  const mov={
-    fecha:getTodayStr(), turno:currentTurno, tipo, detalle:det,
-    usd_ing:tipo==='Ingreso'?usd:null, usd_eg:tipo==='Egreso'?usd:null,
-    crc_ing:tipo==='Ingreso'?crc:null, crc_eg:tipo==='Egreso'?crc:null,
-    timestamp: Date.now()
-  };
-  // Remove nulls
-  Object.keys(mov).forEach(k=>{if(mov[k]===null)delete mov[k];});
-
+  if(!usd&&!crc){showNotif('Ingresá un monto',true);return;}
+  const mov={fecha:getTodayStr(),turno:currentTurno,tipo,categoria:cat,detalle:det,
+    recepcionista:voluntarioActivo||'Sin asignar',timestamp:Date.now()};
+  if(usd){if(tipo==='Ingreso')mov.usd_ing=usd;else mov.usd_eg=usd;}
+  if(crc){if(tipo==='Ingreso')mov.crc_ing=crc;else mov.crc_eg=crc;}
   try{
     setSyncStatus('syncing');
     document.getElementById('btn-agregar').disabled=true;
-    await addDoc(collection(db,'movimientos'), mov);
-    setSyncStatus('online');
-    clearForm();
-    showNotif('✓ Guardado en Firebase');
-  } catch(e){
-    setSyncStatus('error');
-    showNotif('Error al guardar','#f87171');
-  } finally{
-    document.getElementById('btn-agregar').disabled=false;
-  }
+    await addDoc(collection(db,'movimientos'),mov);
+    setSyncStatus('online');clearForm();showNotif('✓ Guardado');
+  }catch(e){setSyncStatus('error');showNotif('Error al guardar',true);}
+  finally{document.getElementById('btn-agregar').disabled=false;}
 };
 
-window.delMov = async function(firestoreId){
-  if(!confirm('¿Eliminar este movimiento?')) return;
+window.delMov=async function(id){
+  if(!confirm('¿Eliminar este movimiento?'))return;
+  const m=cajaData.find(x=>x.id===id);
   try{
     setSyncStatus('syncing');
-    await deleteDoc(doc(db,'movimientos',firestoreId));
-    setSyncStatus('online');
-    showNotif('Eliminado');
-  } catch(e){
-    setSyncStatus('error');
-    showNotif('Error al eliminar','#f87171');
-  }
+    await deleteDoc(doc(db,'movimientos',id));
+    await logAudit('BORRADO','Movimiento caja: '+(m?.detalle||id),
+      `${m?.fecha} ${m?.turno} ${m?.tipo} ${m?.usd_ing?'$'+m.usd_ing:m?.crc_ing?'₡'+m.crc_ing:''}`.trim(),'eliminado');
+    setSyncStatus('online');showNotif('Eliminado');
+  }catch(e){setSyncStatus('error');showNotif('Error',true);}
 };
 
 window.clearForm=function(){
   ['mov-detalle','mov-usd','mov-crc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('mov-tipo').value='Ingreso';
+  document.getElementById('mov-cat').value='Alojamiento';
 };
 
-// ════════════════════════════════════════════════════════════
-// RESUMEN
-// ════════════════════════════════════════════════════════════
-window.setRange=function(r,btn){resumenRange=r;document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderResumen();};
+// ── CONTABILIDAD ──────────────────────────────────────────
+window.setContRange=function(r,btn){contRange=r;document.querySelectorAll('#cont-range-sel .range-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderContabilidad();};
 
-function getDateRange(){
+function getContDateRange(){
+  const today=new Date();let start;
+  if(contRange==='semana'){start=new Date(today);start.setDate(today.getDate()-6);}
+  else if(contRange==='mes'){start=new Date(today.getFullYear(),today.getMonth(),1);}
+  else{start=new Date(2026,0,1);}
+  const dates=[];
+  for(let d=new Date(start);d<=today;d.setDate(d.getDate()+1))
+    dates.push(p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear());
+  return dates;
+}
+
+function renderContabilidad(){
+  const dates=getContDateRange();
+  const data=cajaData.filter(m=>dates.includes(m.fecha));
+  const totalUsdIng=data.reduce((s,m)=>s+(m.usd_ing||0),0);
+  const totalUsdEg=data.reduce((s,m)=>s+(m.usd_eg||0),0);
+  const totalCrcIng=data.reduce((s,m)=>s+(m.crc_ing||0),0);
+  const totalCrcEg=data.reduce((s,m)=>s+(m.crc_eg||0),0);
+
+  document.getElementById('cont-cards').innerHTML=`
+    <div class="card card-accent"><div class="card-label">Total Ingresos USD</div><div class="card-value">$${totalUsdIng.toFixed(2)}</div><div class="card-sub">egresos $${totalUsdEg.toFixed(2)}</div></div>
+    <div class="card"><div class="card-label">Total Ingresos CRC</div><div class="card-value" style="font-size:18px">₡${Math.round(totalCrcIng).toLocaleString('es-CR')}</div><div class="card-sub">egresos ₡${Math.round(totalCrcEg).toLocaleString('es-CR')}</div></div>
+    <div class="card ${(totalUsdIng-totalUsdEg)<0?'card-warn':''}"><div class="card-label">Neto USD</div><div class="card-value">$${(totalUsdIng-totalUsdEg).toFixed(2)}</div><div class="card-sub">${dates.length} días</div></div>
+    <div class="card"><div class="card-label">Neto CRC</div><div class="card-value" style="font-size:18px">₡${Math.round(totalCrcIng-totalCrcEg).toLocaleString('es-CR')}</div><div class="card-sub">&nbsp;</div></div>`;
+
+  // Charts by category
+  const cats=Object.keys(CAT_COLORS);
+  const ingByCat={},egByCat={};
+  cats.forEach(c=>{ingByCat[c]=0;egByCat[c]=0;});
+  data.forEach(m=>{
+    const c=m.categoria||'Otros';
+    if(m.tipo==='Ingreso'){ingByCat[c]=(ingByCat[c]||0)+(m.usd_ing||0)+(m.crc_ing||0)/600;}
+    else{egByCat[c]=(egByCat[c]||0)+(m.usd_eg||0)+(m.crc_eg||0)/600;}
+  });
+
+  const ingEntries=Object.entries(ingByCat).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const egEntries=Object.entries(egByCat).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const mxI=ingEntries.length?ingEntries[0][1]:1;
+  const mxE=egEntries.length?egEntries[0][1]:1;
+
+  document.getElementById('cont-chart-ing').innerHTML=ingEntries.length
+    ?ingEntries.map(([c,v])=>`<div class="bar-row">
+      <div class="bar-label"><span class="cat-badge ${CAT_COLORS[c]||''}" style="padding:2px 6px;font-size:10px">${c}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/mxI*100)}%"></div></div>
+      <div class="bar-val" style="font-size:11px">${data.filter(m=>m.categoria===c&&m.tipo==='Ingreso').length} mov.</div>
+      </div>`).join('')
+    :'<div class="empty">Sin ingresos</div>';
+
+  document.getElementById('cont-chart-eg').innerHTML=egEntries.length
+    ?egEntries.map(([c,v])=>`<div class="bar-row">
+      <div class="bar-label"><span class="cat-badge ${CAT_COLORS[c]||''}" style="padding:2px 6px;font-size:10px">${c}</span></div>
+      <div class="bar-track"><div class="bar-fill rooms" style="width:${Math.round(v/mxE*100)}%"></div></div>
+      <div class="bar-val" style="font-size:11px">${data.filter(m=>m.categoria===c&&m.tipo==='Egreso').length} mov.</div>
+      </div>`).join('')
+    :'<div class="empty">Sin egresos</div>';
+
+  // Detail table
+  const sorted=[...data].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  document.getElementById('cont-table').innerHTML=sorted.length
+    ?sorted.map(m=>`<tr>
+      <td>${m.fecha}</td>
+      <td><span class="badge ${m.turno==='MAÑANA'?'badge-yellow':'badge-blue'}">${m.turno}</span></td>
+      <td>${m.recepcionista||'—'}</td>
+      <td><span class="cat-badge ${CAT_COLORS[m.categoria]||'badge-gray'}">${m.categoria||'—'}</span></td>
+      <td>${m.detalle}</td>
+      <td><span class="badge ${m.tipo==='Ingreso'?'badge-green':'badge-red'}">${m.tipo}</span></td>
+      <td class="${m.usd_ing?'amount-usd':m.usd_eg?'amount-neg':''}">${m.usd_ing?'+$'+m.usd_ing.toFixed(2):m.usd_eg?'-$'+m.usd_eg.toFixed(2):'—'}</td>
+      <td class="${m.crc_ing?'amount-crc':m.crc_eg?'amount-neg':''}">${m.crc_ing?'+₡'+m.crc_ing.toLocaleString('es-CR'):m.crc_eg?'-₡'+m.crc_eg.toLocaleString('es-CR'):'—'}</td>
+      </tr>`).join('')
+    :'<tr><td colspan="8" class="empty">Sin movimientos en este período</td></tr>';
+}
+
+// ── AUDITORÍA ─────────────────────────────────────────────
+window.renderAudit=function(){
+  const filter=document.getElementById('audit-filter')?.value||'TODOS';
+  const data=filter==='TODOS'?auditData:auditData.filter(a=>a.accion===filter);
+  const actionClass={'NUEVO':'audit-action-new','EDICION':'audit-action-edit','BORRADO':'audit-action-delete','ESTADO':'audit-action-estado','CHECKOUT':'audit-action-edit'};
+  const actionLabel={'NUEVO':'✚ Nuevo','EDICION':'✎ Edición','BORRADO':'✕ Borrado','ESTADO':'⇄ Estado','CHECKOUT':'⏏ Check-out'};
+  document.getElementById('audit-table').innerHTML=data.length
+    ?data.map(a=>`<tr>
+      <td style="font-size:12px;white-space:nowrap">${a.timestamp?msToDatetimeStr(a.timestamp):'—'}</td>
+      <td><span class="${actionClass[a.accion]||''}" style="font-weight:700;font-size:12px">${actionLabel[a.accion]||a.accion}</span></td>
+      <td>${a.recepcionista||'—'}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${a.detalle||'—'}</td>
+      <td style="color:var(--muted);font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis">${a.dato_anterior||'—'}</td>
+      <td style="font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis">${a.dato_nuevo||'—'}</td>
+      </tr>`).join('')
+    :'<tr><td colspan="6" class="empty">Sin registros aún</td></tr>';
+};
+
+function renderRecepConfig(){
+  document.getElementById('recep-list').innerHTML=recepcionistas.map(r=>`
+    <div class="recep-chip ${voluntarioActivo===r?'selected':''}">
+      <span class="chip-name">${r}</span>
+      <span class="chip-del" onclick="removeRecep('${r}')">×</span>
+    </div>`).join('');
+}
+
+window.addRecepcionista=async function(){
+  const v=document.getElementById('new-recep-input').value.trim();
+  if(!v)return;
+  if(recepcionistas.includes(v)){showNotif('Ya existe',true);return;}
+  const nueva=[...recepcionistas,v];
+  try{
+    await setDoc(doc(db,'config','recepcionistas'),{lista:nueva});
+    document.getElementById('new-recep-input').value='';
+    showNotif('✓ '+v+' agregado');
+  }catch(e){showNotif('Error',true);}
+};
+
+window.removeRecep=async function(nombre){
+  if(!confirm('¿Eliminar a '+nombre+'?'))return;
+  const nueva=recepcionistas.filter(r=>r!==nombre);
+  try{await setDoc(doc(db,'config','recepcionistas'),{lista:nueva});}
+  catch(e){showNotif('Error',true);}
+};
+
+// ── RESUMEN ───────────────────────────────────────────────
+window.setRange=function(r,btn){resumenRange=r;document.querySelectorAll('#tab-resumen .range-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderResumen();};
+
+function getResumenDateRange(){
   const today=new Date();let start;
   if(resumenRange==='semana'){start=new Date(today);start.setDate(today.getDate()-6);}
   else if(resumenRange==='mes'){start=new Date(today.getFullYear(),today.getMonth(),1);}
@@ -1186,7 +1433,7 @@ function getDateRange(){
 }
 
 function renderResumen(){
-  const dates=getDateRange();
+  const dates=getResumenDateRange();
   const data=cajaData.filter(m=>dates.includes(m.fecha));
   const uI=data.reduce((s,m)=>s+(m.usd_ing||0),0),uE=data.reduce((s,m)=>s+(m.usd_eg||0),0);
   const cI=data.reduce((s,m)=>s+(m.crc_ing||0),0),cE=data.reduce((s,m)=>s+(m.crc_eg||0),0);
@@ -1195,13 +1442,13 @@ function renderResumen(){
 
   document.getElementById('resumen-cards').innerHTML=`
     <div class="card card-accent"><div class="card-label">Ingresos USD</div><div class="card-value">$${uI.toFixed(2)}</div><div class="card-sub">neto $${(uI-uE).toFixed(2)}</div></div>
-    <div class="card"><div class="card-label">Ingresos CRC</div><div class="card-value" style="font-size:20px">₡${Math.round(cI).toLocaleString('es-CR')}</div><div class="card-sub">neto ₡${Math.round(cI-cE).toLocaleString('es-CR')}</div></div>
+    <div class="card"><div class="card-label">Ingresos CRC</div><div class="card-value" style="font-size:18px">₡${Math.round(cI).toLocaleString('es-CR')}</div><div class="card-sub">neto ₡${Math.round(cI-cE).toLocaleString('es-CR')}</div></div>
     <div class="card"><div class="card-label">Días con datos</div><div class="card-value">${[...new Set(data.map(m=>m.fecha))].length}</div><div class="card-sub">de ${dates.length} en rango</div></div>
-    <div class="card ${totalDiffs>0?'card-warn':''}"><div class="card-label">Diferencias caja</div><div class="card-value">${totalDiffs}</div><div class="card-sub">${totalDiffs===0?'Todo cuadra ✓':'revisar en Caja'}</div></div>`;
+    <div class="card ${totalDiffs>0?'card-warn':''}"><div class="card-label">Diferencias caja</div><div class="card-value">${totalDiffs}</div><div class="card-sub">${totalDiffs===0?'Todo cuadra ✓':'revisar Caja'}</div></div>`;
 
   document.getElementById('resumen-alertas').innerHTML=totalDiffs>0
-    ?`<div class="alert-box alert-warn">⚠️ <strong>${totalDiffs} diferencias</strong> detectadas en: ${allCierreDates.filter(d=>getDiffs(d).length>0).join(', ')}</div>`
-    :data.length?'<div class="alert-box alert-ok">✓ Todas las cajas cuadran correctamente.</div>':'';
+    ?`<div class="alert-box alert-warn">⚠️ <strong>${totalDiffs} diferencias</strong> en: ${allCierreDates.filter(d=>getDiffs(d).length>0).join(', ')}</div>`
+    :data.length?'<div class="alert-box alert-ok">✓ Todas las cajas cuadran.</div>':'';
 
   const byDay={};dates.forEach(d=>{byDay[d]={usd:0,crc:0};});
   data.forEach(m=>{byDay[m.fecha].usd+=(m.usd_ing||0);byDay[m.fecha].crc+=(m.crc_ing||0);});
@@ -1209,46 +1456,20 @@ function renderResumen(){
   const mxU=Math.max(...recent.map(d=>byDay[d].usd),1);
   const mxC=Math.max(...recent.map(d=>byDay[d].crc),1);
 
-  document.getElementById('chart-usd').innerHTML=recent.map(d=>{
-    const v=byDay[d].usd;
-    return`<div class="bar-row"><div class="bar-label">${dateLabel(d)}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/mxU*100)}%"></div></div>
-      <div class="bar-val">$${v.toFixed(2)}</div></div>`;}).join('')||'<div class="empty">Sin datos</div>';
+  document.getElementById('chart-usd').innerHTML=recent.map(d=>{const v=byDay[d].usd;return`<div class="bar-row"><div class="bar-label">${dateLabel(d)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/mxU*100)}%"></div></div><div class="bar-val">$${v.toFixed(2)}</div></div>`;}).join('')||'<div class="empty">Sin datos</div>';
+  document.getElementById('chart-crc').innerHTML=recent.map(d=>{const v=byDay[d].crc;return`<div class="bar-row"><div class="bar-label">${dateLabel(d)}</div><div class="bar-track"><div class="bar-fill crc" style="width:${Math.round(v/mxC*100)}%"></div></div><div class="bar-val">₡${Math.round(v).toLocaleString('es-CR')}</div></div>`;}).join('')||'<div class="empty">Sin datos</div>';
 
-  document.getElementById('chart-crc').innerHTML=recent.map(d=>{
-    const v=byDay[d].crc;
-    return`<div class="bar-row"><div class="bar-label">${dateLabel(d)}</div>
-      <div class="bar-track"><div class="bar-fill crc" style="width:${Math.round(v/mxC*100)}%"></div></div>
-      <div class="bar-val">₡${Math.round(v).toLocaleString('es-CR')}</div></div>`;}).join('')||'<div class="empty">Sin datos</div>';
-
-  const roomRev={};allGuests.forEach(g=>{if(g.total&&g.hab){const h=cap(g.hab);roomRev[h]=(roomRev[h]||0)+g.total;}});
-  const rs=Object.entries(roomRev).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const mxR=rs.length?rs[0][1]:1;
-  document.getElementById('chart-rooms').innerHTML=rs.map(([r,v])=>`<div class="bar-row">
-    <div class="bar-label">${r}</div>
-    <div class="bar-track"><div class="bar-fill rooms" style="width:${Math.round(v/mxR*100)}%"></div></div>
-    <div class="bar-val">$${v.toFixed(0)}</div></div>`).join('')||'<div class="empty">Sin datos</div>';
+  const roomRev={};guestData.forEach(g=>{if(g.total&&g.hab){const h=cap(g.hab);roomRev[h]=(roomRev[h]||0)+g.total;}});
+  const rs=Object.entries(roomRev).sort((a,b)=>b[1]-a[1]).slice(0,10);const mxR=rs.length?rs[0][1]:1;
+  document.getElementById('chart-rooms').innerHTML=rs.map(([r,v])=>`<div class="bar-row"><div class="bar-label">${r}</div><div class="bar-track"><div class="bar-fill rooms" style="width:${Math.round(v/mxR*100)}%"></div></div><div class="bar-val">$${v.toFixed(0)}</div></div>`).join('')||'<div class="empty">Sin datos</div>';
 
   const allDR=[];allCierreDates.forEach(d=>getDiffs(d).forEach(df=>allDR.push({fecha:d,...df})));
   document.getElementById('diffs-table').innerHTML=allDR.length
-    ?allDR.map(d=>`<tr><td>${d.fecha}</td>
-      <td><span class="badge badge-yellow">${d.turno}</span><br><small style="color:var(--muted)">${d.tipo}</small></td>
+    ?allDR.map(d=>`<tr><td>${d.fecha}</td><td><span class="badge badge-yellow">${d.turno}</span></td>
       <td class="${Math.abs(d.diff_usd)>0.01?'diff-bad':'diff-ok-cell'}">${Math.abs(d.diff_usd)>0.01?'$'+d.diff_usd.toFixed(2):'✓'}</td>
       <td class="${Math.abs(d.diff_crc)>1?'diff-bad':'diff-ok-cell'}">${Math.abs(d.diff_crc)>1?'₡'+Math.round(d.diff_crc).toLocaleString('es-CR'):'✓'}</td></tr>`).join('')
     :'<tr><td colspan="4" class="empty">Sin diferencias ✓</td></tr>';
-
-  const allMovS=[...cajaData].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  document.getElementById('resumen-mov-table').innerHTML=allMovS.length
-    ?allMovS.map(m=>`<tr><td>${m.fecha}</td>
-      <td><span class="badge ${m.turno==='MAÑANA'?'badge-yellow':'badge-blue'}">${m.turno}</span></td>
-      <td>${m.detalle}</td>
-      <td><span class="badge ${m.tipo==='Ingreso'?'badge-green':'badge-red'}">${m.tipo}</span></td>
-      <td class="${m.usd_ing?'amount-usd':m.usd_eg?'amount-neg':''}">${m.usd_ing?'+$'+m.usd_ing.toFixed(2):m.usd_eg?'-$'+m.usd_eg.toFixed(2):'—'}</td>
-      <td class="${m.crc_ing?'amount-crc':m.crc_eg?'amount-neg':''}">${m.crc_ing?'+₡'+m.crc_ing.toLocaleString('es-CR'):m.crc_eg?'-₡'+m.crc_eg.toLocaleString('es-CR'):'—'}</td></tr>`).join('')
-    :'<tr><td colspan="6" class="empty">Sin movimientos aún</td></tr>';
 }
-
 </script>
-
-
-</body></html>
+</body>
+</html>
