@@ -221,16 +221,22 @@ tr:hover td{background:var(--surface2);}
   <div class="logo">Soul <span>Rebel</span></div>
   <div class="header-right">
     <div class="sync-status"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">En línea</span></div>
+    <div id="header-recep" style="display:none;align-items:center;gap:8px;background:rgba(200,245,90,.08);border:1px solid rgba(200,245,90,.25);border-radius:20px;padding:5px 12px;cursor:pointer" onclick="abrirSeleccionVoluntario()" title="Cambiar recepcionista">
+      <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;flex-shrink:0"></span>
+      <span id="header-recep-name" style="font-size:13px;font-weight:700;color:var(--accent)"></span>
+      <span style="font-size:10px;color:var(--muted)">cambiar</span>
+    </div>
     <div class="date-badge">Hoy · <strong id="today-date"></strong></div>
   </div>
 </header>
 <nav>
   <button class="nav-btn active" onclick="showTab('inicio',this)">🏠 Inicio</button>
-  <button class="nav-btn" onclick="showTab('gantt',this)">📅 GANTT A</button>
-  <button class="nav-btn" onclick="showTab('gantt2',this)">🗓️ GANTT B</button>
+  <button class="nav-btn" onclick="showTab('gantt2',this)">📅 GANTT</button>
   <button class="nav-btn" onclick="showTab('huespedes',this)">👤 Huéspedes</button>
+  <button class="nav-btn" onclick="showTab('residentes',this)">🏡 Residentes</button>
   <button class="nav-btn" onclick="showTab('habitaciones',this)">🛏️ Habitaciones</button>
   <button class="nav-btn" onclick="showTab('caja',this)">💰 Caja</button>
+  <button class="nav-btn" onclick="showTab('llaves',this)">🔑 Llaves</button>
   <button class="nav-btn" onclick="showTab('contabilidad',this)">📒 Contabilidad</button>
   <button class="nav-btn" onclick="showTab('resumen',this)">📊 Resumen</button>
   <button class="nav-btn" onclick="showTab('auditoria',this)">🔒 Auditoría</button>
@@ -240,6 +246,15 @@ tr:hover td{background:var(--surface2);}
 
 <!-- INICIO -->
 <div class="tab active" id="tab-inicio">
+  <!-- Alerta de checkouts pendientes (se muestra solo si hay) -->
+  <div id="checkout-alert-banner" style="display:none;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);border-radius:12px;padding:14px 18px;margin-bottom:20px;align-items:center;gap:12px;flex-wrap:wrap">
+    <span style="font-size:20px">⏰</span>
+    <div style="flex:1">
+      <div style="font-weight:700;color:var(--yellow)">Checkouts pendientes hoy</div>
+      <div style="font-size:12px;color:var(--muted)" id="checkout-alert-sub">Revisá quién se fue y quién se queda antes de las 11am</div>
+    </div>
+    <button class="btn-primary" style="background:var(--yellow);color:#000;font-size:12px;padding:8px 14px" onclick="scrollToCheckouts()">Ver ahora ↓</button>
+  </div>
   <div class="cards-grid">
     <div class="card card-accent">
       <div class="card-label">Huéspedes hoy</div>
@@ -264,10 +279,17 @@ tr:hover td{background:var(--surface2);}
   </div>
   <p class="section-title">Voluntario en turno</p>
   <div id="voluntario-display" style="margin-bottom:22px"></div>
+
+  <!-- CHECKOUTS HOY -->
+  <div id="checkout-hoy-section" style="display:none;margin-bottom:24px">
+    <p class="section-title" style="color:var(--yellow);margin-bottom:10px">⏰ Checkouts hoy · 11am</p>
+    <div id="checkout-hoy-list"></div>
+  </div>
+
   <p class="section-title">Huéspedes activos hoy</p>
   <div class="table-wrap" style="margin-bottom:22px">
     <table>
-      <thead><tr><th>Hab.</th><th>ID</th><th>Nombre</th><th>Check-in</th><th>$/Noche</th><th>Noches</th><th>Total</th></tr></thead>
+      <thead><tr><th>Hab.</th><th>ID</th><th>Nombre</th><th>Check-in</th><th>$/Noche</th><th>Noches</th><th>Total</th><th></th></tr></thead>
       <tbody id="active-today-table"></tbody>
     </table>
   </div>
@@ -280,25 +302,7 @@ tr:hover td{background:var(--surface2);}
   </div>
 </div>
 
-<!-- GANTT A — barra horizontal compacta -->
-<div class="tab" id="tab-gantt">
-  <div class="gantt-nav">
-    <button class="date-nav-btn" onclick="ganttPrev()">‹</button>
-    <div class="gantt-nav-label" id="gantt-label"></div>
-    <button class="date-nav-btn" onclick="ganttNext()">›</button>
-    <button class="btn-primary" style="padding:8px 16px;font-size:12px" onclick="ganttGoToday()">Hoy</button>
-  </div>
-  <div class="gantt-wrap">
-    <table class="gantt-table" id="gantt-table"></table>
-  </div>
-  <div class="gantt-legend">
-    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#dc2626"></div> Reserva</div>
-    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#d97706"></div> Cobrar (activo)</div>
-    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#16a34a"></div> Pagado</div>
-  </div>
-</div>
-
-<!-- GANTT B — vista calendario (estilo imagen) -->
+<!-- GANTT B — vista calendario -->
 <div class="tab" id="tab-gantt2">
   <div class="gantt-nav">
     <button class="date-nav-btn" onclick="gantt2Prev()">‹</button>
@@ -322,12 +326,33 @@ tr:hover td{background:var(--surface2);}
     <input class="search-input" style="margin-bottom:0" id="search-input" type="text" placeholder="Buscar por nombre, ID o habitación..." oninput="filterGuests()">
     <button class="btn-primary" style="white-space:nowrap" onclick="openNewGuestModal()">+ Check-in</button>
   </div>
-  <div class="table-wrap">
+  <!-- Activos -->
+  <p class="section-title" style="margin-bottom:10px">🟢 Alojados actualmente</p>
+  <div class="table-wrap" style="margin-bottom:24px">
     <table>
-      <thead><tr><th>ID</th><th>Nombre</th><th>Habitación</th><th>Check-in</th><th>$/Noche</th><th>Días</th><th>Total</th><th>Estado</th></tr></thead>
-      <tbody id="guests-table"></tbody>
+      <thead><tr><th>ID</th><th>Nombre</th><th>Habitación</th><th>Check-in</th><th>Precio/N</th><th>Noches</th><th>Total</th><th>Estado</th></tr></thead>
+      <tbody id="guests-table-active"></tbody>
     </table>
   </div>
+  <!-- Inactivos -->
+  <p class="section-title" style="margin-bottom:10px">⬛ Anteriores</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Nombre</th><th>Habitación</th><th>Check-in</th><th>Precio/N</th><th>Noches</th><th>Total</th><th>Estado</th></tr></thead>
+      <tbody id="guests-table-inactive"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- RESIDENTES INDEFINIDOS -->
+<div class="tab" id="tab-residentes">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <p class="section-title" style="margin-bottom:4px">Residentes indefinidos</p>
+      <p style="font-size:12px;color:var(--muted)">Huéspedes sin fecha de salida. Registrá sus pagos parciales para controlar deuda.</p>
+    </div>
+  </div>
+  <div id="residentes-list"></div>
 </div>
 
 <!-- HABITACIONES -->
@@ -380,10 +405,10 @@ tr:hover td{background:var(--surface2);}
     </div>
     <div class="form-grid">
       <div class="form-group"><label class="form-label">Tipo</label>
-        <select class="form-select" id="mov-tipo"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select>
+        <select class="form-select" id="mov-tipo" onchange="toggleMovGuestSel()"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select>
       </div>
       <div class="form-group"><label class="form-label">Categoría</label>
-        <select class="form-select" id="mov-cat">
+        <select class="form-select" id="mov-cat" onchange="toggleMovGuestSel()">
           <option value="Alojamiento">Alojamiento</option>
           <option value="Depósito llave">Depósito llave</option>
           <option value="Compras/Insumos">Compras/Insumos</option>
@@ -391,6 +416,11 @@ tr:hover td{background:var(--surface2);}
           <option value="Salarios">Salarios</option>
           <option value="Transferencia">Transferencia</option>
           <option value="Otros">Otros</option>
+        </select>
+      </div>
+      <div class="form-group" id="mov-guest-group" style="display:none"><label class="form-label">Huésped</label>
+        <select class="form-select" id="mov-guest" onchange="autoFillMovDetalle()">
+          <option value="">Seleccionar huésped...</option>
         </select>
       </div>
       <div class="form-group"><label class="form-label">Detalle</label>
@@ -425,6 +455,36 @@ tr:hover td{background:var(--surface2);}
     <table>
       <thead><tr><th>Turno</th><th>Recep.</th><th>Cat.</th><th>Detalle</th><th>Tipo</th><th>USD</th><th>CRC</th><th></th></tr></thead>
       <tbody id="caja-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LLAVES -->
+<div class="tab" id="tab-llaves">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+    <div>
+      <p class="section-title" style="margin-bottom:4px">🔑 Depósitos de llave</p>
+      <p style="font-size:12px;color:var(--muted)">Registro de depósitos cobrados, devueltos y no reclamados.</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="turno-btn active" id="dep-filter-pend" onclick="filterDepositos('pendiente',this)">Pendientes</button>
+      <button class="turno-btn" id="dep-filter-all" onclick="filterDepositos('todos',this)">Todos</button>
+    </div>
+  </div>
+  <!-- Resumen de totales -->
+  <div class="totales-bar" style="margin-bottom:20px">
+    <div class="total-item"><div class="total-label">Recibido USD</div><div class="total-value amount-usd" id="dep-total-rec-usd">$0</div></div>
+    <div class="total-item"><div class="total-label">Recibido CRC</div><div class="total-value amount-crc" id="dep-total-rec-crc">₡0</div></div>
+    <div class="total-item"><div class="total-label">Devuelto USD</div><div class="total-value amount-neg" id="dep-total-dev-usd">$0</div></div>
+    <div class="total-item"><div class="total-label">Devuelto CRC</div><div class="total-value amount-neg" id="dep-total-dev-crc">₡0</div></div>
+    <div class="total-item"><div class="total-label">⏳ Pendiente USD</div><div class="total-value" style="color:var(--yellow)" id="dep-total-pend-usd">$0</div></div>
+    <div class="total-item"><div class="total-label">⏳ Pendiente CRC</div><div class="total-value" style="color:var(--yellow)" id="dep-total-pend-crc">₡0</div></div>
+    <div class="total-item"><div class="total-label">⚠️ No cobradas</div><div class="total-value" style="color:var(--red)" id="dep-total-noc">0</div></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fecha</th><th>Huésped</th><th>Monto</th><th>Estado</th><th>Recep.</th><th></th></tr></thead>
+      <tbody id="dep-table"></tbody>
     </table>
   </div>
 </div>
@@ -535,6 +595,19 @@ tr:hover td{background:var(--surface2);}
     <div id="modal-body"></div>
   </div>
 </div>
+
+<!-- MODAL DE BIENVENIDA — bloqueante, no se puede cerrar sin elegir -->
+<div id="welcome-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center">
+    <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:900;margin-bottom:4px">Soul <span style="color:var(--accent)">Rebel</span></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:28px;letter-spacing:.05em">HOSTEL · RECEPCIÓN</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:6px">¿Quién está en turno?</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Seleccioná tu nombre para continuar.</div>
+    <div id="welcome-chips" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+    <div style="font-size:11px;color:var(--muted)">Si tu nombre no aparece, pedile a un administrador que te agregue en ⚙️ Config</div>
+  </div>
+</div>
+
 <div class="notif" id="notif"></div>
 
 <script type="module">
@@ -563,6 +636,7 @@ const CAT_COLORS = {'Alojamiento':'cat-alojamiento','Depósito llave':'cat-llave
 let cajaData   = [];
 let cierreData = {};
 let guestData  = [];
+let depositosData = [];
 let auditData  = [];
 let recepcionistas = ['Pupi','Alan','Adri','Nico'];
 let voluntarioActivo = null;
@@ -604,13 +678,30 @@ function estadoPillClass(estado){
   if(estado==='activo'||estado==='pendiente') return 'cobrar';
   return{'reserva':'reserva','cobrar':'cobrar','pagado':'pagado'}[estado]||'cobrar';
 }
-// A guest is "currently in hostel" if estado is cobrar/activo/pendiente
+// Guest is active TODAY if today falls within their stay dates
+// We ignore the 'activo' flag entirely — dates are the source of truth
+// Normalize any ms timestamp to local midnight (strips time component)
+function toLocalMidnight(ms){
+  const d = new Date(ms);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+
 function isGuestActive(g){
-  const hoy=Date.now();
-  const cin=g.checkin_ms||0;
-  const cout=g.checkout_ms||(cin+365*86400000);
-  // Active = today falls within stay AND not checked out
-  return hoy>=cin && hoy<cout && g.activo!==false;
+  if(!g.checkin_ms) return false;
+  const hoyMs = toLocalMidnight(Date.now());
+  const cin = toLocalMidnight(g.checkin_ms);
+  // No checkout = indefinite resident → always active from checkin
+  if(!g.checkout_ms) return hoyMs >= cin;
+  const cout = toLocalMidnight(g.checkout_ms);
+  return hoyMs >= cin && hoyMs < cout;
+}
+
+// guestOnDate: does guest occupy a given date cell (dateMs = already local midnight)
+function guestOnDate(g, dateMs){
+  const cin = toLocalMidnight(g.checkin_ms||0);
+  if(!g.checkout_ms) return dateMs >= cin;
+  const cout = toLocalMidnight(g.checkout_ms);
+  return dateMs >= cin && dateMs < cout;
 }
 
 async function logAudit(accion, detalle, datoAnterior='', datoNuevo=''){
@@ -675,16 +766,28 @@ function startListeners(){
     }
     loadedFlags.huespedes=true; checkAllLoaded();
     renderActiveToday();renderGuests(guestData);renderRooms();renderStats();
-    if(document.getElementById('tab-gantt').classList.contains('active'))renderGantt();
     if(document.getElementById('tab-gantt2').classList.contains('active'))renderGantt2();
+    if(document.getElementById('tab-residentes').classList.contains('active'))renderResidentes();
   }, err=>{ loadedFlags.huespedes=true; checkAllLoaded(); console.log('huespedes err',err); });
 
   // Recepcionistas
+  let welcomeShown = false;
   onSnapshot(doc(db,'config','recepcionistas'), snap=>{
     if(snap.exists()&&snap.data().lista){
       recepcionistas=snap.data().lista;
       renderRecepConfig();
     }
+    // Show welcome modal once after first load
+    if(!welcomeShown && !voluntarioActivo){
+      welcomeShown=true;
+      showWelcomeModal();
+    }
+  });
+
+  // Depósitos de llave
+  onSnapshot(query(collection(db,'depositos'),orderBy('timestamp','desc')), snap=>{
+    depositosData=snap.docs.map(d=>({fbId:d.id,...d.data()}));
+    if(document.getElementById('tab-llaves').classList.contains('active')) renderDepositos();
   });
 
   // Auditoría
@@ -786,9 +889,10 @@ window.showTab=function(id,btn){
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
   if(id==='resumen')renderResumen();
-  if(id==='caja')renderCajaView();
-  if(id==='gantt')renderGantt();
+  if(id==='caja'){renderCajaView();}
+  if(id==='llaves')renderDepositos();
   if(id==='gantt2')renderGantt2();
+  if(id==='residentes')renderResidentes();
   if(id==='contabilidad')renderContabilidad();
   if(id==='config')renderRecepConfig();
   if(id==='auditoria')renderAudit();
@@ -805,25 +909,47 @@ function renderStats(){
   document.getElementById('stat-crc').textContent='₡'+Math.round(crc).toLocaleString('es-CR')+' CRC';
   document.getElementById('stat-ocup').textContent=Math.round(active.length/15*100)+'%';
   document.getElementById('stat-ocup-sub').textContent=active.length+' de 15 habitaciones';
+  renderCheckoutsHoy();
 }
 
 // ── ACTIVE TODAY ──────────────────────────────────────────
 function renderActiveToday(){
-  const active=guestData.filter(g=>isGuestActive(g));
+  const active=guestData.filter(g=>isGuestActive(g)).sort((a,b)=>(b.id||0)-(a.id||0));
   document.getElementById('active-today-table').innerHTML=active.length
-    ?active.map(g=>`<tr>
+    ?active.map(g=>`<tr style="cursor:pointer" onclick="openGuestModal('${g.fbId}')">
       <td><span class="badge badge-blue">${cap(g.hab)}</span></td>
       <td><span class="badge badge-gray">#${g.id}</span></td>
       <td><strong>${g.name}</strong></td>
       <td>${g.fecha}</td>
-      <td>${g.precio_dia?'$'+g.precio_dia.toFixed(2):'—'}</td>
-      <td>${g.dias||'—'}</td>
-      <td>${g.total?'<strong style="color:var(--accent)">$'+g.total.toFixed(2)+'</strong>':'—'}</td>
+      <td>${g.precio_dia?(g.moneda==='CRC'?'₡':'$')+g.precio_dia.toFixed(2):'—'}</td>
+      <td>${g.checkout_ms?g.dias||'—':'∞'}</td>
+      <td>${g.total?'<strong style="color:var(--accent)">'+(g.moneda==='CRC'?'₡':'$')+g.total.toFixed(2)+'</strong>':'—'}</td>
+      <td><button onclick="event.stopPropagation();openGuestModal('${g.fbId}')" style="background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;border-radius:6px;padding:3px 8px;font-size:11px">✏️ Ver/Editar</button></td>
       </tr>`).join('')
-    :'<tr><td colspan="7" class="empty">Sin huéspedes activos</td></tr>';
+    :'<tr><td colspan="8" class="empty">Sin huéspedes activos</td></tr>';
 }
 
 // ── VOLUNTARIO ────────────────────────────────────────────
+function renderHeaderRecep(){
+  const el=document.getElementById('header-recep');
+  const nm=document.getElementById('header-recep-name');
+  if(!el||!nm) return;
+  if(voluntarioActivo){
+    nm.textContent=voluntarioActivo;
+    el.style.display='flex';
+  } else {
+    el.style.display='none';
+  }
+}
+
+// Guard — call before any write. Returns true if OK, shows error + opens selector if not.
+function requireRecep(){
+  if(voluntarioActivo) return true;
+  showNotif('⚠️ Seleccioná un recepcionista antes de continuar',true);
+  abrirSeleccionVoluntario();
+  return false;
+}
+
 function renderVoluntario(){
   const lbl=currentTurno==='MAÑANA'?'☀️ Turno Mañana':'🌙 Turno Tarde';
   document.getElementById('stat-turno-label').textContent=lbl;
@@ -840,7 +966,28 @@ function renderVoluntario(){
       <span style="color:var(--muted);font-size:13px">${lbl} · Sin asignar</span>
       <button class="btn-primary" style="padding:7px 14px;font-size:12px" onclick="abrirSeleccionVoluntario()">+ Asignar turno</button></div>`;
   }
+  renderHeaderRecep();
 }
+
+function showWelcomeModal(){
+  const overlay=document.getElementById('welcome-overlay');
+  const chips=document.getElementById('welcome-chips');
+  if(!overlay||!chips) return;
+  chips.innerHTML=recepcionistas.map(r=>`
+    <button onclick="seleccionarDesdeWelcome('${r}')"
+      style="padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:15px;font-weight:700;color:var(--text);width:100%;transition:all .15s"
+      onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">${r}</button>
+  `).join('');
+  overlay.style.display='flex';
+}
+
+window.seleccionarDesdeWelcome=function(nombre){
+  voluntarioActivo=nombre;
+  document.getElementById('welcome-overlay').style.display='none';
+  renderVoluntario();
+  showNotif('✓ Bienvenido/a '+nombre);
+};
 
 window.abrirSeleccionVoluntario=function(){
   const chips=recepcionistas.map(r=>`
@@ -863,6 +1010,35 @@ window.seleccionarVoluntario=function(nombre){
   showNotif('✓ '+nombre+' en turno');
 };
 
+window.toggleMovGuestSel=function(){
+  const tipo=document.getElementById('mov-tipo')?.value;
+  const cat=document.getElementById('mov-cat')?.value;
+  const grp=document.getElementById('mov-guest-group');
+  if(!grp) return;
+  const show=(cat==='Alojamiento'||cat==='Depósito llave')&&tipo==='Ingreso';
+  grp.style.display=show?'':'none';
+  if(show) populateMovGuestSelect();
+};
+
+function populateMovGuestSelect(){
+  const sel=document.getElementById('mov-guest');if(!sel)return;
+  const active=guestData.filter(g=>isGuestActive(g)).sort((a,b)=>(b.id||0)-(a.id||0));
+  sel.innerHTML='<option value="">Sin huésped específico</option>'+
+    active.map(g=>`<option value="${g.fbId}">#${g.id} · ${cap(g.name)} · ${cap(g.hab)} · ${g.moneda==='CRC'?'₡':'$'}${g.precio_dia||'?'}/n</option>`).join('');
+}
+
+window.autoFillMovDetalle=function(){
+  const fbId=document.getElementById('mov-guest')?.value;
+  if(!fbId) return;
+  const g=guestData.find(x=>x.fbId===fbId);if(!g) return;
+  document.getElementById('mov-detalle').value=`#${g.id} ${cap(g.name)} · ${cap(g.hab)}`;
+  // Auto-fill precio
+  if(g.precio_dia){
+    if(g.moneda==='CRC') document.getElementById('mov-crc').value=g.precio_dia;
+    else document.getElementById('mov-usd').value=g.precio_dia;
+  }
+};
+
 // ── MOVIMIENTOS RECIENTES ─────────────────────────────────
 function renderMovimientosRecientes(){
   const r=[...cajaData].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,6);
@@ -880,28 +1056,45 @@ function renderMovimientosRecientes(){
 
 // ── GUESTS ────────────────────────────────────────────────
 function renderGuests(data){
-  document.getElementById('guests-table').innerHTML=data.length
-    ?[...data].sort((a,b)=>b.activo-a.activo||(b.checkin_ms||0)-(a.checkin_ms||0)).map(g=>`<tr style="cursor:pointer" onclick="openGuestModal('${g.fbId}')">
-      <td><span class="badge badge-gray">#${g.id}</span></td>
-      <td><strong>${cap(g.name)}</strong></td>
-      <td>${cap(g.hab)}</td>
-      <td>${g.fecha}</td>
-      <td>${g.precio_dia?'$'+g.precio_dia.toFixed(2):'—'}</td>
-      <td>${g.dias||'—'}</td>
-      <td>${g.total?'<strong>$'+g.total.toFixed(2)+'</strong>':'—'}</td>
-      <td><button class="estado-pill ${estadoPillClass(g.estado||'cobrar')}" onclick="event.stopPropagation();openGuestModal('${g.fbId}')">${estadoLabel(g.estado||'cobrar')}</button></td>
-      </tr>`).join('')
-    :'<tr><td colspan="8" class="empty">Sin huéspedes</td></tr>';
+  const sorted=[...data].sort((a,b)=>(b.id||0)-(a.id||0));
+  const active=sorted.filter(g=>isGuestActive(g));
+  const inactive=sorted.filter(g=>!isGuestActive(g));
+  const row=g=>`<tr style="cursor:pointer" onclick="openGuestModal('${g.fbId}')">
+    <td><span class="badge badge-gray">#${g.id}</span></td>
+    <td><strong>${cap(g.name)}</strong></td>
+    <td>${cap(g.hab)}</td>
+    <td>${g.fecha}</td>
+    <td>${g.precio_dia?(g.moneda==='CRC'?'₡':'$')+g.precio_dia.toFixed(2):'—'}</td>
+    <td>${g.checkout_ms?g.dias||'—':'∞'}</td>
+    <td>${g.total?'<strong>'+(g.moneda==='CRC'?'₡':'$')+g.total.toFixed(2)+'</strong>':'—'}</td>
+    <td><button class="estado-pill ${estadoPillClass(g.estado||'cobrar')}" onclick="event.stopPropagation();openGuestModal('${g.fbId}')">${estadoLabel(g.estado||'cobrar')}</button></td>
+    </tr>`;
+  const taActive=document.getElementById('guests-table-active');
+  const taInactive=document.getElementById('guests-table-inactive');
+  if(taActive) taActive.innerHTML=active.length?active.map(row).join(''):'<tr><td colspan="8" class="empty">Sin huéspedes activos</td></tr>';
+  if(taInactive) taInactive.innerHTML=inactive.length?inactive.map(row).join(''):'<tr><td colspan="8" class="empty">Sin registros anteriores</td></tr>';
 }
 window.filterGuests=function(){
   const q=document.getElementById('search-input').value.toLowerCase();
-  renderGuests(guestData.filter(g=>g.name.toLowerCase().includes(q)||String(g.id).includes(q)||g.hab.toLowerCase().includes(q)));
+  renderGuests(guestData.filter(g=>g.name.toLowerCase().includes(q)||String(g.id).includes(q)||(g.hab||'').toLowerCase().includes(q)));
 };
 
 window.openGuestModal=function(fbId){
   const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
   const checkoutDate=g.checkout_ms?msToDDMMYYYY(g.checkout_ms):'—';
   const estado=g.estado||'cobrar';
+  // Check for pending llave deposit
+  const depPend=depositosData.find(d=>d.guestFbId===fbId && d.estado==='pendiente');
+  const llaveBadge=depPend
+    ?`<div class="modal-row">
+        <span class="modal-key">🔑 Llave</span>
+        <span class="modal-val" style="display:flex;align-items:center;gap:8px">
+          <span style="background:rgba(251,191,36,.15);color:var(--yellow);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700">⏳ Dep. pendiente: ${depPend.moneda==='USD'?'$':'₡'}${depPend.moneda==='USD'?Number(depPend.monto).toFixed(2):Math.round(depPend.monto).toLocaleString('es-CR')}</span>
+          <button onclick="accionDeposito('${depPend.fbId}','devuelto')" style="background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.3);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">↩ Devolver</button>
+          <button onclick="accionDeposito('${depPend.fbId}','perdido')" style="background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.2);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">💸 No reclamó</button>
+        </span>
+      </div>`
+    :`<div class="modal-row"><span class="modal-key">🔑 Llave</span><span class="modal-val" style="color:var(--muted);font-size:12px">Sin depósito pendiente</span></div>`;
   document.getElementById('modal-title').textContent=cap(g.name);
   document.getElementById('modal-body').innerHTML=`
     <div class="modal-row"><span class="modal-key">ID</span><span class="modal-val">#${g.id}</span></div>
@@ -911,6 +1104,7 @@ window.openGuestModal=function(fbId){
     <div class="modal-row"><span class="modal-key">$/Noche</span><span class="modal-val">${g.precio_dia?'$'+g.precio_dia.toFixed(2):'—'}</span></div>
     <div class="modal-row"><span class="modal-key">Noches</span><span class="modal-val">${g.dias||'—'}</span></div>
     <div class="modal-row"><span class="modal-key">Total</span><span class="modal-val" style="color:var(--accent)">${g.total?'$'+g.total.toFixed(2):'—'}</span></div>
+    ${llaveBadge}
     <div class="modal-row">
       <span class="modal-key">Estado</span>
       <span class="modal-val">
@@ -921,11 +1115,29 @@ window.openGuestModal=function(fbId){
         </select>
       </span>
     </div>
-    ${g.activo?`<div style="margin-top:16px"><button class="btn-danger" onclick="doCheckout('${g.fbId}')">Hacer Check-out</button></div>`:''}`;
+    ${isGuestActive(g)?`<div style="margin-top:16px"><button class="btn-danger" onclick="doCheckout('${g.fbId}')">Hacer Check-out</button></div>`:''}
+    <!-- Movement history for this guest -->
+    ${(()=>{
+      const movs=cajaData.filter(m=>m.guestFbId===fbId).sort((a,b)=>b.timestamp-a.timestamp);
+      if(!movs.length) return '<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)"><p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Movimientos de caja</p><p style="font-size:12px;color:var(--muted)">Sin movimientos registrados con este huésped.</p></div>';
+      return`<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Movimientos de caja</p>
+        <div class="table-wrap" style="max-height:180px;overflow-y:auto"><table>
+          <thead><tr><th>Fecha</th><th>Cat.</th><th>USD</th><th>CRC</th></tr></thead>
+          <tbody>${movs.map(m=>`<tr>
+            <td>${m.fecha}</td>
+            <td><span class="cat-badge ${CAT_COLORS[m.categoria]||'badge-gray'}">${m.categoria}</span></td>
+            <td class="${m.usd_ing?'amount-usd':m.usd_eg?'amount-neg':''}">${m.usd_ing?'+$'+m.usd_ing.toFixed(2):m.usd_eg?'-$'+m.usd_eg.toFixed(2):'—'}</td>
+            <td class="${m.crc_ing?'amount-crc':m.crc_eg?'amount-neg':''}">${m.crc_ing?'+₡'+Math.round(m.crc_ing).toLocaleString('es-CR'):m.crc_eg?'-₡'+Math.round(m.crc_eg).toLocaleString('es-CR'):'—'}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+      </div>`;
+    })()}`;
   document.getElementById('modal-overlay').classList.add('open');
 };
 
 window.cambiarEstado=async function(fbId,estadoAnterior,estadoNuevo){
+  if(!requireRecep()) return;
   if(estadoAnterior===estadoNuevo)return;
   const g=guestData.find(x=>x.fbId===fbId);
   try{
@@ -937,12 +1149,15 @@ window.cambiarEstado=async function(fbId,estadoAnterior,estadoNuevo){
 };
 
 window.doCheckout=async function(fbId){
+  if(!requireRecep()) return;
   const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
-  if(!confirm('¿Confirmar check-out de '+g.name+'?'))return;
+  const motivo=prompt('Motivo del check-out (requerido):','');
+  if(motivo===null) return; // cancelado
+  if(!motivo.trim()){showNotif('⚠️ El motivo es obligatorio',true);return;}
   try{
     setSyncStatus('syncing');
     await setDoc(doc(db,'huespedes',fbId),{activo:false,checkout_ms:Date.now(),estado:'pagado'},{merge:true});
-    await logAudit('CHECKOUT',`#${g.id} ${g.name}`,g.fecha,'checkout '+getTodayStr());
+    await logAudit('CHECKOUT',`#${g.id} ${g.name}`,g.fecha,'checkout '+getTodayStr()+' · '+motivo);
     setSyncStatus('online');showNotif('✓ Check-out realizado');closeModal();
   }catch(e){setSyncStatus('error');showNotif('Error',true);}
 };
@@ -951,44 +1166,91 @@ window.openNewGuestModal=function(){
   const nextId=guestData.length?Math.max(...guestData.map(g=>g.id||0))+1:547;
   document.getElementById('modal-title').textContent='Nuevo Check-in';
   document.getElementById('modal-body').innerHTML=`
-    <div class="form-group" style="margin-bottom:12px"><label class="form-label">Nombre completo</label>
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label">Nombre completo</label>
       <input class="form-input" id="ni-name" placeholder="Nombre del huésped"></div>
-    <div class="form-group" style="margin-bottom:12px"><label class="form-label">Habitación</label>
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label">Habitación</label>
       <select class="form-select" id="ni-hab">${ROOMS.map(r=>`<option>${r}</option>`).join('')}</select></div>
-    <div class="form-group" style="margin-bottom:12px"><label class="form-label">Estado inicial</label>
-      <select class="form-select" id="ni-estado">
-        <option value="cobrar">🟡 Cobrar (activo en hostel)</option>
-        <option value="reserva">🔴 Reserva (no llegó aún)</option>
-        <option value="pagado">🟢 Pagado</option>
-      </select></div>
     <div class="form-grid" style="margin-bottom:12px">
-      <div class="form-group"><label class="form-label">$/Noche</label><input class="form-input" id="ni-precio" type="number" placeholder="0.00"></div>
-      <div class="form-group"><label class="form-label">Noches</label><input class="form-input" id="ni-dias" type="number" placeholder="1"></div>
+      <div class="form-group"><label class="form-label">Precio/Noche</label>
+        <input class="form-input" id="ni-precio" type="number" step="0.01" placeholder="0.00" oninput="calcCheckin()"></div>
+      <div class="form-group" id="ni-dias-group"><label class="form-label">Noches</label>
+        <input class="form-input" id="ni-dias" type="number" placeholder="1" oninput="calcCheckin()"></div>
+      <div class="form-group"><label class="form-label">Moneda</label>
+        <select class="form-select" id="ni-moneda" onchange="calcCheckin()">
+          <option value="USD">USD $</option>
+          <option value="CRC">CRC ₡</option>
+        </select></div>
     </div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">ID asignado: <strong style="color:var(--text)">#${nextId}</strong></p>
-    <button class="btn-primary" onclick="saveNewGuest(${nextId})">✓ Registrar</button>`;
+    <div style="margin-bottom:14px">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px">
+        <input type="checkbox" id="ni-indefinido" onchange="toggleIndefinido()" style="width:16px;height:16px;accent-color:var(--accent2)">
+        <span>🏡 <strong>Indefinido</strong> — sin fecha de salida (se agrega a Residentes)</span>
+      </label>
+    </div>
+    <div class="form-group" id="ni-estado-group" style="margin-bottom:16px">
+      <label class="form-label">Estado</label>
+      <select class="form-select" id="ni-estado">
+        <option value="cobrar">🟡 Cobrar (activo, pago pendiente)</option>
+        <option value="pagado">🟢 Pagado</option>
+        <option value="reserva">🔴 Reserva (aún no llegó)</option>
+      </select></div>
+    <div id="ni-total-preview" style="font-size:13px;color:var(--accent);margin-bottom:14px;font-weight:600;min-height:20px"></div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">ID: <strong style="color:var(--text)">#${nextId}</strong> · Recep: <strong style="color:var(--text)">${voluntarioActivo||'—'}</strong></p>
+    <button class="btn-primary" onclick="saveNewGuest(${nextId})">✓ Registrar Check-in</button>`;
   document.getElementById('modal-overlay').classList.add('open');
 };
 
+window.toggleIndefinido=function(){
+  const ind=document.getElementById('ni-indefinido').checked;
+  const diasGroup=document.getElementById('ni-dias-group');
+  const estadoGroup=document.getElementById('ni-estado-group');
+  if(diasGroup) diasGroup.style.opacity=ind?'0.3':'1';
+  const diasInput=document.getElementById('ni-dias');
+  if(diasInput){ diasInput.disabled=ind; if(ind)diasInput.value=''; }
+  if(estadoGroup){
+    estadoGroup.style.opacity=ind?'0.4':'1';
+    estadoGroup.style.pointerEvents=ind?'none':'auto';
+    if(ind) document.getElementById('ni-estado').value='cobrar';
+  }
+  calcCheckin();
+};
+
+window.calcCheckin=function(){
+  const ind=document.getElementById('ni-indefinido')?.checked;
+  const precio=parseFloat(document.getElementById('ni-precio')?.value)||0;
+  const dias=parseInt(document.getElementById('ni-dias')?.value)||0;
+  const moneda=document.getElementById('ni-moneda')?.value||'USD';
+  const preview=document.getElementById('ni-total-preview');
+  if(ind){ if(preview) preview.textContent='Estadía indefinida · precio/noche referencial'; return; }
+  const total=precio*dias;
+  if(preview) preview.textContent=total>0?`Total estimado: ${moneda==='USD'?'$':'₡'}${moneda==='USD'?total.toFixed(2):Math.round(total).toLocaleString('es-CR')}`:'';
+};
+
 window.saveNewGuest=async function(nextId){
+  if(!requireRecep()) return;
   const name=document.getElementById('ni-name').value.trim();
   const hab=document.getElementById('ni-hab').value;
   const estado=document.getElementById('ni-estado').value;
   const precio=parseFloat(document.getElementById('ni-precio').value)||null;
-  const dias=parseInt(document.getElementById('ni-dias').value)||null;
+  const indefinido=document.getElementById('ni-indefinido')?.checked||false;
+  const dias=indefinido?null:(parseInt(document.getElementById('ni-dias').value)||null);
+  const moneda=document.getElementById('ni-moneda').value||'USD';
   if(!name){showNotif('Ingresá el nombre',true);return;}
   const today=getTodayStr();
-  const total=precio&&dias?parseFloat((precio*dias).toFixed(2)):null;
   const checkin_ms=dateToMs(today);
   const checkout_ms=dias?checkin_ms+dias*86400000:null;
-  const activo = estado !== 'pagado'; // reserva and cobrar are both active stays
-  const guest={id:nextId,name,hab,fecha:today,checkin_ms,checkout_ms,precio_dia:precio,dias,total,activo,estado};
+  const total=precio&&dias?parseFloat((precio*dias).toFixed(2)):null;
+  const guest={id:nextId,name,hab,fecha:today,checkin_ms,checkout_ms,precio_dia:precio,dias,total,moneda,activo:true,estado,indefinido};
   try{
     setSyncStatus('syncing');
     await addDoc(collection(db,'huespedes'),guest);
-    await logAudit('NUEVO',`#${nextId} ${name} · ${cap(hab)}`,'','check-in '+today);
-    setSyncStatus('online');showNotif('✓ Check-in registrado');closeModal();
-  }catch(e){setSyncStatus('error');showNotif('Error',true);}
+    await logAudit('NUEVO',`#${nextId} ${name} · ${cap(hab)}`,'',`check-in ${today} · ${estado}${indefinido?' · INDEFINIDO':''}`);
+    setSyncStatus('online');
+    showNotif('✓ Check-in registrado'+(indefinido?' (Residente indefinido)':''));
+    closeModal();
+  }catch(e){setSyncStatus('error');showNotif('Error: '+e.message,true);console.error(e);}
 };
 
 window.closeModal=function(e){
@@ -996,18 +1258,124 @@ window.closeModal=function(e){
     document.getElementById('modal-overlay').classList.remove('open');
 };
 
-// ── ROOMS ─────────────────────────────────────────────────
+// ── CHECKOUTS HOY ─────────────────────────────────────────
+function renderCheckoutsHoy(){
+  const hoyMs = toLocalMidnight(Date.now());
+  const hora = new Date().getHours();
+  const checkoutsHoy = guestData.filter(g=>{
+    if(!g.checkout_ms) return false;
+    return toLocalMidnight(g.checkout_ms) === hoyMs;
+  }).sort((a,b)=>(a.id||0)-(b.id||0));
+
+  const banner  = document.getElementById('checkout-alert-banner');
+  const section = document.getElementById('checkout-hoy-section');
+  const list    = document.getElementById('checkout-hoy-list');
+  const sub     = document.getElementById('checkout-alert-sub');
+
+  if(!checkoutsHoy.length){
+    if(banner)  banner.style.display='none';
+    if(section) section.style.display='none';
+    return;
+  }
+
+  // Sección visible siempre que haya checkouts hoy; banner solo después de las 11am
+  if(section) section.style.display='block';
+  if(banner){
+    if(hora >= 11){
+      banner.style.display='flex';
+      if(sub) sub.textContent=`${checkoutsHoy.length} huésped${checkoutsHoy.length>1?'es':''} con checkout hoy · Son las ${hora}:${String(new Date().getMinutes()).padStart(2,'0')}hs`;
+    } else {
+      banner.style.display='none';
+    }
+  }
+
+  if(list) list.innerHTML=checkoutsHoy.map(g=>`
+    <div style="background:var(--surface);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:180px">
+        <div style="font-weight:700;font-size:15px">#${g.id} · ${cap(g.name)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${cap(g.hab)} · check-in ${g.fecha} · ${g.dias||'?'} noches</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="checkoutRapido('${g.fbId}','out')"
+          style="background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+          ✓ Se fue (Check-out)
+        </button>
+        <button onclick="checkoutRapido('${g.fbId}','pagado')"
+          style="background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.3);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+          🟢 Se queda · Pagado
+        </button>
+        <button onclick="checkoutRapidoExtender('${g.fbId}')"
+          style="background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.3);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+          🟡 Se queda · Cobrar
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+window.checkoutRapido=async function(fbId, accion){
+  if(!requireRecep()) return;
+  const g=guestData.find(x=>x.fbId===fbId); if(!g) return;
+  if(accion==='out'){
+    const motivo=prompt(`Motivo del check-out de ${g.name} (requerido):`,'');
+    if(motivo===null) return;
+    if(!motivo.trim()){showNotif('⚠️ El motivo es obligatorio',true);return;}
+    try{
+      setSyncStatus('syncing');
+      await setDoc(doc(db,'huespedes',fbId),{activo:false,checkout_ms:Date.now(),estado:'pagado'},{merge:true});
+      await logAudit('CHECKOUT',`#${g.id} ${g.name}`,g.fecha,'checkout '+getTodayStr()+' · '+motivo);
+      setSyncStatus('online'); showNotif('✓ Check-out registrado');
+    }catch(e){setSyncStatus('error');showNotif('Error',true);}
+  } else {
+    const motivo=prompt(`Motivo de extensión para ${g.name} (requerido):`,'Renueva estadía');
+    if(motivo===null) return;
+    if(!motivo.trim()){showNotif('⚠️ El motivo es obligatorio',true);return;}
+    const noches=g.dias||1;
+    const nuevoCheckout=(g.checkout_ms||Date.now())+noches*86400000;
+    try{
+      setSyncStatus('syncing');
+      await setDoc(doc(db,'huespedes',fbId),{checkout_ms:nuevoCheckout,estado:'pagado'},{merge:true});
+      await logAudit('EDICION',`#${g.id} ${g.name} extiende estadía`,msToDDMMYYYY(g.checkout_ms),msToDDMMYYYY(nuevoCheckout)+' · '+motivo);
+      setSyncStatus('online'); showNotif('✓ Estadía extendida · Pagado');
+    }catch(e){setSyncStatus('error');showNotif('Error',true);}
+  }
+};
+
+window.checkoutRapidoExtender=async function(fbId){
+  if(!requireRecep()) return;
+  const g=guestData.find(x=>x.fbId===fbId); if(!g) return;
+  const input=prompt(`¿Cuántas noches adicionales para ${g.name}? (enter = 1)`, '1');
+  if(input===null) return;
+  const noches=parseInt(input)||1;
+  const motivo=prompt('Motivo (requerido):','Renueva estadía, pago pendiente');
+  if(motivo===null) return;
+  if(!motivo.trim()){showNotif('⚠️ El motivo es obligatorio',true);return;}
+  const nuevoCheckout=(g.checkout_ms||Date.now())+noches*86400000;
+  try{
+    setSyncStatus('syncing');
+    await setDoc(doc(db,'huespedes',fbId),{checkout_ms:nuevoCheckout,dias:(g.dias||0)+noches,estado:'cobrar'},{merge:true});
+    await logAudit('EDICION',`#${g.id} ${g.name} extiende estadía (cobrar)`,msToDDMMYYYY(g.checkout_ms),msToDDMMYYYY(nuevoCheckout)+' · '+motivo);
+    setSyncStatus('online'); showNotif(`✓ +${noches} noches · pendiente cobro`);
+  }catch(e){setSyncStatus('error');showNotif('Error',true);}
+};
+
+window.scrollToCheckouts=function(){
+  document.getElementById('checkout-hoy-section')?.scrollIntoView({behavior:'smooth'});
+};
 function renderRooms(){
   const activeRooms={};
-  guestData.filter(g=>isGuestActive(g)).forEach(g=>{activeRooms[cap(g.hab)]={id:g.id,name:g.name,estado:g.estado};});
+  guestData.filter(g=>isGuestActive(g)).forEach(g=>{
+    activeRooms[cap(g.hab)]={id:g.id,name:g.name,estado:g.estado,checkout_ms:g.checkout_ms,dias:g.dias};
+  });
   document.getElementById('rooms-grid').innerHTML=ROOMS.map(r=>{
     const o=activeRooms[r];
     const dotColors={reserva:'#dc2626',cobrar:'#d97706',pendiente:'#d97706',activo:'#d97706',pagado:'#16a34a'};
+    const hastaStr=o?(o.checkout_ms?'hasta '+msToDDMMYYYY(o.checkout_ms):'indefinido'):'';
     return`<div class="room-card ${o?'occupied':'free'}">
       <div class="room-name">${r}</div>
       <span class="badge ${o?'badge-red':'badge-green'}">${o?'Ocupada':'Libre'}</span>
       ${o?`<div class="room-guest" style="margin-top:6px">#${o.id} · ${cap(o.name)}</div>
-           <div style="margin-top:5px;display:flex;align-items:center;gap:4px">
+           <div style="margin-top:4px;font-size:10px;color:var(--muted)">${hastaStr}</div>
+           <div style="margin-top:4px;display:flex;align-items:center;gap:4px">
              <span style="width:7px;height:7px;border-radius:50%;background:${dotColors[o.estado||'cobrar']};display:inline-block"></span>
              <span style="font-size:10px;color:var(--muted)">${estadoLabel(o.estado||'cobrar')}</span>
            </div>`:''}
@@ -1015,15 +1383,6 @@ function renderRooms(){
 }
 
 // ── GANTT ─────────────────────────────────────────────────
-window.ganttPrev=function(){ganttStartDate=addDays(ganttStartDate,-14);renderGantt();};
-window.ganttNext=function(){ganttStartDate=addDays(ganttStartDate,14);renderGantt();};
-window.ganttGoToday=function(){
-  const[d,m,y]=getTodayStr().split('/').map(Number);
-  const start=new Date(y,m-1,d-5);
-  ganttStartDate=p(start.getDate())+'/'+p(start.getMonth()+1)+'/'+start.getFullYear();
-  renderGantt();
-};
-
 function buildOccupancy(){
   const occ={};
   ROOMS.forEach(r=>{occ[r]=[];});
@@ -1035,58 +1394,7 @@ function buildOccupancy(){
   return occ;
 }
 
-// Returns true if guest occupies a given day (dateMs = local midnight)
-function guestOnDate(g, dateMs){
-  const cin=g.checkin_ms||0;
-  const cout=g.checkout_ms||(cin+365*86400000);
-  return dateMs>=cin && dateMs<cout;
-}
-
-function renderGantt(){
-  const dates=[];
-  for(let i=0;i<GANTT_DAYS;i++) dates.push(addDays(ganttStartDate,i));
-  document.getElementById('gantt-label').textContent=dateLabel(ganttStartDate)+' → '+dateLabel(dates[dates.length-1]);
-  const occ=buildOccupancy();
-
-  let html='<thead><tr>';
-  html+=`<th class="gantt-room-col">Habitación</th>`;
-  dates.forEach(d=>{
-    html+=`<th class="gantt-day-header ${isToday(d)?'today':''}">${dateLabelShort(d)}</th>`;
-  });
-  html+='</tr></thead><tbody>';
-
-  ROOMS.forEach(room=>{
-    html+=`<tr><td class="gantt-room-col">${room}</td>`;
-    dates.forEach(date=>{
-      const dateMs=dateToMs(date);
-      const guest=occ[room].find(g=>guestOnDate(g,dateMs));
-      if(guest){
-        const cin=guest.checkin_ms||0;
-        const cout=guest.checkout_ms||(cin+365*86400000);
-        const isFirst=dateMs>=cin && dateMs<cin+86400000;
-        const isLast=dateMs>=cout-86400000 && dateMs<cout;
-        let pos='middle';
-        if(isFirst&&isLast) pos='solo';
-        else if(isFirst) pos='start';
-        else if(isLast) pos='end';
-        const ec=estadoClass(guest.estado||'cobrar');
-        const shortName=guest.name.split(' ')[0];
-        html+=`<td class="gantt-cell ${isToday(date)?'today-col':''}">
-          <div class="gantt-block ${pos} ${ec}" onclick="openGuestModal('${guest.fbId}')"
-            title="#${guest.id} ${guest.name} · ${estadoLabel(guest.estado)} · $${guest.precio_dia||'?'}/noche · ${guest.dias||'?'} noches">
-            <span class="gantt-block-text">${isFirst?'#'+guest.id+' '+shortName:''}</span>
-          </div></td>`;
-      } else {
-        html+=`<td class="gantt-cell free ${isToday(date)?'today-col':''}"></td>`;
-      }
-    });
-    html+='</tr>';
-  });
-  html+='</tbody>';
-  document.getElementById('gantt-table').innerHTML=html;
-}
-
-// ── GANTT B — vista calendario (ancho, nombre completo) ───
+// ── GANTT — vista calendario ───
 window.gantt2Prev=function(){gantt2StartDate=addDays(gantt2StartDate,-7);renderGantt2();};
 window.gantt2Next=function(){gantt2StartDate=addDays(gantt2StartDate,7);renderGantt2();};
 window.gantt2GoToday=function(){
@@ -1122,8 +1430,9 @@ function renderGantt2(){
       const dateMs=dateToMs(date);
       const guest=occ[room].find(g=>guestOnDate(g,dateMs));
       if(guest){
-        const cin=guest.checkin_ms||0;
-        const isFirst=dateMs>=cin && dateMs<cin+86400000;
+        const cinNorm=toLocalMidnight(guest.checkin_ms||0);
+        const isFirst=dateMs===cinNorm;
+        const isIndef=!guest.checkout_ms;
         const ec=guest.estado||'cobrar';
         const bgColors={reserva:'#dc2626',cobrar:'#d97706',pendiente:'#d97706',activo:'#d97706',pagado:'#16a34a'};
         const bg=bgColors[ec]||'#d97706';
@@ -1135,7 +1444,7 @@ function renderGantt2(){
             ${isFirst?`
               <div style="overflow:hidden;flex:1">
                 <div class="gcal-block-name">#${guest.id} ${guest.name}</div>
-                <div class="gcal-block-nights">🌙 ${guest.dias||'?'}n · $${guest.precio_dia||'?'}</div>
+                <div class="gcal-block-nights">🌙 ${isIndef?'∞':''}${guest.dias||'?'}n · $${guest.precio_dia||'?'}</div>
               </div>`:
               `<div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4)"></div>`}
           </div>
@@ -1261,6 +1570,7 @@ function renderCaja(){
 }
 
 window.addMovimiento=async function(){
+  if(!requireRecep()) return;
   if(!isToday(cajaViewDate)){showNotif('Solo podés agregar movimientos al día de hoy',true);return;}
   const det=document.getElementById('mov-detalle').value.trim();
   if(!det){showNotif('Completá el detalle',true);return;}
@@ -1269,27 +1579,36 @@ window.addMovimiento=async function(){
   const usd=parseFloat(document.getElementById('mov-usd').value)||null;
   const crc=parseFloat(document.getElementById('mov-crc').value)||null;
   if(!usd&&!crc){showNotif('Ingresá un monto',true);return;}
+  const guestFbIdMov=document.getElementById('mov-guest')?.value||null;
   const mov={fecha:getTodayStr(),turno:currentTurno,tipo,categoria:cat,detalle:det,
-    recepcionista:voluntarioActivo||'Sin asignar',timestamp:Date.now()};
+    recepcionista:voluntarioActivo,timestamp:Date.now(),
+    ...(guestFbIdMov?{guestFbId:guestFbIdMov}:{})};
   if(usd){if(tipo==='Ingreso')mov.usd_ing=usd;else mov.usd_eg=usd;}
   if(crc){if(tipo==='Ingreso')mov.crc_ing=crc;else mov.crc_eg=crc;}
   try{
     setSyncStatus('syncing');
     document.getElementById('btn-agregar').disabled=true;
-    await addDoc(collection(db,'movimientos'),mov);
+    const docRef=await addDoc(collection(db,'movimientos'),mov);
     setSyncStatus('online');clearForm();showNotif('✓ Guardado');
+    // Si es Ingreso de Alojamiento → pedir depósito de llave
+    if(tipo==='Ingreso' && cat==='Alojamiento'){
+      abrirModalDeposito({movId:docRef.id, det, turno:currentTurno});
+    }
   }catch(e){setSyncStatus('error');showNotif('Error al guardar',true);}
   finally{document.getElementById('btn-agregar').disabled=false;}
 };
 
 window.delMov=async function(id){
-  if(!confirm('¿Eliminar este movimiento?'))return;
+  if(!requireRecep()) return;
   const m=cajaData.find(x=>x.id===id);
+  const motivo=prompt('Motivo de la eliminación (requerido):','');
+  if(motivo===null) return;
+  if(!motivo.trim()){showNotif('⚠️ El motivo es obligatorio',true);return;}
   try{
     setSyncStatus('syncing');
     await deleteDoc(doc(db,'movimientos',id));
     await logAudit('BORRADO','Movimiento caja: '+(m?.detalle||id),
-      `${m?.fecha} ${m?.turno} ${m?.tipo} ${m?.usd_ing?'$'+m.usd_ing:m?.crc_ing?'₡'+m.crc_ing:''}`.trim(),'eliminado');
+      `${m?.fecha} ${m?.turno} ${m?.tipo} ${m?.usd_ing?'$'+m.usd_ing:m?.crc_ing?'₡'+m.crc_ing:''}`.trim(),'eliminado · '+motivo);
     setSyncStatus('online');showNotif('Eliminado');
   }catch(e){setSyncStatus('error');showNotif('Error',true);}
 };
@@ -1298,6 +1617,168 @@ window.clearForm=function(){
   ['mov-detalle','mov-usd','mov-crc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('mov-tipo').value='Ingreso';
   document.getElementById('mov-cat').value='Alojamiento';
+  const grp=document.getElementById('mov-guest-group');if(grp)grp.style.display='none';
+  const sel=document.getElementById('mov-guest');if(sel)sel.value='';
+};
+
+// ── DEPÓSITOS DE LLAVE ───────────────────────────────────
+let depFilter = 'pendiente';
+
+window.filterDepositos=function(f,btn){
+  depFilter=f;
+  document.querySelectorAll('#dep-filter-pend,#dep-filter-all').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderDepositos();
+};
+
+function renderDepositos(){
+  // Totales
+  const todos=depositosData;
+  const recUSD=todos.filter(d=>d.moneda==='USD'&&d.estado!=='no_cobrado').reduce((s,d)=>s+d.monto,0);
+  const recCRC=todos.filter(d=>d.moneda==='CRC'&&d.estado!=='no_cobrado').reduce((s,d)=>s+d.monto,0);
+  const devUSD=todos.filter(d=>d.moneda==='USD'&&d.estado==='devuelto').reduce((s,d)=>s+d.monto,0);
+  const devCRC=todos.filter(d=>d.moneda==='CRC'&&d.estado==='devuelto').reduce((s,d)=>s+d.monto,0);
+  const pendUSD=todos.filter(d=>d.moneda==='USD'&&d.estado==='pendiente').reduce((s,d)=>s+d.monto,0);
+  const pendCRC=todos.filter(d=>d.moneda==='CRC'&&d.estado==='pendiente').reduce((s,d)=>s+d.monto,0);
+  const noCob=todos.filter(d=>d.estado==='no_cobrado').length;
+  const p=id=>document.getElementById(id);
+  if(p('dep-total-rec-usd')) p('dep-total-rec-usd').textContent='$'+recUSD.toFixed(2);
+  if(p('dep-total-rec-crc')) p('dep-total-rec-crc').textContent='₡'+Math.round(recCRC).toLocaleString('es-CR');
+  if(p('dep-total-dev-usd')) p('dep-total-dev-usd').textContent='$'+devUSD.toFixed(2);
+  if(p('dep-total-dev-crc')) p('dep-total-dev-crc').textContent='₡'+Math.round(devCRC).toLocaleString('es-CR');
+  if(p('dep-total-pend-usd')) p('dep-total-pend-usd').textContent='$'+pendUSD.toFixed(2);
+  if(p('dep-total-pend-crc')) p('dep-total-pend-crc').textContent='₡'+Math.round(pendCRC).toLocaleString('es-CR');
+  if(p('dep-total-noc')) p('dep-total-noc').textContent=noCob;
+
+  const filtered = depFilter==='pendiente'
+    ? todos.filter(d=>d.estado==='pendiente')
+    : todos;
+
+  const estadoBadge={
+    pendiente:`<span style="background:rgba(251,191,36,.15);color:var(--yellow);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">⏳ Pendiente</span>`,
+    devuelto:`<span style="background:rgba(74,222,128,.12);color:var(--green);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">✓ Devuelto</span>`,
+    perdido:`<span style="background:rgba(248,113,113,.15);color:var(--red);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">💸 Sin reclamar → ingreso</span>`,
+    no_cobrado:`<span style="background:rgba(248,113,113,.1);color:var(--muted);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">⚠️ No cobrado</span>`
+  };
+
+  const tb=document.getElementById('dep-table');
+  if(!tb) return;
+  tb.innerHTML=filtered.length
+    ?filtered.map(d=>`<tr>
+      <td>${d.fecha||'—'}</td>
+      <td>${d.guestName?`<strong>#${d.guestId||'?'}</strong> ${d.guestName}`:'<span style="color:var(--muted)">Sin huésped</span>'}</td>
+      <td><strong>${d.moneda==='USD'?'$':'₡'}${d.moneda==='USD'?Number(d.monto).toFixed(2):Math.round(d.monto).toLocaleString('es-CR')}</strong></td>
+      <td>${estadoBadge[d.estado]||d.estado}</td>
+      <td>${d.recepcionista||'—'}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        ${d.estado==='pendiente'?`
+          <button onclick="accionDeposito('${d.fbId}','devuelto')" style="background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.3);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap">↩ Devolver</button>
+          <button onclick="accionDeposito('${d.fbId}','perdido')" style="background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.25);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap">💸 No reclamó</button>
+        `:''}
+      </td>
+    </tr>`).join('')
+    :`<tr><td colspan="6" class="empty">Sin depósitos ${depFilter==='pendiente'?'pendientes':''}</td></tr>`;
+}
+
+window.accionDeposito=async function(fbId, nuevoEstado){
+  if(!requireRecep()) return;
+  const d=depositosData.find(x=>x.fbId===fbId); if(!d) return;
+  const msgs={devuelto:`¿Confirmar devolución de llave a ${d.guestName||'huésped'}?`, perdido:`¿Marcar como "sin reclamar" e incorporar como ingreso del hostel?`};
+  const motivo=prompt(msgs[nuevoEstado]+'\nMotivo (requerido):',nuevoEstado==='devuelto'?'Devolución al hacer checkout':'Se fue sin reclamar');
+  if(motivo===null) return;
+  if(!motivo.trim()){showNotif('⚠️ Motivo requerido',true);return;}
+  try{
+    setSyncStatus('syncing');
+    await setDoc(doc(db,'depositos',fbId),{estado:nuevoEstado,fechaAccion:getTodayStr(),recepcionistaCierre:voluntarioActivo,motivoCierre:motivo},{merge:true});
+    if(nuevoEstado==='perdido'){
+      // Registrar como ingreso extra en movimientos
+      const ingrExtra={fecha:getTodayStr(),turno:currentTurno,tipo:'Ingreso',categoria:'Depósito llave',
+        detalle:`Llave no reclamada · ${d.guestName||'sin nombre'} · ${d.fecha}`,
+        recepcionista:voluntarioActivo,timestamp:Date.now()};
+      if(d.moneda==='USD') ingrExtra.usd_ing=d.monto;
+      else ingrExtra.crc_ing=d.monto;
+      await addDoc(collection(db,'movimientos'),ingrExtra);
+      await logAudit('EDICION',`Depósito llave sin reclamar · ${d.guestName||'?'}`,`${d.moneda==='USD'?'$':'₡'}${d.monto} pendiente`,'incorporado como ingreso · '+motivo);
+    } else {
+      await logAudit('EDICION',`Devolución llave · ${d.guestName||'?'}`,`${d.moneda==='USD'?'$':'₡'}${d.monto} pendiente`,'devuelto · '+motivo);
+    }
+    setSyncStatus('online');showNotif(nuevoEstado==='devuelto'?'✓ Llave devuelta':'✓ Registrado como ingreso');
+    renderDepositos();
+  }catch(e){setSyncStatus('error');showNotif('Error',true);console.error(e);}
+};
+
+// Llamado desde addMovimiento cuando categoría = Alojamiento + tipo = Ingreso
+function abrirModalDeposito(contexto){
+  // contexto = {det, turno, tipo, cat, usd, crc, movId}  (movimiento ya guardado)
+  document.getElementById('modal-title').textContent='🔑 Depósito de llave';
+  const guestSugg=guestData.filter(g=>isGuestActive(g)).sort((a,b)=>(b.id||0)-(a.id||0));
+  const opts=`<option value="">Sin huésped / genérico</option>`+guestSugg.map(g=>`<option value="${g.fbId}">#${g.id} · ${cap(g.name)} · ${cap(g.hab)}</option>`).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Se registró el ingreso de alojamiento. ¿Se cobró el depósito de llave?</p>
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label">Huésped (opcional)</label>
+      <select class="form-select" id="dep-guest">${opts}</select>
+    </div>
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="form-group"><label class="form-label">Monto depósito</label>
+        <input class="form-input" id="dep-monto" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label class="form-label">Moneda</label>
+        <select class="form-select" id="dep-moneda">
+          <option value="USD">USD $</option>
+          <option value="CRC">CRC ₡</option>
+        </select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+      <button class="btn-primary" onclick="guardarDeposito()" style="flex:1">✓ Guardar depósito</button>
+      <button onclick="noCobraronDeposito()" style="flex:1;background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:9px 14px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px">⚠️ No se cobró</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center">Si no se cobró, quedará registrado en auditoría como aviso.</p>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+window.guardarDeposito=async function(){
+  if(!requireRecep()) return;
+  const monto=parseFloat(document.getElementById('dep-monto')?.value);
+  const moneda=document.getElementById('dep-moneda')?.value||'USD';
+  const guestFbId=document.getElementById('dep-guest')?.value||'';
+  if(!monto||monto<=0){showNotif('Ingresá el monto del depósito',true);return;}
+  const guest=guestFbId?guestData.find(g=>g.fbId===guestFbId):null;
+  const dep={
+    fecha:getTodayStr(), monto, moneda,
+    guestId:guest?.id||null, guestName:guest?.name||null, guestFbId:guestFbId||null,
+    estado:'pendiente', recepcionista:voluntarioActivo, timestamp:Date.now()
+  };
+  try{
+    setSyncStatus('syncing');
+    await addDoc(collection(db,'depositos'),dep);
+    // También registrar en movimientos como ingreso de categoría Depósito llave
+    const mov={fecha:getTodayStr(),turno:currentTurno,tipo:'Ingreso',categoria:'Depósito llave',
+      detalle:`Llave${guest?` · #${guest.id} ${guest.name}`:''}`,
+      recepcionista:voluntarioActivo, timestamp:Date.now()};
+    if(moneda==='USD') mov.usd_ing=monto; else mov.crc_ing=monto;
+    await addDoc(collection(db,'movimientos'),mov);
+    await logAudit('NUEVO',`Depósito llave${guest?` · #${guest.id} ${guest.name}`:''}`,``,`${moneda==='USD'?'$':'₡'}${monto} · pendiente devolución`);
+    setSyncStatus('online');showNotif('✓ Depósito registrado');closeModal();
+    renderDepositos();
+  }catch(e){setSyncStatus('error');showNotif('Error',true);console.error(e);}
+};
+
+window.noCobraronDeposito=async function(){
+  if(!requireRecep()) return;
+  const guestFbId=document.getElementById('dep-guest')?.value||'';
+  const guest=guestFbId?guestData.find(g=>g.fbId===guestFbId):null;
+  try{
+    setSyncStatus('syncing');
+    // Guardar en depositos como no_cobrado para trazabilidad
+    await addDoc(collection(db,'depositos'),{
+      fecha:getTodayStr(),monto:0,moneda:'USD',
+      guestId:guest?.id||null,guestName:guest?.name||null,guestFbId:guestFbId||null,
+      estado:'no_cobrado',recepcionista:voluntarioActivo,timestamp:Date.now()
+    });
+    await logAudit('AVISO',`⚠️ NO SE COBRÓ DEPÓSITO DE LLAVE${guest?` · #${guest.id} ${guest.name}`:''}`,voluntarioActivo,'Sin cobrar');
+    setSyncStatus('online');showNotif('⚠️ Registrado en auditoría como no cobrado',true);closeModal();
+    renderDepositos();
+  }catch(e){setSyncStatus('error');showNotif('Error',true);}
 };
 
 // ── CONTABILIDAD ──────────────────────────────────────────
@@ -1374,6 +1855,161 @@ function renderContabilidad(){
       </tr>`).join('')
     :'<tr><td colspan="8" class="empty">Sin movimientos en este período</td></tr>';
 }
+
+// ── RESIDENTES INDEFINIDOS ────────────────────────────────
+function renderResidentes(){
+  const residentes=guestData.filter(g=>g.indefinido && isGuestActive(g))
+    .sort((a,b)=>(b.id||0)-(a.id||0));
+  const container=document.getElementById('residentes-list');
+  if(!residentes.length){
+    container.innerHTML='<div class="empty" style="padding:40px;text-align:center;color:var(--muted)">Sin residentes indefinidos.<br>Al hacer check-in, activá la opción "Indefinido".</div>';
+    return;
+  }
+  container.innerHTML=residentes.map(g=>{
+    // Days lived = at minimum 1 (the day they checked in counts)
+    const checkinMidnight = toLocalMidnight(g.checkin_ms||Date.now());
+    const hoyMidnight = toLocalMidnight(Date.now());
+    const diasVividos = Math.max(1, Math.floor((hoyMidnight - checkinMidnight) / 86400000) + 1);
+    const pagos=g.pagos||[];
+    const moneda=g.moneda||'USD';
+    const precioRef=g.precio_dia||0;
+
+    // Total paid in guest's currency
+    const totalPagado=pagos.reduce((s,p)=>s+(p.moneda===moneda?Number(p.monto):0),0);
+
+    // dias pagados = floor(totalPagado / precio), saldo a favor = remainder
+    const diasPagados=precioRef>0?Math.floor(totalPagado/precioRef):0;
+    const saldoFavor=precioRef>0?(totalPagado%(precioRef)):totalPagado;
+
+    // Deuda = dias que vivio - dias que pago, en moneda
+    const diasDeuda=Math.max(0, diasVividos - diasPagados);
+    // Subtract saldo a favor from first unpaid day if it partially covers it
+    const deudaBruta=diasDeuda*precioRef;
+    const deudaNeta=Math.max(0, deudaBruta - saldoFavor);
+
+    // Paid until date
+    const pagadoHastaMs=precioRef>0?checkinMidnight+(diasPagados*86400000):null;
+    const pagadoHastaStr=pagadoHastaMs?msToDDMMYYYY(pagadoHastaMs):'—';
+
+    const fmt=v=>moneda==='CRC'?'₡'+Math.round(v).toLocaleString('es-CR'):'$'+Number(v).toFixed(2);
+    const deudaColor=deudaNeta>0?'var(--red)':saldoFavor>0?'var(--yellow)':'var(--green)';
+
+    return`<div class="form-section" style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;cursor:pointer" onclick="openGuestModal('${g.fbId}')">#${g.id} · ${cap(g.name)} <span style="font-size:13px;color:var(--muted)">↗</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${cap(g.hab)} · desde ${g.fecha}</div>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:12px;color:var(--muted)">Precio/noche:</span>
+            <input id="precio-res-${g.fbId}" type="number" step="0.01" value="${precioRef}" 
+              style="width:90px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:13px;font-weight:700"
+              onchange="actualizarPrecioRes('${g.fbId}',this.value)">
+            <span style="font-size:12px;color:var(--muted)">${moneda}</span>
+          </div>
+        </div>
+        <button class="btn-primary" style="font-size:12px;padding:8px 14px" onclick="openPagoModal('${g.fbId}')">+ Registrar pago</button>
+      </div>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px">
+        <div class="card"><div class="card-label">Días vividos</div><div class="card-value" style="font-size:22px">${diasVividos}</div></div>
+        <div class="card"><div class="card-label">Días pagados</div><div class="card-value" style="font-size:22px;color:var(--green)">${diasPagados}</div></div>
+        <div class="card ${deudaNeta>0?'card-warn':saldoFavor>0?'':'card-accent'}">
+          <div class="card-label">Deuda</div>
+          <div class="card-value" style="font-size:20px;color:${deudaColor}">${fmt(deudaNeta)}</div>
+        </div>
+        ${saldoFavor>0.01?`<div class="card" style="border-color:var(--yellow)">
+          <div class="card-label">Saldo a favor</div>
+          <div class="card-value" style="font-size:18px;color:var(--yellow)">${fmt(saldoFavor)}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">no cubre día completo</div>
+        </div>`:''}
+        <div class="card"><div class="card-label">Pago hasta</div><div class="card-value" style="font-size:16px">${pagadoHastaStr}</div></div>
+        <div class="card"><div class="card-label">Último pago</div><div class="card-value" style="font-size:14px">${pagos.length?pagos[pagos.length-1].fecha:'—'}</div></div>
+      </div>
+      <!-- Payment history -->
+      ${pagos.length?`<p class="section-title" style="margin-bottom:8px">Historial de pagos</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Fecha</th><th>Monto</th><th>Días cubiertos</th><th>Saldo a favor</th><th>Nota</th></tr></thead>
+        <tbody>${[...pagos].reverse().map(p=>{
+          const pm=Number(p.monto);
+          const dc=precioRef>0?Math.floor(pm/precioRef):0;
+          const sf=precioRef>0?pm%precioRef:0;
+          return`<tr>
+            <td>${p.fecha}</td>
+            <td><strong>${p.moneda==='CRC'?'₡':'$'}${p.moneda==='CRC'?Math.round(pm).toLocaleString('es-CR'):pm.toFixed(2)}</strong></td>
+            <td>${dc} día${dc!==1?'s':''}</td>
+            <td style="color:${sf>0.01?'var(--yellow)':'var(--muted)'}">${sf>0.01?(p.moneda==='CRC'?'₡'+Math.round(sf).toLocaleString('es-CR'):'$'+sf.toFixed(2)):'—'}</td>
+            <td style="color:var(--muted)">${p.nota||'—'}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>`:
+      '<div style="font-size:12px;color:var(--muted);padding:8px 0">Sin pagos registrados aún.</div>'}
+    </div>`;
+  }).join('');
+}
+
+window.actualizarPrecioRes=async function(fbId, nuevoPrecio){
+  if(!requireRecep()) return;
+  const precio=parseFloat(nuevoPrecio);
+  if(!precio||precio<=0){showNotif('Precio inválido',true);return;}
+  const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
+  const motivo=prompt(`Motivo del cambio de precio para ${g.name} (requerido):`,'Actualización de tarifa');
+  if(motivo===null){renderResidentes();return;} // revert display
+  if(!motivo.trim()){showNotif('⚠️ Motivo obligatorio',true);renderResidentes();return;}
+  try{
+    setSyncStatus('syncing');
+    await setDoc(doc(db,'huespedes',fbId),{precio_dia:precio},{merge:true});
+    await logAudit('EDICION',`#${g.id} ${g.name} precio/noche`,String(g.precio_dia),String(precio)+' · '+motivo);
+    setSyncStatus('online');showNotif('✓ Precio actualizado');
+  }catch(e){setSyncStatus('error');showNotif('Error',true);}
+};
+
+window.openPagoModal=function(fbId){
+  const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
+  document.getElementById('modal-title').textContent='Registrar pago · '+cap(g.name);
+  document.getElementById('modal-body').innerHTML=`
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="form-group"><label class="form-label">Monto</label>
+        <input class="form-input" id="pago-monto" type="number" step="0.01" placeholder="0.00" oninput="calcPagoDias('${g.fbId}')"></div>
+      <div class="form-group"><label class="form-label">Moneda</label>
+        <select class="form-select" id="pago-moneda" onchange="calcPagoDias('${g.fbId}')">
+          <option value="${g.moneda||'USD'}">${g.moneda||'USD'}</option>
+          ${(g.moneda||'USD')==='USD'?'<option value="CRC">CRC</option>':'<option value="USD">USD</option>'}
+        </select></div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px"><label class="form-label">Nota (opcional)</label>
+      <input class="form-input" id="pago-nota" placeholder="Ej: semana del 10 al 17"></div>
+    <div id="pago-dias-preview" style="font-size:13px;color:var(--accent);margin-bottom:16px;font-weight:600;min-height:20px"></div>
+    <button class="btn-primary" onclick="savePago('${fbId}')">✓ Registrar pago</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.calcPagoDias=function(fbId){
+  const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
+  const monto=parseFloat(document.getElementById('pago-monto')?.value)||0;
+  const precio=g.precio_dia||0;
+  const preview=document.getElementById('pago-dias-preview');
+  if(preview&&monto>0&&precio>0) preview.textContent=`Cubre ${Math.floor(monto/precio)} noches`;
+  else if(preview) preview.textContent='';
+};
+
+window.savePago=async function(fbId){
+  if(!requireRecep()) return;
+  const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
+  const monto=parseFloat(document.getElementById('pago-monto').value);
+  const moneda=document.getElementById('pago-moneda').value;
+  const nota=document.getElementById('pago-nota').value.trim();
+  if(!monto||monto<=0){showNotif('Ingresá un monto válido',true);return;}
+  const nuevoPago={fecha:getTodayStr(),monto,moneda,nota,timestamp:Date.now()};
+  const pagosActuales=g.pagos||[];
+  const pagosNuevos=[...pagosActuales,nuevoPago];
+  try{
+    setSyncStatus('syncing');
+    await setDoc(doc(db,'huespedes',fbId),{pagos:pagosNuevos},{merge:true});
+    await logAudit('EDICION',`Pago residente #${g.id} ${g.name}`,``,`${moneda==='CRC'?'₡':'$'}${monto} · ${nota||'sin nota'}`);
+    setSyncStatus('online');showNotif('✓ Pago registrado');closeModal();
+    renderResidentes();
+  }catch(e){setSyncStatus('error');showNotif('Error',true);}
+};
 
 // ── AUDITORÍA ─────────────────────────────────────────────
 window.renderAudit=function(){
