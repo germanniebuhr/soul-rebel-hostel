@@ -123,6 +123,12 @@ tr:hover td{background:var(--surface2);}
 .vol-badge{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;display:inline-flex;align-items:center;gap:8px;font-size:13px;}
 .vol-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
 .empty{text-align:center;padding:36px 24px;color:var(--muted);font-size:14px;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+::-webkit-scrollbar-corner{background:transparent;}
+*{scrollbar-width:thin;scrollbar-color:#2a2a2a transparent;}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:90%;max-width:500px;max-height:85vh;overflow-y:auto;}
@@ -230,9 +236,10 @@ tr:hover td{background:var(--surface2);}
   <div class="logo">Soul <span>Rebel</span></div>
   <div class="header-right">
     <div class="sync-status"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">En línea</span></div>
-    <div id="header-recep" style="display:none;align-items:center;gap:8px;background:rgba(200,245,90,.08);border:1px solid rgba(200,245,90,.25);border-radius:20px;padding:5px 12px;cursor:pointer" onclick="abrirSeleccionVoluntario()" title="Cambiar recepcionista">
+    <div id="header-recep" style="display:none;align-items:center;gap:6px;background:rgba(200,245,90,.08);border:1px solid rgba(200,245,90,.25);border-radius:20px;padding:5px 12px;cursor:pointer" onclick="abrirSeleccionVoluntario()" title="Cambiar recepcionista / turno">
       <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;flex-shrink:0"></span>
       <span id="header-recep-name" style="font-size:13px;font-weight:700;color:var(--accent)"></span>
+      <span id="header-turno-icon" style="font-size:12px"></span>
       <span style="font-size:10px;color:var(--muted)">cambiar</span>
     </div>
     <div id="header-tc" style="font-size:11px;color:var(--muted);white-space:nowrap;cursor:pointer" onclick="fetchTC().then(renderTCBadge)" title="Tipo de cambio · toca para actualizar">
@@ -298,11 +305,6 @@ tr:hover td{background:var(--surface2);}
       <div class="card-sub" id="stat-ocup-sub">de 15 habitaciones</div>
     </div>
     <div class="card">
-      <div class="card-label">Ingresos hoy USD</div>
-      <div class="card-value" id="stat-usd">$0</div>
-      <div class="card-sub" id="stat-crc">₡0 CRC</div>
-    </div>
-    <div class="card">
       <div class="card-label">Ocupación</div>
       <div class="card-value" id="stat-ocup">—</div>
       <div class="card-sub">% habitaciones</div>
@@ -322,16 +324,18 @@ tr:hover td{background:var(--surface2);}
       <div class="card-value" id="stat-cobrar" style="color:#f59e0b">0</div>
       <div class="card-sub">activos pendientes de cobro</div>
     </div>
-    <div class="card" id="tc-badge" style="cursor:pointer" onclick="fetchTC().then(()=>showNotif('✓ Tipo de cambio actualizado'))">
-      <div class="card-label">💱 Tipo de cambio</div>
-      <div class="card-value" style="font-size:16px" id="tc-value">cargando…</div>
-      <div class="card-sub">USD → CRC · toca para actualizar</div>
-    </div>
   </div>
+
   <!-- CHECKINS HOY (RESERVAS) -->
-  <div id="checkin-hoy-section" style="display:none;margin-bottom:24px">
+  <div id="checkin-hoy-section" style="display:none;margin-bottom:16px">
     <p class="section-title" style="color:#a78bfa;margin-bottom:10px">📋 Check-ins esperados hoy</p>
     <div id="checkin-hoy-list"></div>
+  </div>
+
+  <!-- RESERVAS VENCIDAS (llegaron ayer o antes, sin status) -->
+  <div id="checkin-vencidas-section" style="display:none;margin-bottom:24px">
+    <p class="section-title" style="color:rgba(248,113,113,.9);margin-bottom:10px">⚠️ Check-ins pendientes de días anteriores</p>
+    <div id="checkin-vencidas-list"></div>
   </div>
 
   <!-- RESERVAS FUTURAS -->
@@ -347,14 +351,32 @@ tr:hover td{background:var(--surface2);}
   </div>
 
   <p class="section-title">Huéspedes activos hoy</p>
-  <div class="table-wrap" style="margin-bottom:22px">
+  <div class="table-wrap" style="margin-bottom:32px">
     <table>
       <thead><tr><th>Hab.</th><th>ID</th><th>Nombre</th><th>Check-in</th><th>Check-out</th><th>$/Noche</th><th>Noches</th><th>Total</th><th></th></tr></thead>
       <tbody id="active-today-table"></tbody>
     </table>
   </div>
-  <p class="section-title">Últimos movimientos de caja</p>
-  <div class="table-wrap">
+
+  <!-- ── FINANZAS ─────────────────────────────────────── -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+    <p class="section-title" style="margin:0;font-size:16px">💰 Finanzas</p>
+    <button onclick="abrirNuevoMovimiento()" class="btn-primary" style="font-size:13px;padding:9px 18px">+ Nuevo movimiento de caja</button>
+  </div>
+  <div class="cards-grid" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-label">Ingresos hoy USD</div>
+      <div class="card-value" id="stat-usd">$0</div>
+      <div class="card-sub" id="stat-crc">₡0 CRC</div>
+    </div>
+    <div class="card" id="tc-badge" style="cursor:pointer" onclick="fetchTC().then(()=>showNotif('✓ Tipo de cambio actualizado'))">
+      <div class="card-label">💱 Tipo de cambio</div>
+      <div class="card-value" style="font-size:16px" id="tc-value">cargando…</div>
+      <div class="card-sub">USD → CRC · toca para actualizar</div>
+    </div>
+  </div>
+  <p class="section-title" style="margin-bottom:10px">Últimos movimientos de caja</p>
+  <div class="table-wrap" style="margin-bottom:32px">
     <table>
       <thead><tr><th>Fecha</th><th>Turno</th><th>Recepcionista</th><th>Detalle</th><th>USD</th><th>CRC</th><th>≈ USD</th></tr></thead>
       <tbody id="movimientos-recientes"></tbody>
@@ -380,20 +402,21 @@ tr:hover td{background:var(--surface2);}
 
 <!-- GANTT B — vista calendario -->
 <div class="tab" id="tab-gantt2">
-  <div class="gantt-nav">
+  <div class="gantt-nav" style="flex-wrap:wrap">
     <button class="date-nav-btn" onclick="gantt2Prev()">‹</button>
     <div class="gantt-nav-label" id="gantt2-label"></div>
     <button class="date-nav-btn" onclick="gantt2Next()">›</button>
     <button class="btn-primary" style="padding:8px 16px;font-size:12px" onclick="gantt2GoToday()">Hoy</button>
+    <div style="flex:1"></div>
+    <div class="gantt-legend" style="margin:0;gap:12px">
+      <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#dc2626"></div> Reserva</div>
+      <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#d97706"></div> Pago pendiente</div>
+      <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#ea580c"></div> Debe saldo</div>
+      <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#16a34a"></div> Día pagado</div>
+    </div>
   </div>
   <div class="gcal-wrap">
     <table class="gcal-table" id="gcal-table"></table>
-  </div>
-  <div class="gantt-legend">
-    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#dc2626"></div> Reserva</div>
-    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#d97706"></div> Pago pendiente</div>
-    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#ea580c"></div> Debe saldo</div>
-    <div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:#16a34a"></div> Día pagado</div>
   </div>
 </div>
 
@@ -503,27 +526,60 @@ tr:hover td{background:var(--surface2);}
     </div>
   </div>
   <p class="section-title">Registrar movimiento</p>
-  <div class="form-section">
-    <div class="turno-selector" id="form-turno-sel">
-      <button class="turno-btn active" onclick="setTurno('MAÑANA',this)">☀️ Mañana</button>
-      <button class="turno-btn" onclick="setTurno('TARDE',this)">🌙 Tarde</button>
+  <div style="margin-bottom:16px">
+    <button onclick="abrirNuevoMovimiento()" class="btn-primary" style="font-size:14px;padding:12px 24px">
+      + Nuevo movimiento de caja
+    </button>
+  </div>
+  <div style="display:grid;gap:6px;margin-bottom:8px">
+    <!-- Contable: monto del servicio -->
+    <div class="totales-bar" style="background:var(--surface2)">
+      <div class="total-item" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);align-self:center">📊 Contable</div>
+      <div class="total-item"><div class="total-label">Ing. USD</div><div class="total-value amount-usd" id="total-usd-ing">$0</div></div>
+      <div class="total-item"><div class="total-label">Eg. USD</div><div class="total-value amount-neg" id="total-usd-eg">$0</div></div>
+      <div class="total-item"><div class="total-label">Neto USD</div><div class="total-value" id="total-usd-net">$0</div></div>
+      <div class="total-item"><div class="total-label">Ing. CRC</div><div class="total-value amount-crc" id="total-crc-ing">₡0</div></div>
+      <div class="total-item"><div class="total-label">Eg. CRC</div><div class="total-value amount-neg" id="total-crc-eg">₡0</div></div>
+      <div class="total-item"><div class="total-label">Neto CRC</div><div class="total-value" id="total-crc-net">₡0</div></div>
     </div>
-    <div class="form-grid" id="caja-form-grid">
-      <!-- Populated by buildCajaForm() -->
-    </div>
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="btn-primary" id="btn-agregar" onclick="addMovimiento()">+ Agregar</button>
-      <button class="btn-secondary" onclick="clearForm()">Limpiar</button>
+    <!-- Caja real: efectivo físico que entró/salió del cajón -->
+    <div class="totales-bar" style="background:rgba(200,245,90,.06);border:1px solid rgba(200,245,90,.15)">
+      <div class="total-item" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);align-self:center">💵 Caja real</div>
+      <div class="total-item"><div class="total-label">Entró USD</div><div class="total-value amount-usd" id="real-usd-in">$0</div></div>
+      <div class="total-item"><div class="total-label">Salió USD</div><div class="total-value amount-neg" id="real-usd-out">$0</div></div>
+      <div class="total-item"><div class="total-label">Neto USD</div><div class="total-value" id="real-usd-net">$0</div></div>
+      <div class="total-item"><div class="total-label">Entró CRC</div><div class="total-value amount-crc" id="real-crc-in">₡0</div></div>
+      <div class="total-item"><div class="total-label">Salió CRC</div><div class="total-value amount-neg" id="real-crc-out">₡0</div></div>
+      <div class="total-item"><div class="total-label">Neto CRC</div><div class="total-value" id="real-crc-net">₡0</div></div>
     </div>
   </div>
-  <div class="totales-bar">
-    <div class="total-item"><div class="total-label">Ing. USD</div><div class="total-value amount-usd" id="total-usd-ing">$0</div></div>
-    <div class="total-item"><div class="total-label">Eg. USD</div><div class="total-value amount-neg" id="total-usd-eg">$0</div></div>
-    <div class="total-item"><div class="total-label">Neto USD</div><div class="total-value" id="total-usd-net">$0</div></div>
-    <div class="total-item"><div class="total-label">Ing. CRC</div><div class="total-value amount-crc" id="total-crc-ing">₡0</div></div>
-    <div class="total-item"><div class="total-label">Eg. CRC</div><div class="total-value amount-neg" id="total-crc-eg">₡0</div></div>
-    <div class="total-item"><div class="total-label">Neto CRC</div><div class="total-value" id="total-crc-net">₡0</div></div>
-  </div>
+
+  <!-- ARQUEO DE CAJA -->
+  <details id="arqueo-details" style="margin-bottom:20px" ontoggle="if(this.open)renderArqueo()">
+    <summary style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;padding:12px 0;color:var(--accent);user-select:none">
+      🧾 Arqueo de caja — conteo de billetes
+    </summary>
+    <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-top:8px">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Contá los billetes físicos en caja. El sistema compara con los movimientos registrados y detecta diferencias.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-weight:700;font-size:13px;color:var(--accent);margin-bottom:10px">💵 Billetes USD</div>
+          <div style="display:grid;gap:6px" id="arqueo-usd-grid"></div>
+          <div style="margin-top:10px;padding:8px 10px;background:rgba(200,245,90,.08);border-radius:8px;font-size:13px">
+            Total USD: <strong id="arq-total-usd" style="color:var(--accent)">$0.00</strong>
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:13px;color:#60a5fa;margin-bottom:10px">🇨🇷 Billetes CRC</div>
+          <div style="display:grid;gap:6px" id="arqueo-crc-grid"></div>
+          <div style="margin-top:10px;padding:8px 10px;background:rgba(96,165,250,.08);border-radius:8px;font-size:13px">
+            Total CRC: <strong id="arq-total-crc" style="color:#60a5fa">₡0</strong>
+          </div>
+        </div>
+      </div>
+      <div id="arqueo-diff" style="margin-top:14px;padding:12px;border-radius:10px;border:1px solid var(--border);font-size:13px"></div>
+    </div>
+  </details>
   <div class="turno-selector" id="caja-filter-sel">
     <button class="turno-btn active" onclick="filterCaja('TODOS',this)">Todos</button>
     <button class="turno-btn" onclick="filterCaja('MAÑANA',this)">☀️ Mañana</button>
@@ -889,9 +945,21 @@ tr:hover td{background:var(--surface2);}
 <div id="welcome-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center">
     <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:900;margin-bottom:4px">Soul <span style="color:var(--accent)">Rebel</span></div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:28px;letter-spacing:.05em">HOSTEL · RECEPCIÓN</div>
-    <div style="font-size:16px;font-weight:700;margin-bottom:6px">¿Quién está en turno?</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Seleccioná tu nombre para continuar.</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:24px;letter-spacing:.05em">HOSTEL · RECEPCIÓN</div>
+    <!-- TURNO -->
+    <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;text-align:left">Turno</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:10px;overflow:hidden;border:2px solid var(--border);margin-bottom:20px">
+      <button id="wc-btn-manana" onclick="wcSetTurno('MAÑANA')"
+        style="padding:11px;font-weight:800;font-size:13px;border:none;cursor:pointer;background:rgba(245,158,11,.2);color:var(--yellow);border-right:1px solid var(--border)">
+        ☀️ Mañana
+      </button>
+      <button id="wc-btn-tarde" onclick="wcSetTurno('TARDE')"
+        style="padding:11px;font-weight:800;font-size:13px;border:none;cursor:pointer;background:var(--surface2);color:var(--muted)">
+        🌙 Tarde
+      </button>
+    </div>
+    <!-- RECEPCIONISTA -->
+    <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;text-align:left">¿Quién está en turno?</div>
     <div id="welcome-chips" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
     <div style="font-size:11px;color:var(--muted)">Si tu nombre no aparece, pedile a un administrador que te agregue en ⚙️ Config</div>
   </div>
@@ -1277,6 +1345,8 @@ function startListeners(){
   // Depósitos de llave
   onSnapshot(query(collection(db,'depositos'),orderBy('timestamp','desc')), snap=>{
     depositosData=snap.docs.map(d=>({fbId:d.id,...d.data()}));
+    renderActiveToday();
+    renderGuests(guestData);
     if(document.getElementById('tab-llaves').classList.contains('active')) renderDepositos();
   });
 
@@ -1314,8 +1384,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(sub) sub.textContent=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('caja-date-picker').value=dateStrToISO(getTodayStr());
   // Calendar: start from today
-  ganttStartDate = getTodayStr();
-  gantt2StartDate = getTodayStr();
+  ganttStartDate = addDays(getTodayStr(), -1);
+  gantt2StartDate = addDays(getTodayStr(), -1);
   renderCajaDateLabel();renderVoluntario();renderRecepConfig();
   startListeners();
   buildCajaForm(); // initial render with defaults
@@ -1352,15 +1422,16 @@ function renderStats(){
   const crc=td.reduce((s,m)=>s+(m.crc_ing||0),0);
   const reservasHoy=guestData.filter(g=>g.estado==='reserva'&&toLocalMidnight(g.checkin_ms||0)===hoyMs);
   const reservasFuturas=guestData.filter(g=>g.estado==='reserva'&&toLocalMidnight(g.checkin_ms||0)>hoyMs);
-  // Checkouts today: programmed checkout date is today AND still active (activo !== false)
+  const reservasVencidas=guestData.filter(g=>g.estado==='reserva'&&toLocalMidnight(g.checkin_ms||0)<hoyMs);
+  // Checkouts today: programmed checkout date is today AND still active AND actually arrived (not just reserva)
   const checkoutsHoy=guestData.filter(g=>
     g.checkout_ms&&
     toLocalMidnight(g.checkout_ms)===hoyMs&&
     g.activo!==false&&
-    g.estado!=='cancelado'&&g.estado!=='noshow'
+    g.estado!=='cancelado'&&g.estado!=='noshow'&&g.estado!=='reserva'
   );
   const cobrar=active.filter(g=>g.estado==='cobrar'||g.estado==='pendiente'||g.estado==='activo'||g.estado==='pago_pendiente'||g.estado==='debe_saldo');
-  const totalReservas=reservasHoy.length+reservasFuturas.length;
+  const totalReservas=reservasHoy.length+reservasFuturas.length+reservasVencidas.length;
 
   document.getElementById('stat-huespedes').textContent=active.length;
   document.getElementById('stat-usd').textContent='$'+usd.toFixed(2);
@@ -1369,6 +1440,7 @@ function renderStats(){
   document.getElementById('stat-ocup-sub').textContent=active.length+' de 15 habitaciones';
   document.getElementById('stat-reservas').textContent=totalReservas;
   document.getElementById('stat-reservas-sub').textContent=
+    reservasVencidas.length?`⚠️ ${reservasVencidas.length} pendiente${reservasVencidas.length>1?'s':''} · ${reservasHoy.length} hoy · ${reservasFuturas.length} próximas`:
     reservasHoy.length?`${reservasHoy.length} hoy · ${reservasFuturas.length} próximas`:
     `${totalReservas} próxima${totalReservas!==1?'s':''}`;
   document.getElementById('stat-checkouts').textContent=checkoutsHoy.length;
@@ -1406,12 +1478,19 @@ function renderActiveToday(){
       const isResidente=g.indefinido||!g.checkout_ms;
       const movsAloj=cajaData.filter(m=>m.guestFbId===g.fbId&&m.categoria==='Alojamiento'&&m.tipo==='Ingreso');
       const hasPago=movsAloj.length>0;
-      const depPend=depositosData.find(d=>d.guestFbId===g.fbId&&(d.estado==='pendiente'||d.estado==='no_cobrado'||d.estado==='pendiente_cobro'));
 
-      // For residents: check if today is covered by their paid balance
+      // llave badge — separate from estado
+      const tieneLlave=depositosData.find(d=>d.guestFbId===g.fbId&&d.estado==='pendiente');
+      const depNoCobrado=depositosData.find(d=>d.guestFbId===g.fbId&&(d.estado==='no_cobrado'||d.estado==='pendiente_cobro'));
+      const llaveBadge=tieneLlave
+        ?`<span style="background:rgba(251,191,36,.18);color:#f59e0b;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">🔑 POSEE LLAVE</span>`
+        :depNoCobrado
+        ?`<span style="background:rgba(248,113,113,.15);color:var(--red);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">🔑 SIN DEP.</span>`
+        :'';
+
+      // estado badge — calculate dynamically, don't trust Firestore estado alone
       let badge='';
       if(isResidente){
-        // Reuse same TC-aware logic from renderResidentes
         const gMoneda=g.moneda||'USD';
         const totalPagado=movsAloj.reduce((s,m)=>{
           const tc=m.tc_rate||tcRate||500;
@@ -1420,19 +1499,28 @@ function renderActiveToday(){
         const checkinMs=toLocalMidnight(g.checkin_ms||Date.now());
         const diasVividos=Math.max(1,Math.floor((hoyMs-checkinMs)/86400000)+1);
         const diasPagados=g.precio_dia>0?Math.floor(totalPagado/g.precio_dia):0;
-        const alDia=diasPagados>=diasVividos;
-        badge=alDia
+        badge=diasPagados>=diasVividos
           ?`<span style="color:var(--green);font-size:10px;font-weight:700">✓ AL DÍA</span>`
-          :`<span style="color:#f59e0b;font-size:10px;font-weight:700">● PAGO PEND.</span>`;
+          :`<span style="background:rgba(245,158,11,.2);color:#f59e0b;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">PAGO PEND.</span>`;
       } else {
-        const isCobrar=g.estado==='cobrar'||g.estado==='pendiente'||g.estado==='activo'||g.estado==='pago_pendiente';
-        const isDebeSaldo=g.estado==='debe_saldo';
-        const sinPagoReal=g.estado==='pagado'&&!hasPago;
-        badge=isCobrar
-          ?`<span style="color:#f59e0b;font-size:10px;font-weight:700">● PAGO PEND.</span>`
-          :isDebeSaldo?`<span style="color:#fb923c;font-size:10px;font-weight:700">🟠 DEBE SALDO</span>`
-          :sinPagoReal?`<span style="color:#f59e0b;font-size:10px;font-weight:700">⚠ SIN PAGO REG.</span>`
-          :depPend?`<span style="color:var(--yellow);font-size:10px;font-weight:700">🔑 DEP. PEND.</span>`:'';
+        // Dynamically check if guest paid something but not full amount
+        const gMoneda=g.moneda||'USD';
+        const totalEsp=g.total||(g.precio_dia&&g.dias?g.precio_dia*g.dias:0);
+        const totalPag=movsAloj.reduce((s,m)=>{
+          const tc=m.tc_rate||tcRate||500;
+          return s+(gMoneda==='CRC'?(m.crc_ing||0)+((m.usd_ing||0)*tc):(m.usd_ing||0)+((m.crc_ing||0)/tc));
+        },0);
+        const tol=gMoneda==='CRC'?50:0.10;
+        const debeSaldo=totalEsp>0&&totalPag>tol&&totalPag<totalEsp-tol;
+        const noPago=totalEsp>0&&totalPag<=tol;
+        const sinPagoReg=g.estado==='pagado'&&!hasPago;
+        badge=debeSaldo||g.estado==='debe_saldo'
+          ?`<span style="background:rgba(248,113,113,.2);color:var(--red);font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;border:1px solid rgba(248,113,113,.4)">⚠️ DEBE SALDO</span>`
+          :noPago||['cobrar','pendiente','activo','pago_pendiente'].includes(g.estado)
+          ?`<span style="background:rgba(245,158,11,.2);color:#f59e0b;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">PAGO PEND.</span>`
+          :sinPagoReg
+          ?`<span style="background:rgba(245,158,11,.15);color:#f59e0b;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">⚠ SIN PAGO</span>`
+          :'';
       }
 
       // Checkout column: residents get a special badge instead of ∞
@@ -1445,7 +1533,7 @@ function renderActiveToday(){
       return`<tr style="cursor:pointer${isCheckoutHoy?';background:rgba(251,191,36,.05)':''}" onclick="openGuestModal('${g.fbId}')">
         <td><span class="badge badge-blue">${normHab(g.hab)}</span></td>
         <td><span class="badge badge-gray">#${g.id}</span></td>
-        <td><strong>${cap(g.name)}</strong>${g.pais?` <span style="font-size:10px;color:var(--muted)">${paisConBandera(g.pais)}</span>`:''} ${badge}</td>
+        <td><strong>${cap(g.name)}</strong>${g.pais?` <span style="font-size:10px;color:var(--muted)">${paisConBandera(g.pais)}</span>`:''} ${badge}${llaveBadge}</td>
         <td>${g.fecha}</td>
         <td>${checkoutCell}</td>
         <td>${g.precio_dia?(g.moneda==='CRC'?'₡':'$')+g.precio_dia.toFixed(2):'—'}</td>
@@ -1461,9 +1549,11 @@ function renderActiveToday(){
 function renderHeaderRecep(){
   const el=document.getElementById('header-recep');
   const nm=document.getElementById('header-recep-name');
+  const ti=document.getElementById('header-turno-icon');
   if(!el||!nm) return;
   if(voluntarioActivo){
     nm.textContent=voluntarioActivo;
+    if(ti) ti.textContent=currentTurno==='MAÑANA'?'☀️':'🌙';
     el.style.display='flex';
   } else {
     el.style.display='none';
@@ -1479,17 +1569,20 @@ function requireRecep(){
 }
 
 function renderVoluntario(){
-  const lbl=currentTurno==='MAÑANA'?'☀️ Turno Mañana':'🌙 Turno Tarde';
+  const turnoIcon=currentTurno==='MAÑANA'?'☀️':'🌙';
+  const turnoLabel=currentTurno==='MAÑANA'?'Mañana':'Tarde';
   const el=document.getElementById('voluntario-display');
   if(!el) return;
   if(voluntarioActivo){
     el.innerHTML=`<div class="vol-badge" style="background:rgba(200,245,90,.1);border-color:var(--accent)">
-      <div class="vol-dot"></div><strong style="color:var(--accent)">${voluntarioActivo}</strong>
-      <span style="color:var(--muted);font-size:12px">· ${lbl}</span>
-      <button onclick="abrirSeleccionVoluntario()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;margin-left:8px">cambiar</button></div>`;
+      <div class="vol-dot"></div>
+      <strong style="color:var(--accent)">${voluntarioActivo}</strong>
+      <span style="color:var(--muted);font-size:12px">· ${turnoIcon} ${turnoLabel}</span>
+      <button onclick="abrirSeleccionVoluntario()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;margin-left:8px">cambiar</button>
+    </div>`;
   } else {
     el.innerHTML=`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <span style="color:var(--muted);font-size:13px">${lbl} · Sin asignar</span>
+      <span style="color:var(--muted);font-size:13px">Sin asignar</span>
       <button class="btn-primary" style="padding:7px 14px;font-size:12px" onclick="abrirSeleccionVoluntario()">+ Asignar turno</button></div>`;
   }
   renderHeaderRecep();
@@ -1505,35 +1598,95 @@ function showWelcomeModal(){
       onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
       onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">${r}</button>
   `).join('');
+  // Pre-select turno based on time
+  wcSetTurno(currentTurno);
   overlay.style.display='flex';
 }
+
+window.wcSetTurno=function(turno){
+  currentTurno=turno;
+  const btnM=document.getElementById('wc-btn-manana');
+  const btnT=document.getElementById('wc-btn-tarde');
+  if(btnM){
+    btnM.style.background=turno==='MAÑANA'?'rgba(245,158,11,.25)':'var(--surface2)';
+    btnM.style.color=turno==='MAÑANA'?'var(--yellow)':'var(--muted)';
+  }
+  if(btnT){
+    btnT.style.background=turno==='TARDE'?'rgba(96,165,250,.2)':'var(--surface2)';
+    btnT.style.color=turno==='TARDE'?'#60a5fa':'var(--muted)';
+  }
+};
 
 window.seleccionarDesdeWelcome=function(nombre){
   voluntarioActivo=nombre;
   document.getElementById('welcome-overlay').style.display='none';
   renderVoluntario();
-  showNotif('✓ Bienvenido/a '+nombre);
+  showNotif(`✓ Bienvenido/a ${nombre} · ${currentTurno==='MAÑANA'?'☀️ Turno Mañana':'🌙 Turno Tarde'}`);
 };
 
 window.abrirSeleccionVoluntario=function(){
-  const chips=recepcionistas.map(r=>`
-    <div onclick="seleccionarVoluntario('${r}')" style="padding:10px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">${r}</div>
-  `).join('');
-  document.getElementById('modal-title').textContent='¿Quién está en turno?';
-  document.getElementById('modal-body').innerHTML=`
-    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">${currentTurno==='MAÑANA'?'☀️ Turno Mañana (10–14hs)':'🌙 Turno Tarde (14–20hs)'}</p>
-    <div style="display:flex;flex-direction:column;gap:8px;">${chips}</div>
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:8px">¿No está en la lista? Agregalo en ⚙️ Config</p>
+  const turnoActual=currentTurno;
+  const chips=recepcionistas.map(r=>{
+    const isActive=voluntarioActivo===r;
+    return`<div onclick="seleccionarVoluntario('${r}')"
+      style="padding:12px 18px;background:${isActive?'rgba(200,245,90,.15)':'var(--surface2)'};
+      border:2px solid ${isActive?'var(--accent)':'var(--border)'};
+      border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;
+      display:flex;align-items:center;justify-content:space-between;transition:all .15s"
+      onmouseover="this.style.borderColor='var(--accent)'"
+      onmouseout="this.style.borderColor='${isActive?'var(--accent)':'var(--border)'}'">
+      <span>${r}</span>
+      ${isActive?'<span style="color:var(--accent);font-size:11px">· activo</span>':''}
     </div>`;
+  }).join('');
+
+  document.getElementById('modal-title').textContent='👤 ¿Quién entra en turno?';
+  document.getElementById('modal-body').innerHTML=`
+    <!-- TURNO -->
+    <div style="margin-bottom:18px">
+      <label class="form-label" style="margin-bottom:8px;display:block">Turno</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:10px;overflow:hidden;border:2px solid var(--border)">
+        <button id="sel-btn-manana" onclick="selSetTurno('MAÑANA')"
+          style="padding:12px;font-weight:800;font-size:13px;border:none;cursor:pointer;
+          background:${turnoActual==='MAÑANA'?'rgba(245,158,11,.25)':'var(--surface2)'};
+          color:${turnoActual==='MAÑANA'?'var(--yellow)':'var(--muted)'};
+          border-right:1px solid var(--border)">
+          ☀️ Mañana
+        </button>
+        <button id="sel-btn-tarde" onclick="selSetTurno('TARDE')"
+          style="padding:12px;font-weight:800;font-size:13px;border:none;cursor:pointer;
+          background:${turnoActual==='TARDE'?'rgba(96,165,250,.2)':'var(--surface2)'};
+          color:${turnoActual==='TARDE'?'#60a5fa':'var(--muted)'}">
+          🌙 Tarde
+        </button>
+      </div>
+    </div>
+    <!-- RECEPCIONISTAS -->
+    <label class="form-label" style="margin-bottom:8px;display:block">Recepcionista</label>
+    <div style="display:flex;flex-direction:column;gap:8px">${chips}</div>
+    <p style="font-size:12px;color:var(--muted);margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">¿No está en la lista? Agregalo en ⚙️ Config</p>`;
   openModal();
+};
+
+window.selSetTurno=function(turno){
+  currentTurno=turno;
+  const btnM=document.getElementById('sel-btn-manana');
+  const btnT=document.getElementById('sel-btn-tarde');
+  if(btnM){
+    btnM.style.background=turno==='MAÑANA'?'rgba(245,158,11,.25)':'var(--surface2)';
+    btnM.style.color=turno==='MAÑANA'?'var(--yellow)':'var(--muted)';
+  }
+  if(btnT){
+    btnT.style.background=turno==='TARDE'?'rgba(96,165,250,.2)':'var(--surface2)';
+    btnT.style.color=turno==='TARDE'?'#60a5fa':'var(--muted)';
+  }
 };
 
 window.seleccionarVoluntario=function(nombre){
   voluntarioActivo=nombre;
   renderVoluntario();
   closeModal();
-  showNotif('✓ '+nombre+' en turno');
+  showNotif(`✓ ${nombre} · ${currentTurno==='MAÑANA'?'☀️ Turno Mañana':'🌙 Turno Tarde'}`);
 };
 
 // ── PLAN DE CUENTAS — BUILD CAJA FORM ─────────────────────
@@ -1541,17 +1694,11 @@ function buildCajaForm(){
   const grid=document.getElementById('caja-form-grid');
   if(!grid) return;
 
-  const allCats=[
-    ...planCuentas.ingresos.map(c=>({...c,tipo:'Ingreso'})),
-    ...planCuentas.egresos.map(c=>({...c,tipo:'Egreso'}))
-  ];
-
-  // SINPE options
   const sinpeActivos=sinpeConfig.filter(s=>s.activo!==false);
   const sinpeOpts=sinpeActivos.map(s=>`<option value="sinpe:${s.nombre}">${s.nombre} · ${s.numero}</option>`).join('');
   const metodoPagoOpts=`
     <option value="efectivo">💵 Efectivo</option>
-    ${sinpeOpts?`<optgroup label="SINPE">${sinpeOpts}</optgroup>`:''}
+    ${sinpeOpts?`<optgroup label="📲 SINPE">${sinpeOpts}</optgroup>`:''}
     ${tarjetaEnabled?'<option value="tarjeta">💳 Tarjeta</option>':''}`;
 
   grid.innerHTML=`
@@ -1562,9 +1709,7 @@ function buildCajaForm(){
       </select>
     </div>
     <div class="form-group"><label class="form-label">Categoría</label>
-      <select class="form-select" id="mov-cat" onchange="onCajaCatChange()">
-        ${allCats.map(c=>`<option value="${c.nombre}" data-tipo="${c.tipo}">${c.tipo==='Ingreso'?'↑':'↓'} ${c.nombre}</option>`).join('')}
-      </select>
+      <select class="form-select" id="mov-cat" onchange="onCajaCatChange()"></select>
     </div>
     <div class="form-group" id="mov-subcat-group" style="display:none"><label class="form-label">Subcategoría</label>
       <select class="form-select" id="mov-subcat" onchange="onCajaSubcatChange()"></select>
@@ -1577,23 +1722,760 @@ function buildCajaForm(){
         <option value="">Sin huésped específico</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">Detalle</label>
+    <div class="form-group" style="grid-column:span 2"><label class="form-label">Detalle</label>
       <input class="form-input" id="mov-detalle" placeholder="Descripción del movimiento">
     </div>
     <div class="form-group"><label class="form-label">💳 Método de pago</label>
-      <select class="form-select" id="mov-metodo">${metodoPagoOpts}</select>
+      <select class="form-select" id="mov-metodo" onchange="onMetodoChange()">${metodoPagoOpts}</select>
     </div>
-    <div class="form-group"><label class="form-label">USD $</label>
-      <input class="form-input" id="mov-usd" type="number" step="0.01" placeholder="0.00" oninput="autoConvertCaja('usd')">
-    </div>
+
+    <!-- MONTO A COBRAR -->
     <div class="form-group">
-      <label class="form-label">CRC ₡ <span id="caja-tc-hint" style="font-size:10px;color:var(--muted);font-weight:400"></span></label>
-      <input class="form-input" id="mov-crc" type="number" step="1" placeholder="0" oninput="autoConvertCaja('crc')">
+      <label class="form-label">Monto cobrado <span style="font-size:10px;color:var(--muted)">(del servicio)</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <input class="form-input" id="mov-usd" type="number" step="0.01" placeholder="USD $" oninput="calcCajaVuelto()">
+        <input class="form-input" id="mov-crc" type="number" step="1" placeholder="CRC ₡" oninput="calcCajaVuelto()">
+      </div>
+      <div id="caja-tc-hint" style="font-size:10px;color:var(--muted);margin-top:3px"></div>
+    </div>
+
+    <!-- BILLETE RECIBIDO — solo efectivo -->
+    <div id="caja-billete-section" style="grid-column:span 2;background:rgba(200,245,90,.06);border:1px solid rgba(200,245,90,.2);border-radius:10px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label class="form-label" style="color:var(--accent)">💵 Billete recibido</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+          <input class="form-input" id="billete-usd" type="number" step="0.01" placeholder="USD $" oninput="calcCajaVuelto()">
+          <input class="form-input" id="billete-crc" type="number" step="1" placeholder="CRC ₡" oninput="calcCajaVuelto()">
+        </div>
+      </div>
+      <div>
+        <label class="form-label" style="color:#fb923c">↩ Vuelto dado</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+          <input class="form-input" id="vuelto-usd" type="number" step="0.01" placeholder="USD $" oninput="calcCajaVuelto()">
+          <input class="form-input" id="vuelto-crc" type="number" step="1" placeholder="CRC ₡" oninput="calcCajaVuelto()">
+        </div>
+      </div>
+      <!-- RESULTADO -->
+      <div id="caja-vuelto-result" style="grid-column:span 2;margin-top:4px;min-height:36px"></div>
     </div>`;
 
-  // Set initial tipo correctly
   onCajaTipoChange();
+  calcCajaVuelto();
 }
+
+window.abrirNuevoMovimiento=function(){
+  if(!requireRecep()) return;
+  if(!isToday(cajaViewDate)&&cajaViewDate){
+    showNotif('Solo podés agregar movimientos al día de hoy',true);return;
+  }
+  const sinpeActivos=sinpeConfig.filter(s=>s.activo!==false);
+  const sinpeOpts=sinpeActivos.map(s=>`<option value="sinpe:${s.nombre}">${s.nombre} · ${s.numero}</option>`).join('');
+  const metodoPagoOpts=`
+    <option value="efectivo">💵 Efectivo</option>
+    ${sinpeOpts?`<optgroup label="📲 SINPE">${sinpeOpts}</optgroup>`:''}
+    ${tarjetaEnabled?'<option value="tarjeta">💳 Tarjeta</option>':''}`;
+
+  document.getElementById('modal-title').textContent='💰 Nuevo movimiento de caja';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="display:grid;gap:16px">
+
+      <!-- TIPO TOGGLE -->
+      <div>
+        <label class="form-label">Tipo</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:10px;overflow:hidden;border:2px solid var(--border);margin-top:6px">
+          <button id="nm-btn-ingreso" onclick="nmSetTipo('Ingreso')"
+            style="padding:12px;font-weight:800;font-size:14px;border:none;cursor:pointer;background:rgba(74,222,128,.2);color:var(--green);border-right:1px solid var(--border)">
+            ▲ INGRESO
+          </button>
+          <button id="nm-btn-egreso" onclick="nmSetTipo('Egreso')"
+            style="padding:12px;font-weight:800;font-size:14px;border:none;cursor:pointer;background:var(--surface2);color:var(--muted)">
+            ▼ EGRESO
+          </button>
+        </div>
+        <input type="hidden" id="nm-tipo" value="Ingreso">
+      </div>
+
+      <!-- TURNO + CATEGORIA en fila -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group">
+          <label class="form-label">Turno</label>
+          <select class="form-select" id="nm-turno">
+            <option value="MAÑANA">☀️ Mañana</option>
+            <option value="TARDE">🌙 Tarde</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoría</label>
+          <select class="form-select" id="nm-cat" onchange="nmOnCatChange()"></select>
+        </div>
+      </div>
+
+      <!-- SUBCATEGORIA -->
+      <div class="form-group" id="nm-subcat-group" style="display:none">
+        <label class="form-label">Subcategoría</label>
+        <select class="form-select" id="nm-subcat" onchange="nmOnSubcatChange()"></select>
+      </div>
+      <div class="form-group" id="nm-subcat-otro-group" style="display:none">
+        <label class="form-label">Especificar</label>
+        <input class="form-input" id="nm-subcat-otro" placeholder="Ej: Polvo lavarropas">
+      </div>
+
+      <!-- HUESPED — required for Alojamiento/Depósito llave -->
+      <div class="form-group" id="nm-guest-group" style="display:none">
+        <label class="form-label">Huésped <span id="nm-guest-req" style="color:var(--red);display:none">*</span></label>
+        <select class="form-select" id="nm-guest" onchange="nmAutoFillDetalle();document.getElementById('nm-guest-warn').style.display='none'">
+          <option value="">— Seleccioná el huésped —</option>
+        </select>
+        <div id="nm-debt-hint" style="font-size:12px;margin-top:5px;min-height:16px"></div>
+        <div id="nm-guest-warn" style="display:none;font-size:11px;color:var(--red);margin-top:4px">⚠️ Seleccioná el huésped para que el pago quede asociado a su cuenta</div>
+        <button type="button" onclick="closeModal();openNewGuestModal()"
+          style="margin-top:8px;background:none;border:1px dashed var(--border);color:var(--muted);padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;width:100%">
+          + Nuevo huésped / Check-in
+        </button>
+      </div>
+
+      <!-- DETALLE -->
+      <div class="form-group">
+        <label class="form-label">Detalle <span style="color:var(--red)">*</span></label>
+        <input class="form-input" id="nm-detalle" placeholder="Descripción del movimiento">
+      </div>
+
+      <!-- METODO DE PAGO -->
+      <div class="form-group" id="nm-metodo-group">
+        <label class="form-label">💳 Método de pago</label>
+        <select class="form-select" id="nm-metodo" onchange="nmOnMetodoChange()">${metodoPagoOpts}</select>
+      </div>
+
+      <!-- MONTO -->
+      <div>
+        <label class="form-label" id="nm-monto-label">Monto a cobrar</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+          <input class="form-input" id="nm-usd" type="number" step="0.01" placeholder="USD $" oninput="nmCalcVuelto()">
+          <input class="form-input" id="nm-crc" type="number" step="1" placeholder="CRC ₡" oninput="nmCalcVuelto()">
+        </div>
+        <div id="nm-tc-hint" style="font-size:11px;color:var(--muted);margin-top:5px"></div>
+        <!-- Saldo a favor — aparece automáticamente si cobrado > adeudado -->
+        <div id="nm-saldo-favor-row" style="display:none;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;background:rgba(251,191,36,.08);border-radius:8px;border:1px solid rgba(251,191,36,.2)">
+          <input type="checkbox" id="nm-saldo-favor-chk" style="accent-color:var(--yellow);width:16px;height:16px">
+          <label for="nm-saldo-favor-chk" style="font-size:12px;color:var(--yellow);cursor:pointer;font-weight:700">💛 El excedente queda como saldo a favor del huésped</label>
+        </div>
+      </div>
+
+      <!-- CALCULADORA BILLETE / VUELTO -->
+      <div id="nm-billete-section" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;display:grid;gap:12px">
+        <div style="font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.08em">🧮 Calculadora de efectivo</div>
+
+        <!-- A COBRAR hint -->
+        <div id="nm-cobrar-hint" style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:8px 12px;font-size:12px;display:none">
+          <span style="color:var(--muted)">A cobrar:</span>
+          <span id="nm-cobrar-usd" style="color:var(--green);font-weight:700;margin:0 6px"></span>
+          <span style="color:var(--muted)">·</span>
+          <span id="nm-cobrar-crc" style="color:var(--green);font-weight:700;margin-left:6px"></span>
+        </div>
+
+        <!-- RECIBÍ -->
+        <div>
+          <label class="form-label" style="color:var(--accent)">💵 Recibí</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+            <input class="form-input" id="nm-bill-usd" type="number" step="0.01" placeholder="USD $" oninput="nmCalcVuelto()">
+            <input class="form-input" id="nm-bill-crc" type="number" step="1" placeholder="CRC ₡" oninput="nmCalcVuelto()">
+          </div>
+        </div>
+
+        <!-- VUELTO -->
+        <div>
+          <label class="form-label" style="color:#fb923c">↩ Vuelto dado</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+            <input class="form-input" id="nm-vu-usd" type="number" step="0.01" placeholder="USD $" oninput="nmCalcVuelto()">
+            <input class="form-input" id="nm-vu-crc" type="number" step="1" placeholder="CRC ₡" oninput="nmCalcVuelto()">
+          </div>
+        </div>
+
+        <!-- RESULTADO -->
+        <div id="nm-vuelto-result"></div>
+      </div>
+
+      <!-- GUARDAR -->
+      <button id="nm-btn-save" class="btn-primary" style="font-size:14px;padding:13px;margin-top:2px" onclick="confirmarNuevoMovimiento()">✓ Guardar movimiento</button>
+    </div>`;
+
+  const turnoSel=document.getElementById('nm-turno');
+  if(turnoSel) turnoSel.value=currentTurno;
+
+  openModal();
+  nmSetTipo('Ingreso');
+};
+
+window.nmSetTipo=function(tipo){
+  const input=document.getElementById('nm-tipo');
+  if(input) input.value=tipo;
+  const btnI=document.getElementById('nm-btn-ingreso');
+  const btnE=document.getElementById('nm-btn-egreso');
+  if(btnI){
+    btnI.style.background=tipo==='Ingreso'?'rgba(74,222,128,.25)':'var(--surface2)';
+    btnI.style.color=tipo==='Ingreso'?'var(--green)':'var(--muted)';
+  }
+  if(btnE){
+    btnE.style.background=tipo==='Egreso'?'rgba(248,113,113,.2)':'var(--surface2)';
+    btnE.style.color=tipo==='Egreso'?'var(--red)':'var(--muted)';
+  }
+  const saveBtn=document.getElementById('nm-btn-save');
+  if(saveBtn){
+    saveBtn.style.background=tipo==='Egreso'?'var(--red)':'var(--accent)';
+    saveBtn.style.color=tipo==='Egreso'?'#fff':'#000';
+  }
+  const montoLabel=document.getElementById('nm-monto-label');
+  if(montoLabel) montoLabel.textContent=tipo==='Ingreso'?'Monto a cobrar':'Monto a pagar';
+  nmOnTipoChange();
+};
+
+window.nmOnTipoChange=function(){
+  const tipo=document.getElementById('nm-tipo')?.value||'Ingreso';
+  const catSel=document.getElementById('nm-cat');
+  if(catSel){
+    const cats=tipo==='Ingreso'?planCuentas.ingresos:planCuentas.egresos;
+    catSel.innerHTML=cats.map(c=>`<option value="${c.nombre}">${c.nombre}</option>`).join('');
+  }
+  const metodoGrp=document.getElementById('nm-metodo-group');
+  if(metodoGrp) metodoGrp.style.display=tipo==='Ingreso'?'':'none';
+  nmOnCatChange();
+  nmOnMetodoChange();
+  nmCalcVuelto();
+};
+
+window.nmOnCatChange=function(){
+  const tipo=document.getElementById('nm-tipo')?.value;
+  const cat=document.getElementById('nm-cat')?.value;
+  // Guest selector — required for Alojamiento and Depósito llave
+  const guestGrp=document.getElementById('nm-guest-group');
+  const guestReq=document.getElementById('nm-guest-req');
+  const isAloj=(cat==='Alojamiento'||cat==='Depósito llave')&&tipo==='Ingreso';
+  if(guestGrp) guestGrp.style.display=isAloj?'':'none';
+  if(guestReq) guestReq.style.display=isAloj?'':'none';
+  if(isAloj){
+    const sel=document.getElementById('nm-guest');
+    if(sel){
+      const prevVal=sel.value; // preserve current selection
+      const active=guestData.filter(g=>isGuestActive(g)).sort((a,b)=>(b.id||0)-(a.id||0));
+      sel.innerHTML='<option value="">— Seleccioná el huésped —</option>'+
+        active.map(g=>{
+          const isRes=g.indefinido||!g.checkout_ms;
+          return`<option value="${g.fbId}">${isRes?'🏡':'👤'} #${g.id} · ${cap(g.name)} · ${normHab(g.hab)} · ${g.moneda==='CRC'?'₡':'$'}${g.precio_dia||'?'}/n</option>`;
+        }).join('');
+      // Restore previous selection if still valid
+      if(prevVal&&sel.querySelector(`option[value="${prevVal}"]`)){
+        sel.value=prevVal;
+      } else if(active.length===1){
+        // Auto-select if only one active guest
+        sel.value=active[0].fbId;
+        nmAutoFillDetalle();
+      }
+    }
+  }
+  // Subcategories
+  const allCats=[...planCuentas.ingresos,...planCuentas.egresos];
+  const catObj=allCats.find(c=>c.nombre===cat);
+  const subGrp=document.getElementById('nm-subcat-group');
+  const subSel=document.getElementById('nm-subcat');
+  if(catObj?.subcats?.length){
+    if(subSel) subSel.innerHTML=catObj.subcats.map(s=>`<option value="${s}">${s}</option>`).join('')+'<option value="__otro__">Otro...</option>';
+    if(subGrp) subGrp.style.display='';
+    nmOnSubcatChange();
+  } else {
+    if(subGrp) subGrp.style.display='none';
+    const otroGrp=document.getElementById('nm-subcat-otro-group');
+    if(otroGrp) otroGrp.style.display='none';
+  }
+};
+
+window.nmOnSubcatChange=function(){
+  const val=document.getElementById('nm-subcat')?.value;
+  const otroGrp=document.getElementById('nm-subcat-otro-group');
+  if(otroGrp) otroGrp.style.display=val==='__otro__'?'':'none';
+};
+
+window.nmAutoFillDetalle=function(){
+  const fbId=document.getElementById('nm-guest')?.value;
+  const det=document.getElementById('nm-detalle');
+  const debtHint=document.getElementById('nm-debt-hint');
+  if(!fbId){if(debtHint)debtHint.innerHTML='';return;}
+  const g=guestData.find(x=>x.fbId===fbId);if(!g) return;
+  if(det) det.value=`#${g.id} ${cap(g.name)} · ${normHab(g.hab)}`;
+  // Show what guest owes
+  if(debtHint){
+    const gMon=g.moneda||'USD';
+    const sym=gMon==='CRC'?'₡':'$';
+    const movsAloj=cajaData.filter(m=>m.guestFbId===fbId&&m.categoria==='Alojamiento'&&m.tipo==='Ingreso');
+    const pagadoBase=movsAloj.reduce((s,m)=>s+(gMon==='CRC'?(m.crc_ing||0)+(m.usd_ing||0)*tcRate:(m.usd_ing||0)+(m.crc_ing||0)/tcRate),0);
+    const total=g.total||0;
+    const saldoFavor=g.saldo_a_favor_usd||0;
+    if(g.indefinido){
+      debtHint.innerHTML=`<span style="color:var(--muted)">Residente indefinido · ${sym}${(g.moneda==='CRC'?Math.round(pagadoBase).toLocaleString('es-CR'):pagadoBase.toFixed(2))} pagado${saldoFavor>0?` · <span style="color:var(--yellow)">💛 Saldo a favor: $${saldoFavor.toFixed(2)}</span>`:''}</span>`;
+    } else if(total){
+      const deuda=Math.max(0,total-pagadoBase);
+      debtHint.innerHTML=deuda<pagoTolerance(gMon)
+        ?`<span style="color:var(--green)">✓ Saldado · Total: ${sym}${gMon==='CRC'?Math.round(total).toLocaleString('es-CR'):total.toFixed(2)}${saldoFavor>0?` · <span style="color:var(--yellow)">💛 Saldo a favor: $${saldoFavor.toFixed(2)}</span>`:''}</span>`
+        :`<span style="color:var(--yellow)">Adeuda: <strong>${sym}${gMon==='CRC'?Math.round(deuda).toLocaleString('es-CR'):deuda.toFixed(2)}</strong></span>`;
+    }
+  }
+  nmCalcVuelto();
+};
+
+window.renderArqueo=function(){
+  const usdG=document.getElementById('arqueo-usd-grid');
+  const crcG=document.getElementById('arqueo-crc-grid');
+  if(!usdG||usdG.innerHTML) return; // already rendered
+  usdG.innerHTML=[100,50,20,10,5,2,1].map(v=>`
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;color:var(--muted);width:36px;text-align:right;font-weight:700">$${v}</span>
+      <span style="color:var(--muted);font-size:12px">×</span>
+      <input type="number" min="0" step="1" value="0" id="arq-usd-${v}"
+        style="width:64px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:14px;text-align:center"
+        oninput="calcArqueo()">
+      <span style="font-size:11px;color:var(--muted);min-width:60px" id="arq-usd-sub-${v}"></span>
+    </div>`).join('');
+  crcG.innerHTML=[50000,20000,10000,5000,2000,1000,500].map(v=>`
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;color:var(--muted);width:36px;text-align:right;font-weight:700">₡${v>=1000?(v/1000).toFixed(0)+'k':v}</span>
+      <span style="color:var(--muted);font-size:12px">×</span>
+      <input type="number" min="0" step="1" value="0" id="arq-crc-${v}"
+        style="width:64px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:14px;text-align:center"
+        oninput="calcArqueo()">
+      <span style="font-size:11px;color:var(--muted);min-width:80px" id="arq-crc-sub-${v}"></span>
+    </div>`).join('');
+};
+
+window.calcArqueo=function(){
+  const usdDenoms=[100,50,20,10,5,2,1];
+  const crcDenoms=[50000,20000,10000,5000,2000,1000,500];
+
+  let totalUSD=0;
+  usdDenoms.forEach(v=>{
+    const qty=parseFloat(document.getElementById(`arq-usd-${v}`)?.value)||0;
+    const sub=qty*v;
+    totalUSD+=sub;
+    const el=document.getElementById(`arq-usd-sub-${v}`);
+    if(el) el.textContent=qty>0?`= $${sub.toFixed(2)}`:'';
+  });
+
+  let totalCRC=0;
+  crcDenoms.forEach(v=>{
+    const qty=parseFloat(document.getElementById(`arq-crc-${v}`)?.value)||0;
+    const sub=qty*v;
+    totalCRC+=sub;
+    const el=document.getElementById(`arq-crc-sub-${v}`);
+    if(el) el.textContent=qty>0?`= ₡${Math.round(sub).toLocaleString('es-CR')}`:'';
+  });
+
+  const tUSD=document.getElementById('arq-total-usd');
+  const tCRC=document.getElementById('arq-total-crc');
+  if(tUSD) tUSD.textContent='$'+totalUSD.toFixed(2);
+  if(tCRC) tCRC.textContent='₡'+Math.round(totalCRC).toLocaleString('es-CR');
+
+  // Compare with PHYSICAL cash (billete - vuelto), not accounting service amounts
+  const day=cajaData.filter(m=>m.fecha===cajaViewDate&&(m.metodoPago==='Efectivo'||!m.metodoPago));
+  let regUSD=0, regCRC=0;
+  day.forEach(m=>{
+    if(m.tipo==='Ingreso'){
+      regUSD+=(m.billete_usd||m.usd_ing||0)-(m.vuelto_usd||0);
+      regCRC+=(m.billete_crc||m.crc_ing||0)-(m.vuelto_crc||0);
+    } else {
+      regUSD-=(m.usd_eg||0);
+      regCRC-=(m.crc_eg||0);
+    }
+  });
+
+  // Also add opening balance if any
+  const diffEl=document.getElementById('arqueo-diff');
+  if(!diffEl) return;
+
+  const diffUSD=totalUSD-regUSD;
+  const diffCRC=totalCRC-regCRC;
+  const okUSD=Math.abs(diffUSD)<0.10;
+  const okCRC=Math.abs(diffCRC)<50;
+  const allOk=okUSD&&okCRC;
+
+  diffEl.style.background=allOk?'rgba(74,222,128,.08)':'rgba(248,113,113,.08)';
+  diffEl.style.borderColor=allOk?'rgba(74,222,128,.2)':'rgba(248,113,113,.2)';
+  diffEl.innerHTML=`
+    <div style="font-weight:700;color:${allOk?'var(--green)':'var(--red)'};margin-bottom:8px">
+      ${allOk?'✓ Caja cuadra exacto':'⚠️ Diferencia detectada'}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+      <div>
+        <div style="color:var(--muted)">Contado USD</div>
+        <div style="font-weight:700">$${totalUSD.toFixed(2)}</div>
+        <div style="color:var(--muted);margin-top:4px">Registrado USD</div>
+        <div style="font-weight:700">$${regUSD.toFixed(2)}</div>
+        <div style="color:${okUSD?'var(--green)':'var(--red)'};font-weight:700;margin-top:4px">
+          Diferencia: ${diffUSD>0?'+':''}$${diffUSD.toFixed(2)}
+        </div>
+      </div>
+      <div>
+        <div style="color:var(--muted)">Contado CRC</div>
+        <div style="font-weight:700">₡${Math.round(totalCRC).toLocaleString('es-CR')}</div>
+        <div style="color:var(--muted);margin-top:4px">Registrado CRC</div>
+        <div style="font-weight:700">₡${Math.round(regCRC).toLocaleString('es-CR')}</div>
+        <div style="color:${okCRC?'var(--green)':'var(--red)'};font-weight:700;margin-top:4px">
+          Diferencia: ${diffCRC>0?'+':''}₡${Math.round(diffCRC).toLocaleString('es-CR')}
+        </div>
+      </div>
+    </div>`;
+};
+
+window.nmOnMetodoChange=function(){
+  const metodo=document.getElementById('nm-metodo')?.value||'efectivo';
+  const tipo=document.getElementById('nm-tipo')?.value;
+  const sec=document.getElementById('nm-billete-section');
+  if(sec) sec.style.display=(metodo==='efectivo'&&tipo==='Ingreso')?'block':'none';
+  nmCalcVuelto();
+};
+
+window.nmCalcVuelto=function(){
+  const res=document.getElementById('nm-vuelto-result');
+  const hint=document.getElementById('nm-tc-hint');
+  const usd=parseFloat(document.getElementById('nm-usd')?.value)||0;
+  const crc=parseFloat(document.getElementById('nm-crc')?.value)||0;
+  const tipo=document.getElementById('nm-tipo')?.value||'Ingreso';
+  const metodo=document.getElementById('nm-metodo')?.value||'efectivo';
+
+  // Helpers
+  const fU=v=>'$'+Math.abs(v).toFixed(2);
+  const fC=v=>'₡'+Math.round(Math.abs(v)).toLocaleString('es-CR');
+  const both=(usdV,label='')=>{
+    const crcV=usdV*tcRate;
+    return `<strong>${fU(usdV)}</strong> <span style="color:var(--muted);font-size:11px">(${fC(crcV)})</span>${label?' <span style="color:var(--muted)">'+label+'</span>':''}`;
+  };
+
+  // TC hint
+  if(hint){
+    if(usd&&!crc) hint.innerHTML=`<span style="color:var(--muted)">≈ ${fC(usd*tcRate)} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}</span>`;
+    else if(crc&&!usd) hint.innerHTML=`<span style="color:var(--muted)">≈ ${fU(crc/tcRate)} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}</span>`;
+    else if(usd&&crc) hint.innerHTML=`<span style="color:var(--muted)">Total ≈ ${fU(usd+crc/tcRate)} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}</span>`;
+    else hint.innerHTML='';
+  }
+
+  // A cobrar hint + saldo a favor detection
+  const montoUSD=(usd||0)+((crc||0)/tcRate);
+  const cobrarHint=document.getElementById('nm-cobrar-hint');
+  if(cobrarHint) cobrarHint.style.display='none'; // legacy — hide if exists
+  const saldoRow=document.getElementById('nm-saldo-favor-row');
+  const cat=document.getElementById('nm-cat')?.value;
+  const fbId=document.getElementById('nm-guest')?.value;
+  if(cat==='Alojamiento'&&tipo==='Ingreso'&&fbId&&(usd||crc)){
+    const g=guestData.find(x=>x.fbId===fbId);
+    if(g){
+      const gMon=g.moneda||'USD';
+      const movsAloj=cajaData.filter(m=>m.guestFbId===fbId&&m.categoria==='Alojamiento'&&m.tipo==='Ingreso');
+      const pagadoUSD=movsAloj.reduce((s,m)=>s+(m.usd_ing||0)+(m.crc_ing||0)/tcRate,0);
+      const totalUSD=g.indefinido?pagadoUSD:(gMon==='CRC'?(g.total||0)/tcRate:(g.total||0));
+      const deudaUSD=g.indefinido?0:Math.max(0,totalUSD-pagadoUSD);
+      const excedente=montoUSD-deudaUSD;
+      if(excedente>0.10&&saldoRow){
+        saldoRow.style.display='flex';
+        const lbl=saldoRow.querySelector('label');
+        if(lbl) lbl.innerHTML=`💛 Excedente <strong>${fU(excedente)}</strong> (${fC(excedente*tcRate)}) → queda como saldo a favor`;
+      } else if(saldoRow) saldoRow.style.display='none';
+    }
+  } else if(saldoRow) saldoRow.style.display='none';
+
+  if(!res) return;
+  if(metodo!=='efectivo'||tipo!=='Ingreso'){res.innerHTML='';return;}
+  if(!usd&&!crc){res.innerHTML='';return;}
+
+  const billUSD=parseFloat(document.getElementById('nm-bill-usd')?.value)||0;
+  const billCRC=parseFloat(document.getElementById('nm-bill-crc')?.value)||0;
+  const vuUSD=parseFloat(document.getElementById('nm-vu-usd')?.value)||0;
+  const vuCRC=parseFloat(document.getElementById('nm-vu-crc')?.value)||0;
+
+  if(!billUSD&&!billCRC){
+    res.innerHTML=`<div style="font-size:12px;color:var(--muted);padding:4px 0">
+      ← Ingresá el billete recibido para calcular el vuelto
+    </div>`;
+    return;
+  }
+
+  const reciboUSD=billUSD+(billCRC/tcRate);
+  const vueltoUSD=vuUSD+(vuCRC/tcRate);
+  const netoUSD=reciboUSD-vueltoUSD;
+  const diffUSD=netoUSD-montoUSD;        // >0: sobra (falta devolver más), <0: falta cobrar más
+  const vueltoIdealUSD=reciboUSD-montoUSD; // what should be given back
+  const tol=0.10;
+
+  const rows=[];
+
+  // Row 1: recibido
+  rows.push(`<div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+    <span style="color:var(--muted)">💵 Recibido</span>
+    <span>${both(reciboUSD)}</span>
+  </div>`);
+
+  // Row 2: a cobrar
+  rows.push(`<div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+    <span style="color:var(--muted)">🎯 A cobrar</span>
+    <span>${both(montoUSD)}</span>
+  </div>`);
+
+  // Row 3: vuelto ideal
+  if(vueltoIdealUSD>tol){
+    rows.push(`<div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="color:#fb923c">↩ Vuelto ideal</span>
+      <span style="color:#fb923c;font-weight:700">${fU(vueltoIdealUSD)} <span style="font-weight:400;font-size:11px">(${fC(vueltoIdealUSD*tcRate)})</span></span>
+    </div>`);
+  } else if(vueltoIdealUSD<-tol){
+    rows.push(`<div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="color:var(--red)">⚠ Billete insuficiente</span>
+      <span style="color:var(--red);font-weight:700">Faltan ${fU(-vueltoIdealUSD)} (${fC(-vueltoIdealUSD*tcRate)})</span>
+    </div>`);
+  }
+
+  // Row 4: vuelto dado (if filled)
+  if(vuUSD||vuCRC){
+    rows.push(`<div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="color:var(--muted)">↩ Vuelto dado</span>
+      <span>${both(vueltoUSD)}</span>
+    </div>`);
+  }
+
+  // Row 5: status
+  let statusHtml='';
+  if((vuUSD||vuCRC)&&Math.abs(diffUSD)<=tol){
+    statusHtml=`<div style="text-align:center;color:var(--green);font-weight:800;font-size:14px;padding:8px 0">✓ ¡Cuadra exacto!</div>`;
+  } else if((vuUSD||vuCRC)&&diffUSD>tol){
+    statusHtml=`<div style="padding:8px 0;color:#fb923c;font-weight:700;font-size:12px">
+      ⚠ Sobra devolver: ${fU(diffUSD)} · ${fC(diffUSD*tcRate)}<br>
+      <span style="font-weight:400;color:var(--muted)">Falta devolver más vuelto</span>
+    </div>`;
+  } else if((vuUSD||vuCRC)&&diffUSD<-tol){
+    statusHtml=`<div style="padding:8px 0;color:var(--red);font-weight:700;font-size:12px">
+      ✗ Falta devolver: ${fU(-diffUSD)} · ${fC(-diffUSD*tcRate)}<br>
+      <span style="font-weight:400;color:var(--muted)">El vuelto dado es mayor al cobrado</span>
+    </div>`;
+  } else if(!(vuUSD||vuCRC)&&vueltoIdealUSD>tol){
+    statusHtml=`<div style="padding:8px 0;color:#fb923c;font-size:12px">
+      → Acordate de devolver ${fU(vueltoIdealUSD)} (${fC(vueltoIdealUSD*tcRate)})
+    </div>`;
+  }
+
+  res.innerHTML=`<div style="background:rgba(0,0,0,.2);border-radius:8px;padding:8px 12px;margin-top:4px">${rows.join('')}${statusHtml}</div>`;
+};
+
+window.confirmarNuevoMovimiento=async function(){
+  if(!requireRecep()) return;
+  const det=document.getElementById('nm-detalle')?.value.trim();
+  if(!det){showNotif('⚠️ Completá el detalle',true);return;}
+  const tipo=document.getElementById('nm-tipo')?.value;
+  const cat=document.getElementById('nm-cat')?.value;
+  const turno=document.getElementById('nm-turno')?.value||currentTurno;
+  const usd=parseFloat(document.getElementById('nm-usd')?.value)||null;
+  const crc=parseFloat(document.getElementById('nm-crc')?.value)||null;
+  if(!usd&&!crc){showNotif('⚠️ Ingresá el monto',true);return;}
+
+  // Subcategory
+  const subcatVal=document.getElementById('nm-subcat')?.value;
+  const subcatOtro=document.getElementById('nm-subcat-otro')?.value.trim();
+  const subcat=subcatVal==='__otro__'?subcatOtro:subcatVal||null;
+
+  // Método de pago
+  const metodoRaw=document.getElementById('nm-metodo')?.value||'efectivo';
+  let metodoPago='Efectivo',sinpeRecipient=null;
+  if(metodoRaw.startsWith('sinpe:')){metodoPago='SINPE';sinpeRecipient=metodoRaw.replace('sinpe:','');}
+  else if(metodoRaw==='tarjeta') metodoPago='Tarjeta';
+
+  // Guest required for Alojamiento — check early before billete validation
+  const guestFbId=document.getElementById('nm-guest')?.value||null;
+  const isAloj=(cat==='Alojamiento'||cat==='Depósito llave')&&tipo==='Ingreso';
+  if(isAloj&&!guestFbId){
+    const warn=document.getElementById('nm-guest-warn');
+    if(warn) warn.style.display='block';
+    showNotif('⚠️ Seleccioná el huésped para Alojamiento/Depósito',true);
+    return;
+  }
+  const warn=document.getElementById('nm-guest-warn');
+  if(warn) warn.style.display='none';
+
+  // Billete / vuelto
+  let billeteUSD=null,billeteCRC=null,vueltoUSD=null,vueltoCRC=null;
+  if(metodoRaw==='efectivo'&&tipo==='Ingreso'){
+    billeteUSD=parseFloat(document.getElementById('nm-bill-usd')?.value)||null;
+    billeteCRC=parseFloat(document.getElementById('nm-bill-crc')?.value)||null;
+    vueltoUSD=parseFloat(document.getElementById('nm-vu-usd')?.value)||null;
+    vueltoCRC=parseFloat(document.getElementById('nm-vu-crc')?.value)||null;
+    if(!billeteUSD&&!billeteCRC){showNotif('⚠️ Ingresá el billete recibido',true);return;}
+    const montoUSD=(usd||0)+((crc||0)/tcRate);
+    const reciboUSD=(billeteUSD||0)+((billeteCRC||0)/tcRate);
+    const vueltoTotal=(vueltoUSD||0)+((vueltoCRC||0)/tcRate);
+    const netoUSD=reciboUSD-vueltoTotal;
+    if(netoUSD<montoUSD-0.10){showNotif(`✗ Billete insuficiente — recibís $${reciboUSD.toFixed(2)}, necesitás $${montoUSD.toFixed(2)}`,true);return;}
+    if(netoUSD>montoUSD+1){
+      // Save all form values before showing confirmation
+      const savedVals={};
+      ['nm-usd','nm-crc','nm-bill-usd','nm-bill-crc','nm-vu-usd','nm-vu-crc',
+       'nm-detalle','nm-subcat-otro'].forEach(id=>{
+        const el=document.getElementById(id);if(el) savedVals[id]=el.value;
+      });
+      ['nm-tipo','nm-turno','nm-cat','nm-subcat','nm-metodo','nm-guest'].forEach(id=>{
+        const el=document.getElementById(id);if(el) savedVals[id]=el.value;
+      });
+
+      const ok=await new Promise(r=>{
+        const body=document.getElementById('modal-body');
+        const prev=body.innerHTML;
+        const title=document.getElementById('modal-title');
+        title.textContent='⚠️ Verificar vuelto';
+        body.innerHTML=`
+          <div style="font-size:13px;margin-bottom:16px;line-height:1.6">
+            El neto cobrado (<strong>$${netoUSD.toFixed(2)}</strong>) supera el monto del servicio (<strong>$${montoUSD.toFixed(2)}</strong>).<br>
+            Diferencia: <strong style="color:#fb923c">$${(netoUSD-montoUSD).toFixed(2)}</strong><br><br>
+            ¿El vuelto está correcto?
+          </div>
+          <div style="display:grid;gap:8px">
+            <button class="btn-primary" onclick="window._nmConfirm(true)">✓ Sí, guardar</button>
+            <button onclick="window._nmConfirm(false)" style="background:none;border:1px solid var(--border);color:var(--muted);padding:10px;border-radius:8px;cursor:pointer">← Corregir</button>
+          </div>`;
+        window._nmConfirm=v=>{
+          if(!v){
+            title.textContent='💰 Nuevo movimiento de caja';
+            body.innerHTML=prev;
+            // Restore all values
+            Object.entries(savedVals).forEach(([id,val])=>{
+              const el=document.getElementById(id);if(el) el.value=val;
+            });
+            // Re-run display logic
+            nmSetTipo(savedVals['nm-tipo']||'Ingreso');
+            nmOnCatChange();
+            nmOnMetodoChange();
+            nmCalcVuelto();
+          }
+          r(v);
+        };
+      });
+      if(!ok) return;
+    }
+  }
+
+  const saldoAFavor=isAloj&&document.getElementById('nm-saldo-favor-chk')?.checked;
+  // If monto > owed and no saldo a favor checkbox ticked, block
+  if(isAloj&&guestFbId&&!saldoAFavor&&tipo==='Ingreso'){
+    const g2=guestData.find(x=>x.fbId===guestFbId);
+    if(g2&&g2.total&&!g2.indefinido){
+      const gMon=g2.moneda||'USD';
+      const movsAloj=cajaData.filter(m=>m.guestFbId===guestFbId&&m.categoria==='Alojamiento'&&m.tipo==='Ingreso');
+      const pagadoUSD=movsAloj.reduce((s,m)=>s+(m.usd_ing||0)+(m.crc_ing||0)/tcRate,0);
+      const totalUSD=gMon==='CRC'?g2.total/tcRate:g2.total;
+      const deudaUSD=Math.max(0,totalUSD-pagadoUSD);
+      const montoUSDv=(usd||0)+((crc||0)/tcRate);
+      if(montoUSDv>deudaUSD+0.10){
+        const saldoRow=document.getElementById('nm-saldo-favor-row');
+        if(saldoRow) saldoRow.style.display='flex';
+        showNotif('⚠️ El monto supera la deuda. Tildá "saldo a favor" si corresponde.',true);
+        return;
+      }
+    }
+  }
+
+  const mov={fecha:getTodayStr(),turno,tipo,categoria:cat,detalle:det,
+    metodoPago,recepcionista:voluntarioActivo,timestamp:Date.now(),tc_rate:tcRate,
+    ...(subcat?{subcategoria:subcat}:{}),
+    ...(sinpeRecipient?{sinpeRecipient}:{}),
+    ...(billeteUSD?{billete_usd:billeteUSD}:{}),
+    ...(billeteCRC?{billete_crc:billeteCRC}:{}),
+    ...(vueltoUSD?{vuelto_usd:vueltoUSD}:{}),
+    ...(vueltoCRC?{vuelto_crc:vueltoCRC}:{}),
+    ...(guestFbId?{guestFbId}:{}),
+    ...(saldoAFavor?{saldo_a_favor:true}:{})};
+  if(usd){if(tipo==='Ingreso')mov.usd_ing=usd;else mov.usd_eg=usd;}
+  if(crc){if(tipo==='Ingreso')mov.crc_ing=crc;else mov.crc_eg=crc;}
+
+  try{
+    setSyncStatus('syncing');
+    const docRef=await addDoc(collection(db,'movimientos'),mov);
+    // If saldo a favor, update guest doc with amount
+    if(saldoAFavor&&guestFbId){
+      const g3=guestData.find(x=>x.fbId===guestFbId);
+      if(g3){
+        const montoUSDv=(usd||0)+((crc||0)/tcRate);
+        const gMon=g3.moneda||'USD';
+        const movsAloj=cajaData.filter(m=>m.guestFbId===guestFbId&&m.categoria==='Alojamiento'&&m.tipo==='Ingreso');
+        const pagadoUSD=movsAloj.reduce((s,m)=>s+(m.usd_ing||0)+(m.crc_ing||0)/tcRate,0);
+        const totalUSD=g3.indefinido?0:(gMon==='CRC'?(g3.total||0)/tcRate:(g3.total||0));
+        const deudaUSD=g3.indefinido?0:Math.max(0,totalUSD-pagadoUSD);
+        const excedenteUSD=montoUSDv-deudaUSD;
+        const prevSaldo=g3.saldo_a_favor_usd||0;
+        await setDoc(doc(db,'huespedes',guestFbId),{saldo_a_favor_usd:prevSaldo+excedenteUSD},{merge:true});
+        await logAudit('CAJA',`Saldo a favor #${g3.id} ${cap(g3.name)}`,'',`+$${excedenteUSD.toFixed(2)} (₡${Math.round(excedenteUSD*tcRate).toLocaleString('es-CR')})`);
+      }
+    }
+    setSyncStatus('online');
+    showNotif('✓ Movimiento guardado');
+    closeModal();
+    if(tipo==='Ingreso'&&cat==='Alojamiento'){
+      abrirModalDeposito({movId:docRef.id,det,turno});
+    }
+  }catch(e){setSyncStatus('error');showNotif('Error: '+e.message,true);}
+};
+
+window.calcCajaVuelto=function(){
+  const res=document.getElementById('caja-vuelto-result');
+  if(!res) return;
+
+  const montoUSD=parseFloat(document.getElementById('mov-usd')?.value)||0;
+  const montoCRC=parseFloat(document.getElementById('mov-crc')?.value)||0;
+  const billUSD=parseFloat(document.getElementById('billete-usd')?.value)||0;
+  const billCRC=parseFloat(document.getElementById('billete-crc')?.value)||0;
+  const vuUSD=parseFloat(document.getElementById('vuelto-usd')?.value)||0;
+  const vuCRC=parseFloat(document.getElementById('vuelto-crc')?.value)||0;
+
+  if(!montoUSD&&!montoCRC){res.innerHTML='';return;}
+  const metodo=document.getElementById('mov-metodo')?.value||'efectivo';
+  if(metodo!=='efectivo'){
+    // For SINPE/tarjeta just show monto total
+    const eqUSD=montoUSD+(montoCRC/tcRate);
+    res.innerHTML=`<div style="font-size:12px;color:var(--green)">✓ Total a cobrar: <strong>$${eqUSD.toFixed(2)}</strong>${montoCRC?` · ₡${Math.round(montoCRC).toLocaleString('es-CR')}`:''}${montoUSD?' · $'+montoUSD.toFixed(2):''}</div>`;
+    return;
+  }
+
+  // Convert everything to USD for comparison
+  const montoTotalUSD=montoUSD+(montoCRC/tcRate);
+  const reciboTotalUSD=billUSD+(billCRC/tcRate);
+  const vueltoTotalUSD=vuUSD+(vuCRC/tcRate);
+  const netoUSD=reciboTotalUSD-vueltoTotalUSD;
+  const diffUSD=netoUSD-montoTotalUSD;
+  const tol=0.10;
+
+  const fmtUSD=v=>'$'+Math.abs(v).toFixed(2);
+  const fmtCRC=v=>'₡'+Math.round(Math.abs(v)).toLocaleString('es-CR');
+
+  // Status
+  let statusHtml='';
+  if(!billUSD&&!billCRC){
+    statusHtml=`<span style="color:var(--muted);font-size:12px">← Ingresá el billete recibido</span>`;
+  } else if(Math.abs(diffUSD)<=tol){
+    statusHtml=`<span style="color:var(--green);font-weight:700;font-size:13px">✓ Cuadra exacto · Neto: ${fmtUSD(netoUSD)}</span>`;
+  } else if(diffUSD>tol){
+    statusHtml=`<span style="color:#fb923c;font-weight:700;font-size:13px">⚠ Sobra ${fmtUSD(diffUSD)} (≈${fmtCRC(diffUSD*tcRate)}) — revisá el vuelto</span>`;
+  } else {
+    statusHtml=`<span style="color:var(--red);font-weight:700;font-size:13px">✗ Faltan ${fmtUSD(-diffUSD)} — billete insuficiente</span>`;
+  }
+
+  // TC hint
+  const hint=document.getElementById('caja-tc-hint');
+  if(hint&&(montoUSD||montoCRC)){
+    hint.textContent=montoUSD?`≈ ₡${Math.round(montoUSD*tcRate).toLocaleString('es-CR')} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}`:
+      `≈ $${(montoCRC/tcRate).toFixed(2)} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}`;
+  }
+
+  res.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+      <div style="font-size:11px;color:var(--muted)">
+        Recibido: <strong style="color:var(--text)">${fmtUSD(reciboTotalUSD)}</strong>
+        ${billCRC?` (₡${Math.round(billCRC).toLocaleString('es-CR')} + $${billUSD.toFixed(2)})`:''}
+        &nbsp;·&nbsp; Vuelto: <strong style="color:var(--text)">${fmtUSD(vueltoTotalUSD)}</strong>
+        ${vuCRC?` (₡${Math.round(vuCRC).toLocaleString('es-CR')} + $${vuUSD.toFixed(2)})`:''}
+      </div>
+      <div>${statusHtml}</div>
+    </div>`;
+};
 
 window.onCajaTipoChange=function(){
   const tipo=document.getElementById('mov-tipo')?.value;
@@ -1780,10 +2662,15 @@ function renderGuests(data){
 
   const smartBadge=g=>{
     const movsAloj=cajaData.filter(m=>m.guestFbId===g.fbId&&m.categoria==='Alojamiento'&&m.tipo==='Ingreso');
-    const depPend=depositosData.find(d=>d.guestFbId===g.fbId&&(d.estado==='pendiente'||d.estado==='no_cobrado'||d.estado==='pendiente_cobro'));
-    const depBadge=depPend?`<span class="estado-pill" style="background:rgba(251,191,36,.15);color:var(--yellow);margin-left:4px">🔑 Dep. pend.</span>`:'';
+    const tieneLlave=depositosData.find(d=>d.guestFbId===g.fbId&&d.estado==='pendiente');
+    const depNoCobrado=depositosData.find(d=>d.guestFbId===g.fbId&&(d.estado==='no_cobrado'||d.estado==='pendiente_cobro'));
+    const llaveBadge=tieneLlave
+      ?`<span class="estado-pill" style="background:rgba(251,191,36,.18);color:#f59e0b;margin-left:4px">🔑 POSEE LLAVE</span>`
+      :depNoCobrado
+      ?`<span class="estado-pill" style="background:rgba(248,113,113,.15);color:var(--red);margin-left:4px">🔑 SIN DEP.</span>`
+      :'';
 
-    // For residents: check if today is covered
+    // Resident al-dia check
     const isResidente=g.indefinido||!g.checkout_ms;
     if(isResidente&&g.precio_dia>0&&movsAloj.length>0){
       const gMoneda=g.moneda||'USD';
@@ -1794,15 +2681,29 @@ function renderGuests(data){
       const hoyMs=toLocalMidnight(Date.now());
       const cinMs=toLocalMidnight(g.checkin_ms||Date.now());
       const diasVividos=Math.max(1,Math.floor((hoyMs-cinMs)/86400000)+1);
-      const diasPagados=Math.floor(totalPagado/g.precio_dia);
-      if(diasPagados>=diasVividos){
-        return`<button class="estado-pill" style="background:rgba(74,222,128,.15);color:var(--green)" onclick="event.stopPropagation();openGuestModal('${g.fbId}')">✓ Al día</button>${depBadge}`;
+      if(Math.floor(totalPagado/g.precio_dia)>=diasVividos){
+        return`<button class="estado-pill" style="background:rgba(74,222,128,.15);color:var(--green)" onclick="event.stopPropagation();openGuestModal('${g.fbId}')">✓ Al día</button>${llaveBadge}`;
       }
     }
 
-    const label=estadoLabel(g.estado||'pago_pendiente');
-    const cls=estadoPillClass(g.estado||'pago_pendiente');
-    return`<button class="estado-pill ${cls}" onclick="event.stopPropagation();openGuestModal('${g.fbId}')">${label}</button>${depBadge}`;
+    const isDebeSaldo=(()=>{
+      if(g.estado==='debe_saldo') return true;
+      const gMoneda=g.moneda||'USD';
+      const totalEsp=g.total||(g.precio_dia&&g.dias?g.precio_dia*g.dias:0);
+      if(!totalEsp) return false;
+      const totalPag=movsAloj.reduce((s,m)=>{
+        const tc=m.tc_rate||tcRate||500;
+        return s+(gMoneda==='CRC'?(m.crc_ing||0)+((m.usd_ing||0)*tc):(m.usd_ing||0)+((m.crc_ing||0)/tc));
+      },0);
+      const tol=gMoneda==='CRC'?50:0.10;
+      return totalPag>tol&&totalPag<totalEsp-tol;
+    })();
+    const label=isDebeSaldo?'⚠️ Debe saldo':estadoLabel(g.estado||'pago_pendiente');
+    const pillStyle=isDebeSaldo
+      ?'background:rgba(248,113,113,.2);color:var(--red);border:1px solid rgba(248,113,113,.4)'
+      :'';
+    const cls=isDebeSaldo?'':estadoPillClass(g.estado||'pago_pendiente');
+    return`<button class="estado-pill ${cls}" style="${pillStyle}" onclick="event.stopPropagation();openGuestModal('${g.fbId}')">${label}</button>${llaveBadge}`;
   };
 
   const row=g=>`<tr style="cursor:pointer" onclick="openGuestModal('${g.fbId}')">
@@ -1968,12 +2869,15 @@ window.openGuestModal=function(fbId){
           onclick="reactivarReserva('${fbId}')">↩ Reactivar como Reserva</button>`:''}
       ${estado==='reserva'?`
         <button style="width:100%;background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.4);padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer"
-          onclick="closeModal();abrirModalPagoReserva(guestData.find(x=>x.fbId==='${fbId}'))">💵 Llegó y pagó — Registrar pago</button>
-        <button style="width:100%;background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.3);padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer"
-          onclick="closeModal();abrirModalPagoReserva(guestData.find(x=>x.fbId==='${fbId}'))">🟡 Llegó · Cobrar después</button>
+          onclick="closeModal();abrirLlegada('${fbId}')">✓ Registrar llegada</button>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <button style="width:100%;background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.3);padding:9px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer"
-            onclick="closeModal();accionReservaHoy('${fbId}','noshow')">👻 No show</button>
+          ${(()=>{const hoyMs=toLocalMidnight(Date.now());const noShowOk=hoyMs>toLocalMidnight(g.checkin_ms||0);
+            return noShowOk
+              ?`<button style="width:100%;background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.3);padding:9px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer"
+                onclick="closeModal();accionReservaHoy('${fbId}','noshow')">👻 No show</button>`
+              :`<button style="width:100%;background:var(--surface2);color:var(--muted);border:1px solid var(--border);padding:9px;border-radius:8px;font-size:12px;cursor:not-allowed;opacity:.45"
+                title="Disponible desde el día siguiente al check-in esperado">👻 No show 🔒</button>`;
+          })()}
           <button style="width:100%;background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:9px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer"
             onclick="closeModal();accionReservaHoy('${fbId}','cancelo')">✕ Canceló</button>
         </div>`:''}
@@ -1984,9 +2888,15 @@ window.openGuestModal=function(fbId){
         <button onclick="abrirExtenderEstadia('${fbId}')"
           style="width:100%;background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.3);padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">
           📅 Extender estadía</button>
+        <button onclick="abrirCambiarHabitacion('${fbId}')"
+          style="width:100%;background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.3);padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">
+          🔄 Cambiar habitación / cama</button>
         <button onclick="abrirCheckoutModal('${fbId}')"
           style="width:100%;background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">
           🚪 Check-out</button>`:''}
+      <button onclick="abrirEditarHuesped('${fbId}')"
+        style="width:100%;background:none;border:1px solid var(--border);color:var(--muted);padding:9px;border-radius:8px;font-size:12px;cursor:pointer;margin-top:4px">
+        ✏️ Editar datos del huésped</button>
     </div>
     <!-- Historial movimientos -->
     ${(()=>{
@@ -2006,6 +2916,108 @@ window.openGuestModal=function(fbId){
       </div>`;
     })()}`;
   openModal();
+};
+
+window.abrirEditarHuesped=function(fbId){
+  const g=guestData.find(x=>x.fbId===fbId);if(!g) return;
+  const sym=g.moneda==='CRC'?'₡':'$';
+  document.getElementById('modal-title').textContent=`✏️ Editar #${g.id} · ${cap(g.name)}`;
+  document.getElementById('modal-body').innerHTML=`
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;padding:8px 10px;background:rgba(251,191,36,.08);border-radius:6px;border:1px solid rgba(251,191,36,.2)">
+      ⚠️ Cualquier cambio queda registrado en auditoría con detalle de qué se modificó, cuándo y quién.
+    </div>
+    <div style="display:grid;gap:12px">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Nombre completo</label>
+          <input class="form-input" id="edit-name" value="${g.name||''}">
+        </div>
+        <div class="form-group"><label class="form-label">Habitación</label>
+          <select class="form-select" id="edit-hab">
+            ${buildRoomOptions(g.fecha)}
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Check-in</label>
+          <input class="form-input" id="edit-checkin" type="date" value="${g.checkin_ms?new Date(g.checkin_ms).toISOString().split('T')[0]:''}">
+        </div>
+        <div class="form-group"><label class="form-label">Check-out</label>
+          <input class="form-input" id="edit-checkout" type="date" value="${g.checkout_ms?new Date(g.checkout_ms).toISOString().split('T')[0]:''}">
+        </div>
+        <div class="form-group"><label class="form-label">Precio/noche (${sym})</label>
+          <input class="form-input" id="edit-precio" type="number" step="0.01" value="${g.precio_dia||''}">
+        </div>
+        <div class="form-group"><label class="form-label">Noches</label>
+          <input class="form-input" id="edit-dias" type="number" step="1" value="${g.dias||''}">
+        </div>
+        <div class="form-group"><label class="form-label">Moneda</label>
+          <select class="form-select" id="edit-moneda">
+            <option value="USD" ${g.moneda==='USD'?'selected':''}>USD $</option>
+            <option value="CRC" ${g.moneda==='CRC'?'selected':''}>CRC ₡</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">País</label>
+          <input class="form-input" id="edit-pais" value="${g.pais||''}">
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Observación del cambio <span style="color:var(--red)">*</span></label>
+        <input class="form-input" id="edit-motivo" placeholder="Ej: Se equivocó al ingresar la habitación">
+      </div>
+      <button class="btn-primary" style="font-size:14px;padding:12px" onclick="confirmarEditarHuesped('${fbId}')">💾 Guardar cambios</button>
+      <button onclick="openGuestModal('${fbId}')" style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px;border-radius:8px;cursor:pointer;font-size:13px">← Volver</button>
+    </div>`;
+  // Pre-select current hab
+  const habSel=document.getElementById('edit-hab');
+  if(habSel){
+    const norm=normHab(g.hab);
+    [...habSel.options].forEach(o=>{if(o.value===norm)o.selected=true;});
+  }
+  openModal();
+};
+
+window.confirmarEditarHuesped=async function(fbId){
+  if(!requireRecep()) return;
+  const g=guestData.find(x=>x.fbId===fbId);if(!g) return;
+  const motivo=document.getElementById('edit-motivo')?.value.trim();
+  if(!motivo){showNotif('⚠️ Ingresá el motivo del cambio',true);return;}
+
+  const nombre=document.getElementById('edit-nombre')?.value.trim()||document.getElementById('edit-name')?.value.trim()||g.name;
+  const hab=document.getElementById('edit-hab')?.value||g.hab;
+  const checkinStr=document.getElementById('edit-checkin')?.value;
+  const checkoutStr=document.getElementById('edit-checkout')?.value;
+  const precio=parseFloat(document.getElementById('edit-precio')?.value)||g.precio_dia;
+  const dias=parseInt(document.getElementById('edit-dias')?.value)||g.dias;
+  const moneda=document.getElementById('edit-moneda')?.value||g.moneda;
+  const pais=document.getElementById('edit-pais')?.value.trim()||g.pais;
+
+  const checkin_ms=checkinStr?toLocalMidnight(new Date(checkinStr+'T12:00:00').getTime()):g.checkin_ms;
+  const checkout_ms=checkoutStr?toLocalMidnight(new Date(checkoutStr+'T12:00:00').getTime()):g.checkout_ms;
+  const total=precio&&dias?precio*dias:g.total;
+
+  // Build changes log — before → after
+  const cambios=[];
+  if(nombre!==g.name) cambios.push(`Nombre: "${g.name}" → "${nombre}"`);
+  if(normHab(hab)!==normHab(g.hab)) cambios.push(`Hab: ${normHab(g.hab)} → ${normHab(hab)}`);
+  if(checkin_ms!==g.checkin_ms) cambios.push(`Check-in: ${g.fecha} → ${msToDDMMYYYY(checkin_ms)}`);
+  if(checkout_ms!==g.checkout_ms) cambios.push(`Check-out: ${g.checkout_ms?msToDDMMYYYY(g.checkout_ms):'∞'} → ${checkout_ms?msToDDMMYYYY(checkout_ms):'∞'}`);
+  if(precio!==g.precio_dia) cambios.push(`Precio/n: ${g.precio_dia} → ${precio}`);
+  if(dias!==g.dias) cambios.push(`Noches: ${g.dias} → ${dias}`);
+  if(moneda!==g.moneda) cambios.push(`Moneda: ${g.moneda} → ${moneda}`);
+  if(pais!==g.pais) cambios.push(`País: ${g.pais||'—'} → ${pais}`);
+
+  if(!cambios.length){showNotif('Sin cambios para guardar');closeModal();return;}
+
+  const updates={name:nombre,hab,checkin_ms,checkout_ms,precio_dia:precio,dias,total,moneda,pais};
+  if(!checkoutStr) updates.checkout_ms=null;
+
+  try{
+    setSyncStatus('syncing');
+    await setDoc(doc(db,'huespedes',fbId),updates,{merge:true});
+    const auditAntes=cambios.map(c=>c.split(' → ')[0]).join(' · ');
+    const auditDespues=cambios.map(c=>c.split(' → ')[1]).join(' · ');
+    await logAudit('EDICION',`✏️ #${g.id} ${cap(g.name)} · ${motivo}`,auditAntes,auditDespues);
+    setSyncStatus('online');
+    showNotif(`✓ Datos de #${g.id} actualizados — ${cambios.length} cambio${cambios.length>1?'s':''}`);
+    closeModal();
+  }catch(e){setSyncStatus('error');showNotif('Error: '+e.message,true);}
 };
 
 window.abrirRegistrarPago=function(fbId){
@@ -2202,6 +3214,76 @@ window.confirmarRegistrarPago=async function(fbId){
 };
 
 // ── EXTENDER ESTADÍA ───────────────────────────────────────
+window.abrirCambiarHabitacion=function(fbId){
+  const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
+  const today=getTodayStr();
+  // Build room options excluding current hab
+  const opts=ROOMS.map(r=>{
+    if(normHab(r)===normHab(g.hab)) return `<option value="${r}" disabled style="color:var(--muted)">${r} (actual)</option>`;
+    // Check conflicts
+    const conflict=guestData.find(x=>isGuestActive(x)&&normHab(x.hab)===r&&x.fbId!==fbId);
+    if(conflict) return `<option value="${r}" disabled style="color:var(--muted)">${r} 🔒 ${cap(conflict.name)}</option>`;
+    return `<option value="${r}">${r}</option>`;
+  }).join('');
+
+  document.getElementById('modal-title').textContent=`🔄 Cambiar habitación · #${g.id} ${cap(g.name)}`;
+  document.getElementById('modal-body').innerHTML=`
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px">
+      Habitación actual: <strong style="color:var(--yellow)">${normHab(g.hab)}</strong>
+      · Check-in: ${g.fecha} · ${g.dias||'∞'} noches
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Nueva habitación <span style="color:var(--red)">*</span></label>
+      <select class="form-select" id="chg-hab">${opts}</select>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">¿Cambia el precio por noche?</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+        <input class="form-input" id="chg-precio" type="number" step="0.01"
+          placeholder="${g.precio_dia||'Mismo precio'}" value="${g.precio_dia||''}">
+        <select class="form-select" id="chg-moneda">
+          <option value="USD" ${g.moneda==='USD'?'selected':''}>USD $</option>
+          <option value="CRC" ${g.moneda==='CRC'?'selected':''}>CRC ₡</option>
+        </select>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Dejá vacío para mantener el precio actual</div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Motivo <span style="color:var(--red)">*</span></label>
+      <input class="form-input" id="chg-motivo" placeholder="Ej: Pidió habitación más tranquila, cama disponible, etc.">
+    </div>
+    <div style="display:grid;gap:8px">
+      <button class="btn-primary" onclick="confirmarCambiarHabitacion('${fbId}')">🔄 Confirmar cambio</button>
+      <button onclick="openGuestModal('${fbId}')" style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px;border-radius:8px;cursor:pointer;font-size:13px">← Volver</button>
+    </div>`;
+  openModal();
+};
+
+window.confirmarCambiarHabitacion=async function(fbId){
+  if(!requireRecep()) return;
+  const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
+  const nuevaHab=document.getElementById('chg-hab')?.value;
+  const motivo=document.getElementById('chg-motivo')?.value.trim();
+  if(!nuevaHab){showNotif('⚠️ Seleccioná la nueva habitación',true);return;}
+  if(!motivo){showNotif('⚠️ Ingresá el motivo del cambio',true);return;}
+  const nuevoPrecio=parseFloat(document.getElementById('chg-precio')?.value)||null;
+  const nuevaMoneda=document.getElementById('chg-moneda')?.value||g.moneda;
+  const updates={hab:nuevaHab};
+  if(nuevoPrecio) updates.precio_dia=nuevoPrecio;
+  if(nuevoPrecio) updates.moneda=nuevaMoneda;
+  if(nuevoPrecio&&g.dias) updates.total=nuevoPrecio*g.dias;
+  try{
+    setSyncStatus('syncing');
+    await setDoc(doc(db,'huespedes',fbId),updates,{merge:true});
+    const antes=`${normHab(g.hab)}${g.precio_dia?` · ${g.moneda==='CRC'?'₡':'$'}${g.precio_dia}/n`:''}`;
+    const despues=`${nuevaHab}${nuevoPrecio?` · ${nuevaMoneda==='CRC'?'₡':'$'}${nuevoPrecio}/n`:''} · ${motivo}`;
+    await logAudit('EDICION',`🔄 Cambio hab. #${g.id} ${cap(g.name)}`,antes,despues);
+    setSyncStatus('online');
+    showNotif(`✓ ${cap(g.name)} movido/a a ${nuevaHab}`);
+    closeModal();
+  }catch(e){setSyncStatus('error');showNotif('Error: '+e.message,true);}
+};
+
 window.abrirExtenderEstadia=function(fbId){
   const g=guestData.find(x=>x.fbId===fbId);if(!g)return;
   const sym=g.moneda==='CRC'?'₡':'$';
@@ -2233,14 +3315,37 @@ window.abrirExtenderEstadia=function(fbId){
       <input type="hidden" id="ext-estado" value="">
     </div>
     <div id="ext-pago-sec" style="display:none;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:12px;margin-bottom:14px">
-      <div class="form-grid">
-        <div class="form-group"><label class="form-label">Monto cobrado</label>
-          <input class="form-input" id="ext-pago-monto" type="number" step="0.01" placeholder="0.00"></div>
-        <div class="form-group"><label class="form-label">Moneda</label>
-          <select class="form-select" id="ext-pago-moneda">
+      <p style="font-size:11px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">💵 Cobro</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="form-group" style="margin:0"><label class="form-label" style="font-size:11px">USD $</label>
+          <input class="form-input" id="ext-pago-monto" type="number" step="0.01" placeholder="0.00" oninput="calcExtVuelto()"></div>
+        <div class="form-group" style="margin:0"><label class="form-label" style="font-size:11px">CRC ₡ <span style="font-size:10px;color:var(--muted)">(opcional)</span></label>
+          <input class="form-input" id="ext-pago-crc" type="number" step="1" placeholder="0" oninput="calcExtVuelto()"></div>
+        <div class="form-group" style="margin:0"><label class="form-label" style="font-size:11px">Moneda base</label>
+          <select class="form-select" id="ext-pago-moneda" onchange="calcExtVuelto()">
             <option value="${g.moneda||'USD'}">${g.moneda||'USD'}</option>
             ${(g.moneda||'USD')==='USD'?'<option value="CRC">CRC ₡</option>':'<option value="USD">USD $</option>'}
           </select></div>
+      </div>
+      <div id="ext-tc-hint" style="font-size:11px;color:var(--muted);margin-bottom:10px"></div>
+      <!-- Billete / Vuelto -->
+      <div style="background:var(--surface2);border-radius:8px;padding:10px;display:grid;gap:8px">
+        <div style="font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.08em">🧮 Billete / Vuelto</div>
+        <div>
+          <label class="form-label" style="color:var(--accent);font-size:11px">💵 Recibí</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+            <input class="form-input" id="ext-bill-usd" type="number" step="0.01" placeholder="USD $" oninput="calcExtVuelto()">
+            <input class="form-input" id="ext-bill-crc" type="number" step="1" placeholder="CRC ₡" oninput="calcExtVuelto()">
+          </div>
+        </div>
+        <div>
+          <label class="form-label" style="color:#fb923c;font-size:11px">↩ Vuelto dado</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+            <input class="form-input" id="ext-vu-usd" type="number" step="0.01" placeholder="USD $" oninput="calcExtVuelto()">
+            <input class="form-input" id="ext-vu-crc" type="number" step="1" placeholder="CRC ₡" oninput="calcExtVuelto()">
+          </div>
+        </div>
+        <div id="ext-vuelto-result" style="font-size:12px;min-height:16px"></div>
       </div>
     </div>
     <div style="display:grid;gap:8px">
@@ -2248,6 +3353,43 @@ window.abrirExtenderEstadia=function(fbId){
       <button onclick="openGuestModal('${fbId}')" style="width:100%;background:none;border:1px solid var(--border);color:var(--muted);padding:9px;border-radius:8px;cursor:pointer;font-size:13px">← Volver</button>
     </div>`;
   setTimeout(()=>calcExtPreview(fbId),0);
+  openModal();
+};
+
+window.calcExtVuelto=function(){
+  const usd=parseFloat(document.getElementById('ext-pago-monto')?.value)||0;
+  const crc=parseFloat(document.getElementById('ext-pago-crc')?.value)||0;
+  const hint=document.getElementById('ext-tc-hint');
+  if(hint){
+    if(usd&&crc) hint.textContent=`Total ≈ $${(usd+crc/tcRate).toFixed(2)} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}`;
+    else if(usd) hint.textContent=`≈ ₡${Math.round(usd*tcRate).toLocaleString('es-CR')} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}`;
+    else if(crc) hint.textContent=`≈ $${(crc/tcRate).toFixed(2)} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}`;
+    else hint.textContent='';
+  }
+  const montoUSD=usd+(crc/tcRate);
+  const billUSD=parseFloat(document.getElementById('ext-bill-usd')?.value)||0;
+  const billCRC=parseFloat(document.getElementById('ext-bill-crc')?.value)||0;
+  const vuUSD=parseFloat(document.getElementById('ext-vu-usd')?.value)||0;
+  const vuCRC=parseFloat(document.getElementById('ext-vu-crc')?.value)||0;
+  const res=document.getElementById('ext-vuelto-result');if(!res) return;
+  if(!montoUSD){res.innerHTML='';return;}
+  if(!billUSD&&!billCRC){res.innerHTML=`<span style="color:var(--muted)">← Ingresá el billete recibido</span>`;return;}
+  const fU=v=>'$'+Math.abs(v).toFixed(2);
+  const fC=v=>'₡'+Math.round(Math.abs(v)).toLocaleString('es-CR');
+  const reciboUSD=billUSD+(billCRC/tcRate);
+  const vueltoUSD=vuUSD+(vuCRC/tcRate);
+  const vueltoIdeal=reciboUSD-montoUSD;
+  const diff=reciboUSD-vueltoUSD-montoUSD;
+  const tol=0.10;
+  let status='';
+  if(vuUSD||vuCRC){
+    if(Math.abs(diff)<=tol) status=`<span style="color:var(--green);font-weight:700">✓ Cuadra</span>`;
+    else if(diff>tol) status=`<span style="color:#fb923c;font-weight:700">⚠ Sobra ${fU(diff)} (${fC(diff*tcRate)})</span>`;
+    else status=`<span style="color:var(--red);font-weight:700">✗ Falta ${fU(-diff)} (${fC(-diff*tcRate)})</span>`;
+  } else if(vueltoIdeal>tol){
+    status=`<span style="color:#fb923c">→ Devolver ${fU(vueltoIdeal)} (${fC(vueltoIdeal*tcRate)})</span>`;
+  } else { status=`<span style="color:var(--green)">✓ Sin vuelto</span>`; }
+  res.innerHTML=`<span style="color:var(--muted)">Recibido: ${fU(reciboUSD)} · Cobrar: ${fU(montoUSD)}</span> ${status}`;
 };
 
 window.setExtEstado=function(est){
@@ -2292,24 +3434,34 @@ window.confirmarExtender=async function(fbId){
   const nuevoMs=base+n*86400000;
   const nuevosDias=(g.dias||0)+n;
   const nuevoTotal=g.precio_dia?g.precio_dia*nuevosDias:g.total;
-  const pagoMonto=est==='pagado'?(parseFloat(document.getElementById('ext-pago-monto')?.value)||null):null;
+  const pagoUSD=est==='pagado'?(parseFloat(document.getElementById('ext-pago-monto')?.value)||null):null;
+  const pagoCRC=est==='pagado'?(parseFloat(document.getElementById('ext-pago-crc')?.value)||null):null;
   const pagoMoneda=document.getElementById('ext-pago-moneda')?.value||g.moneda||'USD';
+  const billUSD=est==='pagado'?(parseFloat(document.getElementById('ext-bill-usd')?.value)||null):null;
+  const billCRC=est==='pagado'?(parseFloat(document.getElementById('ext-bill-crc')?.value)||null):null;
+  const vuUSD=est==='pagado'?(parseFloat(document.getElementById('ext-vu-usd')?.value)||null):null;
+  const vuCRC=est==='pagado'?(parseFloat(document.getElementById('ext-vu-crc')?.value)||null):null;
   const gMoneda=g.moneda||'USD';
-  // Determine final state: if paid, check TC-aware if fully covered
+  // Determine final state: TC-aware comparison
   let estadoFinal=est;
-  if(est==='pagado'&&pagoMonto){
-    const montoEnGMoneda=toGuestCurrency(pagoMonto,pagoMoneda,gMoneda);
+  if(est==='pagado'&&(pagoUSD||pagoCRC)){
+    const montoEnGMoneda=gMoneda==='CRC'?((pagoCRC||0)+(pagoUSD||0)*tcRate):((pagoUSD||0)+(pagoCRC||0)/tcRate);
     const nuevoPrecioPorExtension=g.precio_dia?g.precio_dia*n:0;
     if(nuevoPrecioPorExtension>0&&montoEnGMoneda<nuevoPrecioPorExtension-pagoTolerance(gMoneda)) estadoFinal='debe_saldo';
   }
   try{
     setSyncStatus('syncing');
     await setDoc(doc(db,'huespedes',fbId),{checkout_ms:nuevoMs,dias:nuevosDias,total:nuevoTotal,estado:estadoFinal},{merge:true});
-    if(pagoMonto){
+    if(pagoUSD||pagoCRC){
       const mov={fecha:getTodayStr(),turno:currentTurno,tipo:'Ingreso',categoria:'Alojamiento',
-        detalle:`Extensión #${g.id} ${cap(g.name)} +${n}n`,
-        recepcionista:voluntarioActivo,timestamp:Date.now(),tc_rate:tcRate,guestFbId:fbId};
-      if(pagoMoneda==='USD') mov.usd_ing=pagoMonto; else mov.crc_ing=pagoMonto;
+        detalle:`Extensión #${g.id} ${cap(g.name)} +${n}n`,metodoPago:'Efectivo',
+        recepcionista:voluntarioActivo,timestamp:Date.now(),tc_rate:tcRate,guestFbId:fbId,
+        ...(billUSD?{billete_usd:billUSD}:{}),
+        ...(billCRC?{billete_crc:billCRC}:{}),
+        ...(vuUSD?{vuelto_usd:vuUSD}:{}),
+        ...(vuCRC?{vuelto_crc:vuCRC}:{})};
+      if(pagoUSD) mov.usd_ing=pagoUSD;
+      if(pagoCRC) mov.crc_ing=pagoCRC;
       await addDoc(collection(db,'movimientos'),mov);
     }
     await logAudit('EDICION',`#${g.id} extensión +${n}n`,msToDDMMYYYY(g.checkout_ms||0),`→ ${msToDDMMYYYY(nuevoMs)} · ${estadoFinal}`);
@@ -2582,17 +3734,47 @@ window.openNewGuestModal=function(){
     <!-- PAGO SECTION — aparece cuando estado = pagado -->
     <div id="ni-pago-section" style="display:none;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:14px;margin-bottom:14px">
       <p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--green);font-weight:700;margin-bottom:10px">💵 Cobro registrado en Caja</p>
-      <div class="form-grid">
-        <div class="form-group"><label class="form-label">Monto cobrado <span style="color:var(--red)">*</span></label>
-          <input class="form-input" id="ni-pago-monto" type="number" step="0.01" placeholder="0.00" 
-          oninput="this.dataset.manuallySet='1';calcCheckinPago();calcNiPagoTC()"></div>
-        <div class="form-group"><label class="form-label">Moneda cobro</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end">
+        <div class="form-group" style="margin:0"><label class="form-label">USD $ <span style="color:var(--red)">*</span></label>
+          <input class="form-input" id="ni-pago-monto" type="number" step="0.01" placeholder="0.00"
+            oninput="calcCheckinPago();calcNiPagoTC()"></div>
+        <div class="form-group" style="margin:0"><label class="form-label">CRC ₡ <span style="font-size:10px;color:var(--muted)">(opcional)</span></label>
+          <input class="form-input" id="ni-pago-crc2" type="number" step="1" placeholder="0"
+            oninput="calcCheckinPago();calcNiPagoTC()"></div>
+        <div class="form-group" style="margin:0"><label class="form-label">Moneda base</label>
           <select class="form-select" id="ni-pago-moneda" onchange="calcCheckinPago();calcNiPagoTC()">
             <option value="USD">USD $</option><option value="CRC">CRC ₡</option>
           </select></div>
       </div>
-      <div id="ni-pago-tc-hint" style="font-size:11px;color:var(--muted);margin-top:2px;min-height:14px"></div>
+      <div id="ni-pago-tc-hint" style="font-size:11px;color:var(--muted);margin-top:4px;min-height:14px"></div>
       <div id="ni-pago-diff" style="font-size:12px;min-height:18px;margin-top:4px"></div>
+      <!-- Saldo a favor — aparece solo cuando recibido > monto -->
+      <div id="ni-saldo-favor-row" style="display:none;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;background:rgba(251,191,36,.08);border-radius:8px;border:1px solid rgba(251,191,36,.2)">
+        <input type="checkbox" id="ni-saldo-favor-chk" style="accent-color:var(--yellow);width:16px;height:16px">
+        <label for="ni-saldo-favor-chk" style="font-size:12px;color:var(--yellow);cursor:pointer;font-weight:700">💛 El excedente queda como saldo a favor del huésped</label>
+      </div>
+
+      <!-- CALCULADORA BILLETE / VUELTO -->
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;margin-top:12px">
+        <div style="font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🧮 Billete recibido / Vuelto</div>
+        <div style="display:grid;gap:8px">
+          <div>
+            <label class="form-label" style="color:var(--accent);font-size:11px">💵 Recibí (USD + CRC)</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+              <input class="form-input" id="ni-bill-usd" type="number" step="0.01" placeholder="USD $" oninput="calcCheckinVuelto()">
+              <input class="form-input" id="ni-bill-crc" type="number" step="1" placeholder="CRC ₡" oninput="calcCheckinVuelto()">
+            </div>
+          </div>
+          <div>
+            <label class="form-label" style="color:#fb923c;font-size:11px">↩ Vuelto dado (USD + CRC)</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+              <input class="form-input" id="ni-vu-usd" type="number" step="0.01" placeholder="USD $" oninput="calcCheckinVuelto()">
+              <input class="form-input" id="ni-vu-crc" type="number" step="1" placeholder="CRC ₡" oninput="calcCheckinVuelto()">
+            </div>
+          </div>
+        </div>
+        <div id="ni-vuelto-result" style="margin-top:8px"></div>
+      </div>
     </div>
     <!-- LLAVE SECTION -->
     <div id="ni-llave-section" style="display:none;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:14px;margin-bottom:14px">
@@ -2676,32 +3858,93 @@ function esSaldado(pagado, total, moneda){
 window.calcCheckinPago=function(){
   const precio=parseFloat(document.getElementById('ni-precio')?.value)||0;
   const dias=parseInt(document.getElementById('ni-dias')?.value)||0;
-  const monto=parseFloat(document.getElementById('ni-pago-monto')?.value)||0;
-  const monedaPago=document.getElementById('ni-pago-moneda')?.value||'USD';
-  const monedaReserva=document.getElementById('ni-moneda')?.value||'USD';
+  const montoUSD=parseFloat(document.getElementById('ni-pago-monto')?.value)||0;
+  const montoCRC=parseFloat(document.getElementById('ni-pago-crc2')?.value)||0;
+  const monedaBase=document.getElementById('ni-pago-moneda')?.value||'USD';
   const diff=document.getElementById('ni-pago-diff');if(!diff)return;
-  if(!precio||!monto){diff.textContent='';return;}
-  const esperado=precio*dias; // in monedaReserva
-  // Convert payment to reservation currency for comparison
-  const montoEnMonedaReserva=toGuestCurrency(monto,monedaPago,monedaReserva);
-  const delta=montoEnMonedaReserva-esperado;
-  const sym=monedaReserva==='CRC'?'₡':'$';
-  const fmt=v=>monedaReserva==='CRC'?Math.round(Math.abs(v)).toLocaleString('es-CR'):Math.abs(v).toFixed(2);
-  const crossNote=monedaPago!==monedaReserva?` <span style="font-size:10px;color:var(--muted)">(convertido al TC ₡${tcRate.toLocaleString('es-CR',{maximumFractionDigits:0})})</span>`:'';
-  const tolCI=pagoTolerance(monedaReserva);
-  if(Math.abs(delta)<=tolCI){diff.innerHTML=`<span style="color:var(--green)">✓ Monto exacto</span>${crossNote}`;}
-  else if(delta>0){diff.innerHTML=`<span style="color:var(--yellow)">↑ ${sym}${fmt(delta)} de más (vuelto/anticipo)</span>${crossNote}`;}
-  else{diff.innerHTML=`<span style="color:var(--red)">↓ Falta ${sym}${fmt(Math.abs(delta))} para completar total</span>${crossNote}`;}
+  if(!precio){diff.innerHTML='';return;}
+  const esperado=precio*dias; // in monedaBase
+  // Convert both payments to monedaBase
+  const pagoEnBase=monedaBase==='CRC'
+    ?(montoCRC+(montoUSD*tcRate))
+    :(montoUSD+(montoCRC/tcRate));
+  const delta=pagoEnBase-esperado;
+  const sym=monedaBase==='CRC'?'₡':'$';
+  const fmt=v=>monedaBase==='CRC'?Math.round(Math.abs(v)).toLocaleString('es-CR'):Math.abs(v).toFixed(2);
+  const tol=pagoTolerance(monedaBase);
+  const mixNote=montoUSD&&montoCRC?` <span style="font-size:10px;color:var(--muted)">(mixto · TC ₡${Math.round(tcRate).toLocaleString('es-CR')})</span>`:'';
+  const saldoChk=document.getElementById('ni-saldo-favor-chk');
+  const saldoRow=document.getElementById('ni-saldo-favor-row');
+  if(!montoUSD&&!montoCRC){diff.innerHTML='';return;}
+  if(Math.abs(delta)<=tol){
+    diff.innerHTML=`<span style="color:var(--green)">✓ Monto exacto</span>${mixNote}`;
+    if(saldoRow) saldoRow.style.display='none';
+  } else if(delta>0){
+    diff.innerHTML=`<span style="color:var(--yellow)">↑ ${sym}${fmt(delta)} de más${mixNote?'':''}</span>${mixNote}`;
+    if(saldoRow) saldoRow.style.display='flex'; // show saldo a favor option
+  } else {
+    diff.innerHTML=`<span style="color:var(--red)">↓ Falta ${sym}${fmt(Math.abs(delta))}</span>${mixNote}`;
+    if(saldoRow) saldoRow.style.display='none';
+  }
+  calcCheckinVuelto();
 };
 
 window.calcNiPagoTC=function(){
   const monto=parseFloat(document.getElementById('ni-pago-monto')?.value)||0;
+  const montoCRC=parseFloat(document.getElementById('ni-pago-crc2')?.value)||0;
   const moneda=document.getElementById('ni-pago-moneda')?.value||'USD';
   const hint=document.getElementById('ni-pago-tc-hint');
   if(!hint) return;
-  if(!monto){hint.textContent='';return;}
-  if(moneda==='CRC') hint.textContent=`≈ $${(monto/tcRate).toFixed(2)} USD · TC ₡${tcRate.toLocaleString('es-CR',{maximumFractionDigits:0})}`;
-  else hint.textContent=`≈ ₡${Math.round(monto*tcRate).toLocaleString('es-CR')} CRC · TC ₡${tcRate.toLocaleString('es-CR',{maximumFractionDigits:0})}`;
+  if(monto&&montoCRC) hint.innerHTML=`<span style="color:var(--muted)">Total ≈ ${moneda==='CRC'?'₡'+Math.round(montoCRC+monto*tcRate).toLocaleString('es-CR'):'$'+(monto+montoCRC/tcRate).toFixed(2)} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}</span>`;
+  else if(monto) hint.textContent=`≈ ₡${Math.round(monto*tcRate).toLocaleString('es-CR')} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}`;
+  else if(montoCRC) hint.textContent=`≈ $${(montoCRC/tcRate).toFixed(2)} · TC ₡${Math.round(tcRate).toLocaleString('es-CR')}`;
+  else hint.textContent='';
+};
+
+window.calcCheckinVuelto=function(){
+  const monto=parseFloat(document.getElementById('ni-pago-monto')?.value)||0;
+  const monedaPago=document.getElementById('ni-pago-moneda')?.value||'USD';
+  const billUSD=parseFloat(document.getElementById('ni-bill-usd')?.value)||0;
+  const billCRC=parseFloat(document.getElementById('ni-bill-crc')?.value)||0;
+  const vuUSD=parseFloat(document.getElementById('ni-vu-usd')?.value)||0;
+  const vuCRC=parseFloat(document.getElementById('ni-vu-crc')?.value)||0;
+  const res=document.getElementById('ni-vuelto-result');
+  if(!res) return;
+
+  const fU=v=>'$'+Math.abs(v).toFixed(2);
+  const fC=v=>'₡'+Math.round(Math.abs(v)).toLocaleString('es-CR');
+
+  const montoUSD=monedaPago==='CRC'?monto/tcRate:monto;
+  if(!montoUSD){res.innerHTML='';return;}
+  if(!billUSD&&!billCRC){
+    res.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-top:2px">← Ingresá el billete para calcular vuelto</div>`;
+    return;
+  }
+
+  const reciboUSD=billUSD+(billCRC/tcRate);
+  const vueltoUSD=vuUSD+(vuCRC/tcRate);
+  const netoUSD=reciboUSD-vueltoUSD;
+  const diffUSD=netoUSD-montoUSD;
+  const vueltoIdeal=reciboUSD-montoUSD;
+  const tol=0.10;
+
+  let status='';
+  if(vuUSD||vuCRC){
+    if(Math.abs(diffUSD)<=tol) status=`<span style="color:var(--green);font-weight:700">✓ Cuadra exacto</span>`;
+    else if(diffUSD>tol) status=`<span style="color:#fb923c;font-weight:700">⚠ Sobra devolver ${fU(diffUSD)} (${fC(diffUSD*tcRate)})</span>`;
+    else status=`<span style="color:var(--red);font-weight:700">✗ Falta devolver ${fU(-diffUSD)} (${fC(-diffUSD*tcRate)})</span>`;
+  } else if(vueltoIdeal>tol){
+    status=`<span style="color:#fb923c">→ Devolver ${fU(vueltoIdeal)} (${fC(vueltoIdeal*tcRate)})</span>`;
+  } else if(vueltoIdeal<-tol){
+    status=`<span style="color:var(--red)">✗ Billete insuficiente — faltan ${fU(-vueltoIdeal)}</span>`;
+  } else {
+    status=`<span style="color:var(--green);font-weight:700">✓ Sin vuelto</span>`;
+  }
+
+  res.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-top:2px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
+    <span>Recibido: <strong>${fU(reciboUSD)}</strong> · A cobrar: <strong>${fU(montoUSD)}</strong></span>
+    ${status}
+  </div>`;
 };
 
 window.toggleIndefinido=function(){
@@ -2752,7 +3995,7 @@ window.calcCheckin=function(){
   if(ind){ if(preview) preview.textContent='Estadía indefinida · precio/noche referencial'; return; }
   const total=precio*dias;
   if(preview) preview.textContent=total>0?`Total estimado: ${moneda==='USD'?'$':'₡'}${moneda==='USD'?total.toFixed(2):Math.round(total).toLocaleString('es-CR')}`:'';
-  // Sync pago monto if pagado section is visible and monto hasn't been manually changed
+  // Sync pago monto if not manually changed
   const pagoMonto=document.getElementById('ni-pago-monto');
   if(pagoMonto&&!pagoMonto.dataset.manuallySet&&total>0) pagoMonto.value=moneda==='USD'?total.toFixed(2):Math.round(total);
   calcCheckinPago();
@@ -2832,7 +4075,20 @@ window.saveNewGuest=async function(nextId){
   if(!indefinido&&!dias){showNotif('⚠️ Indicá el número de noches, o marcá Indefinido',true);return;}
   if(estado==='pagado'){
     const pm=parseFloat(document.getElementById('ni-pago-monto')?.value)||0;
-    if(!pm){showNotif('⚠️ Si ya Pagó, ingresá el monto cobrado',true);return;}
+    const pc=parseFloat(document.getElementById('ni-pago-crc2')?.value)||0;
+    if(!pm&&!pc){showNotif('⚠️ Si ya Pagó, ingresá el monto cobrado',true);return;}
+    // If recibido > monto, require saldo a favor checkbox
+    const monedaBase=document.getElementById('ni-pago-moneda')?.value||'USD';
+    const total2=parseFloat(document.getElementById('ni-precio')?.value)||0;
+    const dias2=parseInt(document.getElementById('ni-dias')?.value)||0;
+    const esperado2=total2*dias2;
+    const pagoBase=monedaBase==='CRC'?(pc+(pm*tcRate)):(pm+(pc/tcRate));
+    const tol2=pagoTolerance(monedaBase);
+    if(pagoBase>esperado2+tol2&&!document.getElementById('ni-saldo-favor-chk')?.checked){
+      showNotif('⚠️ El monto recibido supera el total. Tildá "saldo a favor" si corresponde.',true);
+      document.getElementById('ni-saldo-favor-row').style.display='flex';
+      return;
+    }
   }
   // Validar depósito de llave (si sección visible)
   const llaveSec=document.getElementById('ni-llave-section');
@@ -2852,19 +4108,26 @@ window.saveNewGuest=async function(nextId){
   const guest={id:nextId,name,hab,fecha:fechaStr,checkin_ms,checkout_ms,precio_dia:precio,dias,total,moneda,activo:true,estado:estadoFinal,indefinido,...(pais?{pais}:{})};
 
   const pagoMonto=estado==='pagado'?(parseFloat(document.getElementById('ni-pago-monto')?.value)||null):null;
+  const pagoCRC2=estado==='pagado'?(parseFloat(document.getElementById('ni-pago-crc2')?.value)||null):null;
   const pagoMoneda=estado==='pagado'?(document.getElementById('ni-pago-moneda')?.value||moneda):moneda;
+  const saldoAFavor=estado==='pagado'&&document.getElementById('ni-saldo-favor-chk')?.checked;
+  const billUSD=estado==='pagado'?(parseFloat(document.getElementById('ni-bill-usd')?.value)||null):null;
+  const billCRC=estado==='pagado'?(parseFloat(document.getElementById('ni-bill-crc')?.value)||null):null;
+  const vuUSD=estado==='pagado'?(parseFloat(document.getElementById('ni-vu-usd')?.value)||null):null;
+  const vuCRC=estado==='pagado'?(parseFloat(document.getElementById('ni-vu-crc')?.value)||null):null;
   const depMonto=estado!=='reserva'?(parseFloat(document.getElementById('ni-dep-monto')?.value)||null):null;
   const depMoneda=estado!=='reserva'?(document.getElementById('ni-dep-moneda')?.value||'USD'):'USD';
   const depNoCobro=estado!=='reserva'&&(document.getElementById('ni-dep-nocobro')?.checked||false);
 
-  // TC-aware: determine real estado based on payment vs total
+  // TC-aware estado
   let estadoReal=estadoFinal;
-  if(estado==='pagado'&&pagoMonto){
-    const montoEnMoneda=toGuestCurrency(pagoMonto,pagoMoneda,moneda);
-    if(esSaldado(montoEnMoneda,total,moneda)) estadoReal='pagado';
+  if(estado==='pagado'&&(pagoMonto||pagoCRC2)){
+    const montoEnMoneda=pagoMoneda==='CRC'
+      ?((pagoCRC2||0)+(pagoMonto||0)*tcRate)
+      :((pagoMonto||0)+(pagoCRC2||0)/tcRate);
+    if(saldoAFavor||esSaldado(montoEnMoneda,total,pagoMoneda)) estadoReal='pagado';
     else if(montoEnMoneda>0) estadoReal='debe_saldo';
     else estadoReal='pago_pendiente';
-    // Update guest object with real estado
     guest.estado=estadoReal;
   }
 
@@ -2874,13 +4137,20 @@ window.saveNewGuest=async function(nextId){
     const guestFbId=guestRef.id;
     await logAudit('NUEVO',`#${nextId} ${name} · ${hab}`,'',`check-in ${fechaStr} · ${estado}${indefinido?' · INDEFINIDO':''}`);
 
-    if(estado==='pagado'&&pagoMonto){
+    if(estado==='pagado'&&(pagoMonto||pagoCRC2)){
       const movData={fecha:today,turno:currentTurno,tipo:'Ingreso',categoria:'Alojamiento',
         detalle:`#${nextId} ${name} · ${hab}${dias?` · ${dias}n`:''}`,
-        recepcionista:voluntarioActivo,timestamp:Date.now(),tc_rate:tcRate,guestFbId};
-      if(pagoMoneda==='USD') movData.usd_ing=pagoMonto; else movData.crc_ing=pagoMonto;
+        metodoPago:'Efectivo',recepcionista:voluntarioActivo,timestamp:Date.now(),tc_rate:tcRate,guestFbId,
+        ...(billUSD?{billete_usd:billUSD}:{}),
+        ...(billCRC?{billete_crc:billCRC}:{}),
+        ...(vuUSD?{vuelto_usd:vuUSD}:{}),
+        ...(vuCRC?{vuelto_crc:vuCRC}:{}),
+        ...(saldoAFavor?{saldo_a_favor:true}:{})};
+      if(pagoMonto) movData.usd_ing=pagoMonto;
+      if(pagoCRC2) movData.crc_ing=pagoCRC2;
       await addDoc(collection(db,'movimientos'),movData);
-      await logAudit('CAJA',`Alojamiento #${nextId} ${name}`,'',`${pagoMoneda==='USD'?'$':'₡'}${pagoMonto}`);
+      const logMonto=`${pagoMonto?'$'+pagoMonto.toFixed(2):''}${pagoMonto&&pagoCRC2?' + ':''}${pagoCRC2?'₡'+Math.round(pagoCRC2).toLocaleString('es-CR'):''}${saldoAFavor?' · saldo a favor':''}`;
+      await logAudit('CAJA',`Alojamiento #${nextId} ${name}`,'',logMonto);
     }
     if(depNoCobro){
       await addDoc(collection(db,'depositos'),{fecha:today,monto:0,moneda:depMoneda,
@@ -2955,24 +4225,16 @@ function renderCheckoutsHoy(){
   }
 
   if(list) list.innerHTML=checkoutsHoy.map(g=>`
-    <div style="background:var(--surface);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-      <div style="flex:1;min-width:180px">
-        <div style="font-weight:700;font-size:15px">#${g.id} · ${cap(g.name)}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:2px">${cap(g.hab)} · check-in ${g.fecha} · ${g.dias||'?'} noches</div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:9px 14px;background:var(--surface);border:1px solid rgba(251,191,36,.2);border-radius:9px;margin-bottom:7px">
+      <div style="min-width:180px">
+        <strong style="font-size:13px">#${g.id} · ${cap(g.name)}</strong>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">${normHab(g.hab)} · ${g.dias||'?'}n · ${g.moneda==='CRC'?'₡':'$'}${g.precio_dia||'?'}/n</div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="checkoutRapido('${g.fbId}','out')"
-          style="background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
-          ✓ Se fue (Check-out)
-        </button>
-        <button onclick="checkoutRapido('${g.fbId}','pagado')"
-          style="background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.3);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
-          🟢 Se queda · Pagado
-        </button>
-        <button onclick="checkoutRapidoExtender('${g.fbId}')"
-          style="background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.3);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
-          🟡 Se queda · Extender estadía
-        </button>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <button onclick="abrirCheckoutModal('${g.fbId}')" style="background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:5px 12px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🚪 Se fue</button>
+        <button onclick="abrirExtenderEstadia('${g.fbId}')" style="background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.28);padding:5px 12px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">📅 Se queda</button>
+        <button onclick="abrirCambiarHabitacion('${g.fbId}')" style="background:rgba(96,165,250,.08);color:#60a5fa;border:1px solid rgba(96,165,250,.22);padding:5px 12px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🔄 Hab.</button>
+        <button onclick="openGuestModal('${g.fbId}')" style="background:none;border:1px solid var(--border);color:var(--muted);padding:5px 9px;border-radius:7px;font-size:11px;cursor:pointer">ver</button>
       </div>
     </div>`).join('');
 }
@@ -2980,31 +4242,82 @@ function renderCheckoutsHoy(){
 // ── RESERVAS HOY & FUTURAS ────────────────────────────────
 function renderReservasHoy(){
   const hoyMs=toLocalMidnight(Date.now());
+  // Hoy
   const reservasHoy=guestData.filter(g=>g.estado==='reserva'&&toLocalMidnight(g.checkin_ms||0)===hoyMs);
+  // Vencidas: checkin esperado fue ANTES de hoy, siguen en estado reserva
+  const reservasVencidas=guestData.filter(g=>g.estado==='reserva'&&toLocalMidnight(g.checkin_ms||0)<hoyMs)
+    .sort((a,b)=>(b.checkin_ms||0)-(a.checkin_ms||0)); // más recientes primero
+
   const section=document.getElementById('checkin-hoy-section');
   const list=document.getElementById('checkin-hoy-list');
-  if(!section||!list) return;
-  if(!reservasHoy.length){section.style.display='none';renderReservasFuturas();return;}
-  section.style.display='';
-  list.innerHTML=reservasHoy.map(g=>{
-    const sym=g.moneda==='CRC'?'₡':'$';
-    const total=g.total?`${sym}${g.moneda==='CRC'?Math.round(g.total).toLocaleString('es-CR'):g.total.toFixed(2)}`:'—';
-    return`<div class="form-section" style="margin-bottom:12px;border-left:3px solid #a78bfa;cursor:pointer" onclick="openGuestModal('${g.fbId}')">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
-        <div>
-          <div style="font-weight:700;font-size:15px">#${g.id} · ${cap(g.name)}${g.pais?` <span style="font-size:11px;color:var(--muted);font-weight:400">${paisConBandera(g.pais)}</span>`:''}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">${normHab(g.hab)} · ${g.dias||'?'} noches · ${sym}${g.precio_dia||'?'}/n · Total: ${total}</div>
+  const secVenc=document.getElementById('checkin-vencidas-section');
+  const listVenc=document.getElementById('checkin-vencidas-list');
+
+  // Render hoy
+  if(!section||!list){renderReservasFuturas();return;}
+  if(!reservasHoy.length){section.style.display='none';}
+  else{
+    section.style.display='';
+    list.innerHTML=reservasHoy.map(g=>{
+      const sym=g.moneda==='CRC'?'₡':'$';
+      const total=g.total?`${sym}${g.moneda==='CRC'?Math.round(g.total).toLocaleString('es-CR'):g.total.toFixed(2)}`:'—';
+      const noShowStyle=`background:var(--surface2);color:var(--muted);border:1px solid var(--border);cursor:not-allowed;opacity:.45`;
+      return`<div class="form-section" style="margin-bottom:10px;border-left:3px solid #a78bfa;cursor:pointer" onclick="openGuestModal('${g.fbId}')">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-weight:700;font-size:14px">#${g.id} · ${cap(g.name)}${g.pais?` <span style="font-size:11px;color:var(--muted);font-weight:400">${paisConBandera(g.pais)}</span>`:''}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">${normHab(g.hab)} · ${g.dias||'?'}n · ${sym}${g.precio_dia||'?'}/n · Total: ${total}</div>
+          </div>
+          <span style="background:rgba(167,139,250,.15);color:#a78bfa;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">HOY</span>
         </div>
-        <span style="background:rgba(167,139,250,.15);color:#a78bfa;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">RESERVA HOY</span>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px" onclick="event.stopPropagation()">
-        <button onclick="accionReservaHoy('${g.fbId}','noshow')" style="background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.35);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">👻 No show</button>
-        <button onclick="accionReservaHoy('${g.fbId}','cancelo')" style="background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">✕ Canceló</button>
-        <button onclick="accionReservaHoy('${g.fbId}','cobrar')" style="background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.3);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">🟡 Llegó</button>
-        <button onclick="accionReservaHoy('${g.fbId}','pago')" style="background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.3);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">💵 Registrar pago</button>
-      </div>
-    </div>`;
-  }).join('');
+        <div style="display:flex;flex-wrap:wrap;gap:7px" onclick="event.stopPropagation()">
+          <button style="${noShowStyle};padding:6px 13px;border-radius:7px;font-size:12px;font-weight:700"
+            title="Solo disponible desde mañana">👻 No show 🔒</button>
+          <button onclick="accionReservaHoy('${g.fbId}','cancelo')"
+            style="background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:6px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">
+            ✕ Canceló</button>
+          <button onclick="abrirLlegada('${g.fbId}')"
+            style="background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.35);padding:6px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">
+            ✓ Registrar llegada</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Render vencidas
+  if(!secVenc||!listVenc){renderReservasFuturas();return;}
+  if(!reservasVencidas.length){secVenc.style.display='none';}
+  else{
+    secVenc.style.display='';
+    listVenc.innerHTML=reservasVencidas.map(g=>{
+      const sym=g.moneda==='CRC'?'₡':'$';
+      const total=g.total?`${sym}${g.moneda==='CRC'?Math.round(g.total).toLocaleString('es-CR'):g.total.toFixed(2)}`:'—';
+      const diasAtras=Math.round((hoyMs-toLocalMidnight(g.checkin_ms||0))/86400000);
+      return`<div class="form-section" style="margin-bottom:10px;border-left:3px solid rgba(248,113,113,.7);cursor:pointer" onclick="openGuestModal('${g.fbId}')">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-weight:700;font-size:14px">#${g.id} · ${cap(g.name)}${g.pais?` <span style="font-size:11px;color:var(--muted);font-weight:400">${paisConBandera(g.pais)}</span>`:''}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">${normHab(g.hab)} · ${g.dias||'?'}n · ${sym}${g.precio_dia||'?'}/n · Total: ${total}</div>
+          </div>
+          <span style="background:rgba(248,113,113,.12);color:var(--red);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">
+            Esperado hace ${diasAtras} día${diasAtras!==1?'s':''}
+          </span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px" onclick="event.stopPropagation()">
+          <button onclick="accionReservaHoy('${g.fbId}','noshow')"
+            style="background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.35);padding:6px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">
+            👻 No show</button>
+          <button onclick="accionReservaHoy('${g.fbId}','cancelo')"
+            style="background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:6px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">
+            ✕ Canceló</button>
+          <button onclick="abrirLlegada('${g.fbId}')"
+            style="background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.35);padding:6px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">
+            ✓ Registrar llegada</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
   renderReservasFuturas();
 }
 
@@ -3271,11 +4584,64 @@ window.confirmarLlego=async function(fbId, depAccion){
   }catch(e){setSyncStatus('error');showNotif('Error: '+e.message,true);}
 };
 
+window.abrirLlegada=function(fbId){
+  const g=guestData.find(x=>x.fbId===fbId);
+  if(!g){showNotif('⚠️ Huésped no encontrado',true);return;}
+  abrirModalPagoReserva(g);
+};
+
 window.abrirModalPagoReserva=function(g){
+  if(!g) return;
   const sym=g.moneda==='CRC'?'₡':'$';
   const totalEstimado=g.total||(g.precio_dia&&g.dias?g.precio_dia*g.dias:null);
   const fmtTotal=totalEstimado?(g.moneda==='CRC'?Math.round(totalEstimado).toLocaleString('es-CR'):totalEstimado.toFixed(2)):null;
-  document.getElementById('modal-title').textContent=`🚪 Check-in · #${g.id} ${cap(g.name)}`;
+  document.getElementById('modal-title').textContent=`✓ Registrar llegada · #${g.id} ${cap(g.name)}`;
+  document.getElementById('modal-body').innerHTML=`
+    <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px">
+      ${normHab(g.hab)} · ${g.dias||'?'} noches · ${sym}${g.precio_dia||'?'}/n
+      ${fmtTotal?`<br><strong style="color:var(--accent)">Total: ${sym}${fmtTotal}</strong>
+      ${g.moneda==='CRC'
+        ?`<span style="font-size:11px;color:var(--muted);margin-left:6px">≈ $${(totalEstimado/tcRate).toFixed(2)} USD</span>`
+        :`<span style="font-size:11px;color:var(--muted);margin-left:6px">≈ ₡${Math.round(totalEstimado*tcRate).toLocaleString('es-CR')} CRC</span>`}
+      <span style="font-size:10px;color:var(--muted);margin-left:4px">· TC ₡${tcRate.toLocaleString('es-CR',{maximumFractionDigits:0})}</span>`:''}
+    </div>
+    <!-- PAGO -->
+    <div style="background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:12px;margin-bottom:12px">
+      <p style="font-size:11px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">💵 Cobro de alojamiento</p>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Monto cobrado</label>
+          <input class="form-input" id="res-pago-monto" type="number" step="0.01" 
+            value="${fmtTotal||(g.moneda==='CRC'?Math.round(totalEstimado||0):Number(totalEstimado||0).toFixed(2))}"
+            placeholder="0.00" oninput="calcResPagoDiff('${g.fbId}')"></div>
+        <div class="form-group"><label class="form-label">Moneda</label>
+          <select class="form-select" id="res-pago-moneda">
+            <option value="${g.moneda||'USD'}" selected>${g.moneda||'USD'}</option>
+            ${(g.moneda||'USD')==='USD'?'<option value="CRC">CRC ₡</option>':'<option value="USD">USD $</option>'}
+          </select></div>
+      </div>
+      <div id="res-pago-diff" style="font-size:12px;min-height:16px;margin-top:4px"></div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-top:10px;padding:8px 10px;background:rgba(251,191,36,.08);border-radius:7px;border:1px solid rgba(251,191,36,.2)">
+        <input type="checkbox" id="res-no-pago" style="accent-color:var(--yellow)" onchange="toggleResNoPago()">
+        <span style="color:var(--yellow);font-weight:700">🟡 Llegó pero paga después — cobrar luego</span>
+      </label>
+    </div>
+    <!-- LLAVE -->
+    <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:12px;margin-bottom:16px">
+      <p style="font-size:11px;color:var(--yellow);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🔑 Depósito de llave <span style="color:var(--red);font-size:10px">(requerido)</span></p>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Monto depósito</label>
+          <input class="form-input" id="res-dep-monto" type="number" step="0.01" placeholder="5.00"></div>
+        <div class="form-group"><label class="form-label">Moneda</label>
+          <select class="form-select" id="res-dep-moneda">
+            <option value="USD">USD $</option><option value="CRC">CRC ₡</option>
+          </select></div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:8px;cursor:pointer">
+        <input type="checkbox" id="res-dep-nocobro" style="accent-color:var(--yellow)">
+        <span id="res-dep-label">Cobrar depósito después / no se cobró</span>
+      </label>
+    </div>
+    <button class="btn-primary" style="width:100%" onclick="confirmarLlegada('${g.fbId}')">✓ Confirmar llegada</button>`;
   document.getElementById('modal-body').innerHTML=`
     <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px">
       ${normHab(g.hab)} · ${g.dias||'?'} noches · ${sym}${g.precio_dia||'?'}/n
@@ -3517,7 +4883,7 @@ function buildOccupancy(){
 window.gantt2Prev=function(){gantt2StartDate=addDays(gantt2StartDate,-7);renderGantt2();};
 window.gantt2Next=function(){gantt2StartDate=addDays(gantt2StartDate,7);renderGantt2();};
 window.gantt2GoToday=function(){
-  gantt2StartDate=getTodayStr();
+  gantt2StartDate=addDays(getTodayStr(),-1);
   renderGantt2();
 };
 
@@ -3687,22 +5053,40 @@ window.filterCaja=function(f,btn){cajaFilter=f;document.querySelectorAll('#caja-
 function renderCaja(){
   const day=cajaData.filter(m=>m.fecha===cajaViewDate);
   const data=cajaFilter==='TODOS'?day:day.filter(m=>m.turno===cajaFilter);
+
   document.getElementById('caja-table').innerHTML=data.length
-    ?data.map(m=>`<tr>
-      <td><span class="badge ${m.turno==='MAÑANA'?'badge-yellow':'badge-blue'}">${m.turno}</span></td>
-      <td>${m.recepcionista||'—'}</td>
-      <td><span class="cat-badge ${CAT_COLORS[m.categoria]||'badge-gray'}">${m.categoria||'—'}</span></td>
-      <td>${m.detalle}</td>
-      <td><span class="badge ${m.tipo==='Ingreso'?'badge-green':'badge-red'}">${m.tipo}</span></td>
-      <td class="${m.usd_ing?'amount-usd':m.usd_eg?'amount-neg':''}">${m.usd_ing?'+$'+m.usd_ing.toFixed(2):m.usd_eg?'-$'+m.usd_eg.toFixed(2):'—'}</td>
-      <td class="${m.crc_ing?'amount-crc':m.crc_eg?'amount-neg':''}">${m.crc_ing?'+₡'+m.crc_ing.toLocaleString('es-CR'):m.crc_eg?'-₡'+m.crc_eg.toLocaleString('es-CR'):'—'}</td>
-      <td><button onclick="delMov('${m.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px" title="Eliminar">×</button></td>
-      </tr>`).join('')
+    ?data.map(m=>{
+      const hasBillete=m.billete_usd||m.billete_crc;
+      const hasVuelto=m.vuelto_usd||m.vuelto_crc;
+      const esEfectivo=m.metodoPago==='Efectivo'||!m.metodoPago;
+      let billeteInfo='';
+      if(esEfectivo&&(hasBillete||hasVuelto)){
+        const partes=[];
+        if(m.billete_usd) partes.push(`<span style="color:var(--green)">+$${m.billete_usd.toFixed(2)}</span>`);
+        if(m.billete_crc) partes.push(`<span style="color:var(--green)">+₡${Math.round(m.billete_crc).toLocaleString('es-CR')}</span>`);
+        if(m.vuelto_usd) partes.push(`<span style="color:var(--red)">-$${m.vuelto_usd.toFixed(2)}</span>`);
+        if(m.vuelto_crc) partes.push(`<span style="color:var(--red)">-₡${Math.round(m.vuelto_crc).toLocaleString('es-CR')}</span>`);
+        billeteInfo=`<div style="font-size:10px;color:var(--muted);margin-top:2px">💵 ${partes.join(' · ')}</div>`;
+      }
+      return`<tr>
+        <td><span class="badge ${m.turno==='MAÑANA'?'badge-yellow':'badge-blue'}">${m.turno}</span></td>
+        <td>${m.recepcionista||'—'}</td>
+        <td><span class="cat-badge ${CAT_COLORS[m.categoria]||'badge-gray'}">${m.categoria||'—'}</span></td>
+        <td>${m.detalle}${billeteInfo}</td>
+        <td><span class="badge ${m.tipo==='Ingreso'?'badge-green':'badge-red'}">${m.tipo}</span></td>
+        <td class="${m.usd_ing?'amount-usd':m.usd_eg?'amount-neg':''}">${m.usd_ing?'+$'+m.usd_ing.toFixed(2):m.usd_eg?'-$'+m.usd_eg.toFixed(2):'—'}</td>
+        <td class="${m.crc_ing?'amount-crc':m.crc_eg?'amount-neg':''}">${m.crc_ing?'+₡'+Math.round(m.crc_ing).toLocaleString('es-CR'):m.crc_eg?'-₡'+Math.round(m.crc_eg).toLocaleString('es-CR'):'—'}</td>
+        <td><button onclick="delMov('${m.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px" title="Eliminar">×</button></td>
+      </tr>`;
+    }).join('')
     :'<tr><td colspan="8" class="empty">Sin movimientos para este día</td></tr>';
 
-  const uI=day.reduce((s,m)=>s+(m.usd_ing||0),0),uE=day.reduce((s,m)=>s+(m.usd_eg||0),0);
-  const cI=day.reduce((s,m)=>s+(m.crc_ing||0),0),cE=day.reduce((s,m)=>s+(m.crc_eg||0),0);
-  const nU=uI-uE,nC=cI-cE;
+  // ── Contable (monto del servicio) ──
+  const uI=day.reduce((s,m)=>s+(m.usd_ing||0),0);
+  const uE=day.reduce((s,m)=>s+(m.usd_eg||0),0);
+  const cI=day.reduce((s,m)=>s+(m.crc_ing||0),0);
+  const cE=day.reduce((s,m)=>s+(m.crc_eg||0),0);
+  const nU=uI-uE, nC=cI-cE;
   document.getElementById('total-usd-ing').textContent='$'+uI.toFixed(2);
   document.getElementById('total-usd-eg').textContent='$'+uE.toFixed(2);
   document.getElementById('total-usd-net').textContent=(nU>=0?'+':'')+nU.toFixed(2)+' USD';
@@ -3711,6 +5095,37 @@ function renderCaja(){
   document.getElementById('total-crc-eg').textContent='₡'+Math.round(cE).toLocaleString('es-CR');
   document.getElementById('total-crc-net').textContent=(nC>=0?'+':'')+Math.round(nC).toLocaleString('es-CR')+' CRC';
   document.getElementById('total-crc-net').style.color=nC>=0?'var(--green)':'var(--red)';
+
+  // ── Caja real: lo que físicamente entró y salió del cajón ──
+  // Efectivo ingreso: lo que entró = billete || usd_ing/crc_ing
+  // Efectivo egreso: lo que salió = vuelto + usd_eg/crc_eg
+  // No-efectivo (SINPE, Tarjeta): no mueve caja física
+  let rUI=0,rUO=0,rCI=0,rCO=0;
+  day.forEach(m=>{
+    const esEfectivo=m.metodoPago==='Efectivo'||!m.metodoPago;
+    if(!esEfectivo) return; // SINPE/tarjeta no mueve caja física
+    if(m.tipo==='Ingreso'){
+      // Entró: billete recibido (o el monto del servicio si no se registró billete)
+      rUI+=(m.billete_usd||m.usd_ing||0);
+      rCI+=(m.billete_crc||m.crc_ing||0);
+      // Salió: vuelto dado
+      rUO+=(m.vuelto_usd||0);
+      rCO+=(m.vuelto_crc||0);
+    } else {
+      // Egreso: salió de caja
+      rUO+=(m.usd_eg||0);
+      rCO+=(m.crc_eg||0);
+    }
+  });
+  const rnU=rUI-rUO, rnC=rCI-rCO;
+  document.getElementById('real-usd-in').textContent='$'+rUI.toFixed(2);
+  document.getElementById('real-usd-out').textContent='$'+rUO.toFixed(2);
+  document.getElementById('real-usd-net').textContent=(rnU>=0?'+':'')+rnU.toFixed(2)+' USD';
+  document.getElementById('real-usd-net').style.color=rnU>=0?'var(--green)':'var(--red)';
+  document.getElementById('real-crc-in').textContent='₡'+Math.round(rCI).toLocaleString('es-CR');
+  document.getElementById('real-crc-out').textContent='₡'+Math.round(rCO).toLocaleString('es-CR');
+  document.getElementById('real-crc-net').textContent=(rnC>=0?'+':'')+Math.round(rnC).toLocaleString('es-CR')+' CRC';
+  document.getElementById('real-crc-net').style.color=rnC>=0?'var(--green)':'var(--red)';
 }
 
 window.addMovimiento=async function(){
